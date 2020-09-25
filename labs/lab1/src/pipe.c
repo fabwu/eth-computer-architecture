@@ -9,12 +9,17 @@
 #include "pipe.h"
 #include "shell.h"
 #include "mips.h"
+#include "cache.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <assert.h>
 
-//#define DEBUG
+#define DEBUG
+
+#define INST_CACHE_TOTAL_SIZE 8*1024
+#define INST_CACHE_BLOCK_SIZE 32
+#define INST_CACHE_NUM_WAY 4
 
 /* debug */
 void print_op(Pipe_Op *op)
@@ -30,10 +35,23 @@ void print_op(Pipe_Op *op)
 /* global pipeline state */
 Pipe_State pipe;
 
+/* global instrucion cache state */
+Cache inst_cache;
+
 void pipe_init()
 {
     memset(&pipe, 0, sizeof(Pipe_State));
     pipe.PC = 0x00400000;
+
+    /* init instruction cache */
+    cache_init(&inst_cache, INST_CACHE_TOTAL_SIZE, INST_CACHE_BLOCK_SIZE,
+               INST_CACHE_NUM_WAY);
+
+#ifdef DEBUG
+    printf("instruction cache: %d bytes total %d bytes block %d ways %d sets\n\n",
+           INST_CACHE_TOTAL_SIZE, INST_CACHE_BLOCK_SIZE, inst_cache.num_ways,
+           inst_cache.num_sets);
+#endif
 }
 
 void pipe_cycle()
@@ -675,6 +693,9 @@ void pipe_stage_fetch()
     memset(op, 0, sizeof(Pipe_Op));
     op->reg_src1 = op->reg_src2 = op->reg_dst = -1;
 
+    if (cache_is_hit(&inst_cache, pipe.PC)) {
+       printf("HIIIIT\n"); 
+    }
     op->instruction = mem_read_32(pipe.PC);
     op->pc = pipe.PC;
     pipe.decode_op = op;
