@@ -6,10 +6,10 @@ INPUT ?= $(wildcard inputs/*/*.x)
 all: sim
 
 sim: $(SRC)
-	gcc -g -O2 $^ -o $@
+	gcc -Wall -Wextra -g -O2 $^ -o $@
 
 basesim: $(SRC)
-	gcc -g -O2 $^ -o $@
+	gcc -Wall -Wextra -g -O2 $^ -o $@
 
 run: sim
 	@python run.py $(INPUT)

@@ -16,7 +16,8 @@
  * not correspond 1-to-1 with the control signals that would actually pass
  * through the pipeline. Rather, it carries the original instruction, operand
  * information and values as they are collected, and destination information. */
-typedef struct Pipe_Op {
+typedef struct Pipe_Op
+{
     /* PC of this instruction */
     uint32_t pc;
     /* raw instruction */
@@ -30,21 +31,21 @@ typedef struct Pipe_Op {
     int shamt;
 
     /* register source values */
-    int reg_src1, reg_src2; /* 0 -- 31 if this inst has register source(s), or
+    int reg_src1, reg_src2;                  /* 0 -- 31 if this inst has register source(s), or
                                -1 otherwise */
     uint32_t reg_src1_value, reg_src2_value; /* values of operands from source
                                                 regs */
 
     /* memory access information */
-    int is_mem;       /* is this a load/store? */
-    uint32_t mem_addr; /* address if applicable */
-    int mem_write; /* is this a write to memory? */
+    int is_mem;         /* is this a load/store? */
+    uint32_t mem_addr;  /* address if applicable */
+    int mem_write;      /* is this a write to memory? */
     uint32_t mem_value; /* value loaded from memory or to be written to memory */
 
     /* register destination information */
-    int reg_dst; /* 0 -- 31 if this inst has a destination register, -1
+    int reg_dst;             /* 0 -- 31 if this inst has a destination register, -1
                     otherwise */
-    uint32_t reg_dst_value; /* value to write into dest reg. */
+    uint32_t reg_dst_value;  /* value to write into dest reg. */
     int reg_dst_value_ready; /* destination value produced yet? */
 
     /* branch information */
@@ -67,7 +68,8 @@ typedef struct Pipe_Op {
  * be lost).
  */
 
-typedef struct Pipe_State {
+typedef struct Pipe_State
+{
     /* pipe op currently at the input of the given stage (NULL for none) */
     Pipe_Op *decode_op, *execute_op, *mem_op, *wb_op;
 
@@ -81,9 +83,9 @@ typedef struct Pipe_State {
     /* information for PC update (branch recovery). Branches should use this
      * mechanism to redirect the fetch stage, and flush the ops that came after
      * the branch as necessary. */
-    int branch_recover; /* set to '1' to load a new PC */
+    int branch_recover;   /* set to '1' to load a new PC */
     uint32_t branch_dest; /* next fetch will be from this PC */
-    int branch_flush; /* how many stages to flush during recover? (1 = fetch, 2 = fetch/decode, ...) */
+    int branch_flush;     /* how many stages to flush during recover? (1 = fetch, 2 = fetch/decode, ...) */
 
     /* multiplier stall info */
     int multiplier_stall; /* number of remaining cycles until HI/LO are ready */
