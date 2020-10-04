@@ -15,7 +15,7 @@
 #include <stdlib.h>
 #include <assert.h>
 
-#define DEBUG
+//#define DEBUG
 
 #define INST_CACHE_TOTAL_SIZE 8 * 1024
 #define INST_CACHE_BLOCK_SIZE 32
@@ -158,7 +158,8 @@ void pipe_stage_wb()
     {
         if (op->reg_src1_value == 0xA)
         {
-            pipe.PC = op->pc; /* fetch will do pc += 4, then we stop with correct PC */
+            pipe.PC = op->pc + 4; /* fetch stalls so we have to inc. PC */
+            cache_free(&inst_cache); 
             RUN_BIT = 0;
         }
     }
@@ -744,10 +745,27 @@ void pipe_stage_decode()
 
 void pipe_stage_fetch()
 {
+    /* we have to wait until instruction is fetched */
+    if (pipe.inst_cache_stall > 0) {
+        pipe.inst_cache_stall--;
+        return;       
+    }
+
     /* if pipeline is stalled (our output slot is not empty), return */
     if (pipe.decode_op != NULL)
         return;
-
+   
+    /* if cache miss we have to stall fetch stage for 50 cycles
+     *
+     * 1 cycle mem access + 48 cycles stalling + 1 cycle insert op into decode stage
+     *
+     * decode stage can use op at cycle 51
+     */ 
+    if(cache_access(&inst_cache, pipe.PC) == CACHE_MISS) {
+        pipe.inst_cache_stall = 48;
+        return;
+    }
+    
     /* Allocate an op and send it down the pipeline. */
     Pipe_Op *op = malloc(sizeof(Pipe_Op));
     memset(op, 0, sizeof(Pipe_Op));
@@ -755,6 +773,7 @@ void pipe_stage_fetch()
 
     op->instruction = mem_read_32(pipe.PC);
     op->pc = pipe.PC;
+
     pipe.decode_op = op;
 
     /* update PC */
@@ -762,3 +781,4 @@ void pipe_stage_fetch()
 
     stat_inst_fetch++;
 }
+

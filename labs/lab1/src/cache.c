@@ -49,18 +49,10 @@ void cache_init(Cache_State *c, int total_size, int block_size, int num_ways)
     c->blocks = (Cache_Block *)calloc(c->num_sets * c->num_ways, sizeof(Cache_Block));
 
     c->timestamp = 0;
+}
 
-    cache_access(c, 1);
-    cache_access(c, 2);
-    cache_access(c, 3);
-    cache_access(c, 4);
-    cache_access(c, 1);
-    cache_access(c, 2);
-    cache_access(c, 3);
-    cache_access(c, 4);
-    cache_access(c, 0);
-
-    assert(0);
+void cache_free(Cache_State *c) {
+    free(c->blocks);
 }
 
 static uint32_t get_set_idx(Cache_State *c, uint32_t addr)
@@ -83,6 +75,11 @@ static void write_block(Cache_Block *block, uint32_t addr, int timestamp)
 
 enum Cache_Result cache_access(Cache_State *c, uint32_t addr)
 {
+    /* if total size is zero cache is disabled */
+    if(c->total_size == 0) {
+        return CACHE_MISS;
+    }
+
     /* increase timestamp for recency */
     c->timestamp++;
 

@@ -43,6 +43,9 @@ typedef struct Cache_State
 /* initialize a cache with the ususal values */
 void cache_init(Cache_State *c, int total_size, int block_size, int num_ways);
 
+/* free memory used by cache */
+void cache_free(Cache_State *c);
+
 /* simulates a cache access */
 enum Cache_Result cache_access(Cache_State *c, uint32_t addr);
 

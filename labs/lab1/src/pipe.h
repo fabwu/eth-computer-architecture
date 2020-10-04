@@ -91,7 +91,8 @@ typedef struct Pipe_State
     int multiplier_stall; /* number of remaining cycles until HI/LO are ready */
 
     /* place other information here as necessary */
-
+    int inst_cache_stall; /* number of remaining cycles until instruction is loaded from memory */
+    Pipe_Op *stalled_fetch_op;
 } Pipe_State;
 
 /* global variable -- pipeline state */
