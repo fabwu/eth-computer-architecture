@@ -17,9 +17,9 @@
 
 //#define DEBUG
 
-#define INST_CACHE_TOTAL_SIZE 8 * 1024
-#define INST_CACHE_BLOCK_SIZE 32
-#define INST_CACHE_NUM_WAY 4
+#define INST_CACHE_DEFAULT_TOTAL_SIZE 8 * 1024
+#define INST_CACHE_DEFAULT_BLOCK_SIZE 32
+#define INST_CACHE_DEFAULT_NUM_WAY 4
 
 /* debug */
 void print_op(Pipe_Op *op)
@@ -43,13 +43,29 @@ void pipe_init()
     memset(&pipe, 0, sizeof(Pipe_State));
     pipe.PC = 0x00400000;
 
+    char *env;
+    int inst_cache_total_size = INST_CACHE_DEFAULT_TOTAL_SIZE;
+    if ((env = getenv("INST_CACHE_TOTAL_SIZE"))) {
+      inst_cache_total_size = atoi(env);
+    }
+
+    int inst_cache_block_size = INST_CACHE_DEFAULT_BLOCK_SIZE;
+    if((env = getenv("INST_CACHE_BLOCK_SIZE"))) {
+       inst_cache_block_size = atoi(env);
+    }
+
+    int inst_cache_num_way = INST_CACHE_DEFAULT_NUM_WAY;
+    if ((env = getenv("INST_CACHE_NUM_WAY"))) {
+      inst_cache_num_way = atoi(env);
+    }
+
     /* init instruction cache */
-    cache_init(&inst_cache, INST_CACHE_TOTAL_SIZE, INST_CACHE_BLOCK_SIZE,
-               INST_CACHE_NUM_WAY);
+    cache_init(&inst_cache, inst_cache_total_size, inst_cache_block_size,
+               inst_cache_num_way);
 
 #ifdef DEBUG
     printf("instruction cache: %d bytes total %d bytes block %d ways %d sets\n\n",
-           INST_CACHE_TOTAL_SIZE, INST_CACHE_BLOCK_SIZE, inst_cache.num_ways,
+           inst_cache_total_size, inst_cache_block_size, inst_cache.num_ways,
            inst_cache.num_sets);
 #endif
 }

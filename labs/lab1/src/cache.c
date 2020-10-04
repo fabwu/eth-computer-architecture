@@ -3,8 +3,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define DEBUG
-
 __attribute__((unused)) static void printBits(size_t const size, void const *const ptr)
 {
     unsigned char *b = (unsigned char *)ptr;
@@ -75,11 +73,6 @@ static void write_block(Cache_Block *block, uint32_t addr, int timestamp)
 
 enum Cache_Result cache_access(Cache_State *c, uint32_t addr)
 {
-    /* if total size is zero cache is disabled */
-    if(c->total_size == 0) {
-        return CACHE_MISS;
-    }
-
     /* increase timestamp for recency */
     c->timestamp++;
 
