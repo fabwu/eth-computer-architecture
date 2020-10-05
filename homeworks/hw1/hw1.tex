@@ -6,6 +6,10 @@
 \usepackage{listings}
 \usepackage{tabularx}
 \usepackage{xcolor}
+\usepackage{amsmath}
+\usepackage{mathtools}
+\DeclarePairedDelimiter\ceil{\lceil}{\rceil}
+\DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
 
 \renewcommand{\arraystretch}{1.5}
 
@@ -119,9 +123,105 @@
                 0.5141\%$
         \end{enumerate}
     \item RowHammer (150 points)
+        \begin{enumerate}
+            \item The given code doesn't work because the \verb|STORE| instruction is cached in
+                the row buffer even thought the other caches are circumvented using \verb|CLFLUSH|.
+
+            \item We assume that the MSB of the physical address is use to identify the channel. Then
+                we use the next two bits to address the bank and the next six bits are use to identify
+                the row. The remaining seven LSBs are used to address the individual bytes.
+
+                Using this address scheme only \textbf{Code 2a} can induce RowHammer errors because both 
+                addresses map to the same bank on the same channel (three MSBs are equal). RowHammer 
+                requires two aggressor rows on the same bank to circumvent the row buffer.
+        \end{enumerate}
     \item RowHammer Mitigation Mechanisms
+        \begin{enumerate}
+            \item We need 18 bits to store $T$ for each row. Then the total number of bits required
+                is $2 \cdot 8 \cdot 2^{15} \cdot 18 \mathrm{bits} = 9 \mathrm{Mbits}$.
+            
+            \item Now we have 16 banks and $2^{16}$ rows per bank so we get
+                $2 \cdot 16 \cdot 2^{16} \cdot 18 \mathrm{bits} = 36 \mathrm{Mbits}$.
+            
+            \item To analyze mechanism A we look at a $17 \times 64ms$ interval. In this interval
+                row \verb|0x5FF02| had 170 K activations so with T = 164 K mechanism A issued one
+                additional activation. Thus, including the other rows with a higher activation count
+                we get
+                \begin{equation*}
+                    \floor*{\frac{17 \cdot 10K}{T}} + \floor*{\frac{17 \cdot 32K}{T}} + 
+                    \floor*{\frac{17 \cdot 64K}{T}} + \floor*{\frac{17 \cdot 73K}{T}} = 17
+                \end{equation*}
+                additional activations in $17 \times 64ms$. Note that we ignored the remaining
+                $17 \times 301$ activations because they are distributed across the rows such
+                that $T$ does not exceed for a specific row. In summary, mechanism A produces
+                one additional activation within a 64ms time interval.
+
+                For mechanism B we model a random variable $X$ as the number of additional 
+                activations in 64ms. $X$ has a binomial distribution with parameters $n=480K$
+                and $p=0.001$. Therefore, we get $\mathbf{E}[X] = 480K \cdot 0.001 = 480$ 
+                additional activations within a 64ms time interval.
+
+            \item As the memory access pattern doesn't change the answer is the same as before.
+
+            \item For both techniques the memory controller must know which rows are adjacent to
+                each other. It is a challenge to find two adjacent rows because the memory controller
+                cannot rely on the physical address as they are often remapped within the DRAM chip
+                and manufacturers don't disclose the remapping.
+            
+            \item To address this challenge we need intelligent memory controllers and a better
+                interface between the memory controller and DRAM chips.
+        \end{enumerate}
     \item VRL: Variable Refresh Latency (150 points)
+        \begin{enumerate}
+            \item With VRL applied a full refresh has latency $T$ whereas a partial
+                refresh has latency $0.6T$. 10\% of the rows can tolerate one 
+                partial refresh followed by a full refresh so the refresh latency
+                for these rows is $0.1 \times (0.5 \times 0.6T + 0.5 \times T)=0.08T$.
+                Similarly, we get $0.6 \times (0.75 \times 0.6T + 0.25 \times T)=0.42T$
+                and $0.3 \times (0.875 \times 0.6T + 0.125 \times T)=0.195T$ as new latency
+                for the other two groups. Overall, the new refresh latency of a bank
+                is \[0.695T\]
+            
+            \item In a $128ms$ interval 90\% of the rows are refreshed once and 10\% of
+                the rows are refreshed twice. A bank is busy for 
+                $0.9N \times \frac{0.2}{N} + 2 \times 0.1N \times \frac{0.2}{N} = 0.22ms$
+                during a refresh. Therefore, we have a refresh overhead of 
+                \[\frac{0.22}{128}\]
+
+            \item With VRL a partial refresh costs $0.12/Nms$ whereas a full
+                refresh still requires $0.2/Nms$. The refresh pattern for every cell is
+                repeated every $4 \times 128ms$. In this timespan 5\% of the rows have
+                1 full refresh and 3 partial refreshes. 65\% of the rows have 2 full
+                refreshes and 2 partial refreshes. 10\% of the rows have 4 full refreshes
+                and 4 partial refreshes. 20\% of the rows have 4 full refreshes. The total
+                time spent for refresh is then
+                \begin{align*} 
+                    0.2 \ N \times (0.05N \times 1 + 0.65N \times 2 + 0.1N \times 4 + 0.2N \times 4) + \\
+                    0.12 \ N \times (0.05N \times 3 + 0.65N \times 2 + 0.1N \times 4) &= 0.732ms
+                \end{align*}
+                Therefore, we have a refresh overhead of
+                \[\frac{0.732}{512}\] with a reduction of $\approx 16.8\%$ compared to the baseline.
+        \end{enumerate}
     \item BONUS: DRAM Refresh - Energy (150 points)
+        \begin{enumerate}
+            \item We have a total capacity of $2^{60}$ bytes and each row has a size of $2^{13}$ bytes.
+                Hence, the memory system has $2^{47}$ rows.
+
+            \item The memory system has to guarantee a minimum retention time of $64ms$ so it has to refresh
+                all rows within $64ms$. The memory controller issues a REF command every $7.8\mu s$ so 
+                $\frac{64ms}{7.8\mu s}=8205$ REF commands reach the DRAM chip in $64ms$. Thus, each REF
+                command must refresh $2^{47}/8205$ rows.
+
+            \item To calculate the refresh power we use Eq. 18 from the Micron Technical Note.
+                \[P_{ds}(REF) = (IDD5 - IDD3N) \times V_{DD}\]
+                From the datasheet we get $V_{DD}=1.5V$ and if we assume DDR3-1866x16 we get $IDD5=175mA$
+                and $IDD3N=55mA$ from Table 19. Therefore,
+                \[P_{ds}(REF) = (175mA - 55mA) \times 1.5V = 180mW\]
+
+            \item For a refresh cycle ($64ms$) we have $E_{ref} = 180mW \cdot 64ms = 11.52 mJ$. 
+
+                For a day we get $E_{day} = 180mW \cdot 86400 s  = 15552 J$
+        \end{enumerate}
 \end{enumerate}
 
 \end{document}
