@@ -92,7 +92,7 @@ typedef struct Pipe_State
 
     /* place other information here as necessary */
     int inst_cache_stall; /* number of remaining cycles until instruction is loaded from memory */
-    Pipe_Op *stalled_fetch_op;
+    int inst_cache_recover;
 } Pipe_State;
 
 /* global variable -- pipeline state */

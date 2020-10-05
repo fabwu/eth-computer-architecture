@@ -75,6 +75,8 @@ def main():
 
             if error == 0:
                 print("  " + green + "REGISTER CONTENTS OK" + normal)
+            else:
+                raise ValueError("REGISTER CONTENTS ERROR")
             print()
 
 def run(i):

@@ -188,6 +188,7 @@ void pipe_stage_wb()
 
 void pipe_stage_mem()
 {
+    //TODO Add data cache and stall if necessary
     /* if there is no instruction in this pipeline stage, we are done */
     if (!pipe.mem_op)
         return;

@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+//#define DEBUG
+
 __attribute__((unused)) static void printBits(size_t const size, void const *const ptr)
 {
     unsigned char *b = (unsigned char *)ptr;
@@ -38,7 +40,13 @@ void cache_init(Cache_State *c, int total_size, int block_size, int num_ways)
     c->block_size = block_size;
     c->num_ways = num_ways;
 
-    c->num_sets = (total_size / num_ways) / block_size;
+    if (c->total_size == 0) {
+        /* if cache is disabled just allocate one block */
+        c->blocks = (Cache_Block *)calloc(1, sizeof(Cache_Block));
+        return;
+    }
+
+    c->num_sets = (c->total_size / c->num_ways) / c->block_size;
 
     c->set_idx_from = bit_length(c->block_size);
     c->set_idx_to = c->set_idx_from + bit_length(c->num_sets) - 1;
@@ -73,6 +81,20 @@ static void write_block(Cache_Block *block, uint32_t addr, int timestamp)
 
 enum Cache_Result cache_access(Cache_State *c, uint32_t addr)
 {
+    if (c->total_size == 0) 
+    {
+        /* if cache is disabled return HIT on second access but evict address immediately */
+        Cache_Block *block = c->blocks;
+
+        if( block->addr == addr) {
+            block->addr = -1;
+            return CACHE_HIT;
+        } else {
+            block->addr = addr;
+            return CACHE_MISS;
+        }
+    }
+
     /* increase timestamp for recency */
     c->timestamp++;
 
