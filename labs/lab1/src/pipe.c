@@ -21,6 +21,10 @@
 #define INST_CACHE_DEFAULT_BLOCK_SIZE 32
 #define INST_CACHE_DEFAULT_NUM_WAY 4
 
+#define DATA_CACHE_DEFAULT_TOTAL_SIZE 64 * 1024
+#define DATA_CACHE_DEFAULT_BLOCK_SIZE 32
+#define DATA_CACHE_DEFAULT_NUM_WAY 8
+
 /* debug */
 void print_op(Pipe_Op *op)
 {
@@ -38,11 +42,10 @@ Pipe_State pipe;
 /* global instrucion cache state */
 Cache_State inst_cache;
 
-void pipe_init()
-{
-    memset(&pipe, 0, sizeof(Pipe_State));
-    pipe.PC = 0x00400000;
+/* global data cache state */
+Cache_State data_cache;
 
+static void pipe_init_inst_cache() {
     char *env;
     int inst_cache_total_size = INST_CACHE_DEFAULT_TOTAL_SIZE;
     if ((env = getenv("INST_CACHE_TOTAL_SIZE"))) {
@@ -68,6 +71,42 @@ void pipe_init()
            inst_cache_total_size, inst_cache_block_size, inst_cache.num_ways,
            inst_cache.num_sets);
 #endif
+}
+
+static void pipe_init_data_cache() {
+    char *env;
+    int data_cache_total_size = DATA_CACHE_DEFAULT_TOTAL_SIZE;
+    if ((env = getenv("DATA_CACHE_TOTAL_SIZE"))) {
+      data_cache_total_size = atoi(env);
+    }
+
+    int data_cache_block_size = DATA_CACHE_DEFAULT_BLOCK_SIZE;
+    if((env = getenv("DATA_CACHE_BLOCK_SIZE"))) {
+       data_cache_block_size = atoi(env);
+    }
+
+    int data_cache_num_way = DATA_CACHE_DEFAULT_NUM_WAY;
+    if ((env = getenv("DATA_CACHE_NUM_WAY"))) {
+      data_cache_num_way = atoi(env);
+    }
+
+    /* init data cache */
+    cache_init(&data_cache, data_cache_total_size, data_cache_block_size,
+               data_cache_num_way);
+
+#ifdef DEBUG
+    printf("data cache: %d bytes total %d bytes block %d ways %d sets\n\n",
+           data_cache_total_size, data_cache_block_size, data_cache.num_ways,
+           data_cache.num_sets);
+#endif
+}
+
+void pipe_init()
+{
+    memset(&pipe, 0, sizeof(Pipe_State));
+    pipe.PC = 0x00400000;
+    pipe_init_inst_cache();
+    pipe_init_data_cache();
 }
 
 void pipe_cycle()
@@ -188,7 +227,12 @@ void pipe_stage_wb()
 
 void pipe_stage_mem()
 {
-    //TODO Add data cache and stall if necessary
+    /* we have to wait until data is fetched */
+    if (pipe.data_cache_stall > 0) {
+        pipe.data_cache_stall--;
+        return;       
+    }
+
     /* if there is no instruction in this pipeline stage, we are done */
     if (!pipe.mem_op)
         return;
@@ -197,8 +241,14 @@ void pipe_stage_mem()
     Pipe_Op *op = pipe.mem_op;
 
     uint32_t val = 0;
-    if (op->is_mem)
+    if (op->is_mem) {
+        /* both loads and stores read an addr so we stall pipeline only once */
+        if(cache_access(&data_cache, pipe.PC) == CACHE_MISS) {
+            pipe.data_cache_stall = 48;
+            return;
+        } 
         val = mem_read_32(op->mem_addr & ~3);
+    }
 
     switch (op->opcode)
     {

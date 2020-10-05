@@ -109,7 +109,10 @@ def benchmark(config):
             env = {
                 "INST_CACHE_TOTAL_SIZE": config["INSTRUCTION CACHE"]["TotalSize"],
                 "INST_CACHE_BLOCK_SIZE": config["INSTRUCTION CACHE"]["BlockSize"],
-                "INST_CACHE_NUM_WAY": config["INSTRUCTION CACHE"]["NumWay"]
+                "INST_CACHE_NUM_WAY": config["INSTRUCTION CACHE"]["NumWay"],
+                "DATA_CACHE_TOTAL_SIZE": config["DATA CACHE"]["TotalSize"],
+                "DATA_CACHE_BLOCK_SIZE": config["DATA CACHE"]["BlockSize"],
+                "DATA_CACHE_NUM_WAY": config["DATA CACHE"]["NumWay"]
             }
         )
 
