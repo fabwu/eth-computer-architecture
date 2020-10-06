@@ -21,8 +21,6 @@ __attribute__((unused)) static void printBits(size_t const size,
 }
 
 static int bit_length(uint32_t n) {
-  assert(n % 2 == 0);
-
   uint32_t l = 0;
 
   while (n >>= 1)
@@ -43,10 +41,13 @@ void cache_init(Cache_State *c, int total_size, int block_size, int num_ways) {
   }
 
   c->num_sets = (c->total_size / c->num_ways) / c->block_size;
-
   c->set_idx_from = bit_length(c->block_size);
-  c->set_idx_to = c->set_idx_from + bit_length(c->num_sets) - 1;
 
+  if(c->num_sets == 1) {
+    c->set_idx_to = c->set_idx_from;
+  } else {
+    c->set_idx_to = c->set_idx_from + bit_length(c->num_sets) - 1;
+  }
   /* init sets*ways cache blocks */
   c->blocks =
       (Cache_Block *)calloc(c->num_sets * c->num_ways, sizeof(Cache_Block));
@@ -57,13 +58,17 @@ void cache_init(Cache_State *c, int total_size, int block_size, int num_ways) {
 void cache_free(Cache_State *c) { free(c->blocks); }
 
 static uint32_t get_set_idx(Cache_State *c, uint32_t addr) {
-  uint32_t mask = ~0;
-  mask >>= 32 - (c->set_idx_to + 1);
+    if (c->num_sets == 1) {
+        return 0;
+    }
 
-  uint32_t set_idx = (addr & mask);
-  set_idx >>= c->set_idx_from;
+    uint32_t mask = ~0;
+    mask >>= 32 - (c->set_idx_to + 1);
 
-  return set_idx;
+    uint32_t set_idx = (addr & mask);
+    set_idx >>= c->set_idx_from;
+
+    return set_idx;
 }
 
 static uint32_t get_tag(Cache_State *c, uint32_t addr) {

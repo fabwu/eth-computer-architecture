@@ -25,6 +25,8 @@
 
 uint32_t stat_cycles = 0, stat_inst_retire = 0, stat_inst_fetch = 0;
 uint32_t stat_squash = 0;
+uint32_t stat_inst_cache_hits = 0, stat_inst_cache_misses = 0;
+uint32_t stat_data_cache_hits = 0, stat_data_cache_misses = 0;
 
 /***************************************************************/
 /* Main memory.                                                */
@@ -202,6 +204,11 @@ void rdump() {
   printf("RetiredInstr: %u\n", stat_inst_retire);
   printf("IPC: %0.3f\n", ((float)stat_inst_retire) / stat_cycles);
   printf("Flushes: %u\n", stat_squash);
+  /* every miss is also counted as a hit */
+  printf("InstHit: %u\n", stat_inst_cache_hits - stat_inst_cache_misses); 
+  printf("InstMiss: %u\n", stat_inst_cache_misses); 
+  printf("DataHit: %u\n", stat_data_cache_hits - stat_data_cache_misses); 
+  printf("DataMiss: %u\n", stat_data_cache_misses); 
 }
 
 /***************************************************************/

@@ -18,7 +18,7 @@ normal="\033[0m"
 
 def main():
     all_test_inputs = glob.glob("inputs/*/*.x")
-    all_benchmark_inputs = glob.glob("benchmarks/*.ini")
+    all_benchmark_inputs = glob.glob("benchmarks/*/*.ini")
 
     parser = argparse.ArgumentParser()
     parser.add_argument("mode", choices=["benchmark", "test"])
@@ -37,7 +37,17 @@ def main():
 
             print(bold + "Benchmark: " + normal + i)
             sim_out = benchmark(config)
-            print(sim_out)
+            if not sim_out:
+                print(red + "ERROR -- no output from simulator" + normal)
+                continue
+            stats = {}
+            for line in sim_out.split("\n"):
+                x = line.split(": ");
+                stats[x[0]] = x[1]
+            print("Cycles: " + stats['Cycles'])
+            print("IPC: " + stats['IPC'])
+            print("Data Hit/Miss: " + stats['DataHit'] + "/" + stats['DataMiss'])
+            print("Inst Hit/Miss: " + stats['InstHit'] + "/" + stats['InstMiss'])
 
     elif parser.mode == "test":
         if not parser.inputs:
@@ -128,7 +138,7 @@ def benchmark(config):
 
 def filter_stats(out):
     lines = out.split("\n")
-    regex = re.compile("^(HI:)|(LO:)|(R\d+:)|(PC:)|(Cycles:)|(Fetched\w+:)|(Retired\w+:)|(IPC:)|(Flushes:).*$")
+    regex = re.compile("^(HI:)|(LO:)|(R\d+:)|(PC:)|(Cycles:)|(Fetched\w+:)|(Retired\w+:)|(IPC:)|(Flushes:)|(Data\w+:)|(Inst\w+:).*$")
     out = []
     for l in lines:
         if regex.match(l):

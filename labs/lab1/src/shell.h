@@ -26,6 +26,8 @@ uint32_t mem_read_32(uint32_t address);
 void mem_write_32(uint32_t address, uint32_t value);
 
 /* statistics */
-extern uint32_t stat_cycles, stat_inst_retire, stat_inst_fetch, stat_squash;
+extern uint32_t stat_cycles, stat_inst_retire, stat_inst_fetch, stat_squash,
+                stat_inst_cache_hits, stat_inst_cache_misses, 
+                stat_data_cache_hits, stat_data_cache_misses;
 
 #endif

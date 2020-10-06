@@ -25,17 +25,26 @@
 #define DATA_CACHE_DEFAULT_BLOCK_SIZE 32
 #define DATA_CACHE_DEFAULT_NUM_WAY 8
 
+//TODO Inst Miss/Hits are wrong because 0x00000 is also counted
+
 /* debug */
 void print_op(Pipe_Op *op) {
-  if (op)
-    printf("OP (PC=%08x inst=%08x) src1=R%d (%08x) src2=R%d (%08x) dst=R%d "
-           "valid %d (%08x) br=%d taken=%d dest=%08x mem=%d addr=%08x\n",
-           op->pc, op->instruction, op->reg_src1, op->reg_src1_value,
-           op->reg_src2, op->reg_src2_value, op->reg_dst,
-           op->reg_dst_value_ready, op->reg_dst_value, op->is_branch,
-           op->branch_taken, op->branch_dest, op->is_mem, op->mem_addr);
-  else
-    printf("(null)\n");
+    if (op)
+        printf("OP (PC=%08x inst=%08x) src1=R%d (%08x) src2=R%d (%08x) dst=R%d "
+               "valid %d (%08x) br=%d taken=%d dest=%08x mem=%d addr=%08x\n",
+               op->pc, op->instruction, op->reg_src1, op->reg_src1_value,
+               op->reg_src2, op->reg_src2_value, op->reg_dst,
+               op->reg_dst_value_ready, op->reg_dst_value, op->is_branch,
+               op->branch_taken, op->branch_dest, op->is_mem, op->mem_addr);
+    else
+        printf("(null)\n");
+}
+
+void print_cache(Cache_State *c, char *name) {
+    printf(
+        "%s: %d bytes total %d bytes block %d ways %d sets (addr[%d:%d])\n\n",
+        name, c->total_size, c->block_size, c->num_ways, c->num_sets,
+        c->set_idx_to, c->set_idx_from);
 }
 
 /* global pipeline state */
@@ -69,9 +78,7 @@ static void pipe_init_inst_cache() {
              inst_cache_num_way);
 
 #ifdef DEBUG
-  printf("instruction cache: %d bytes total %d bytes block %d ways %d sets\n\n",
-         inst_cache_total_size, inst_cache_block_size, inst_cache.num_ways,
-         inst_cache.num_sets);
+  print_cache(&inst_cache, "instruction cache");
 #endif
 }
 
@@ -97,9 +104,7 @@ static void pipe_init_data_cache() {
              data_cache_num_way);
 
 #ifdef DEBUG
-  printf("data cache: %d bytes total %d bytes block %d ways %d sets\n\n",
-         data_cache_total_size, data_cache_block_size, data_cache.num_ways,
-         data_cache.num_sets);
+  print_cache(&data_cache, "data cache");
 #endif
 }
 
@@ -237,11 +242,14 @@ void pipe_stage_mem() {
   uint32_t val = 0;
   if (op->is_mem) {
     /* both loads and stores read an addr so we stall pipeline only once */
-    if (cache_access(&data_cache, pipe.PC) == CACHE_MISS) {
+    if (cache_access(&data_cache, op->mem_addr) == CACHE_MISS) {
       pipe.data_cache_stall = 48;
+      stat_data_cache_misses++;
       return;
     }
+
     val = mem_read_32(op->mem_addr & ~3);
+    stat_data_cache_hits++;
   }
 
   switch (op->opcode) {
@@ -787,9 +795,11 @@ void pipe_stage_fetch() {
    */
   if (cache_access(&inst_cache, pipe.PC) == CACHE_MISS) {
     pipe.inst_cache_stall = 48;
+    stat_inst_cache_misses++;
     return;
   }
 
+  stat_inst_cache_hits++;
   /* Allocate an op and send it down the pipeline. */
   Pipe_Op *op = malloc(sizeof(Pipe_Op));
   memset(op, 0, sizeof(Pipe_Op));
