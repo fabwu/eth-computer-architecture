@@ -169,6 +169,10 @@ void pipe_cycle() {
 
     stat_squash++;
   }
+
+  if (RUN_BIT == 0) {
+    cache_free(&inst_cache);
+  }
 }
 
 void pipe_recover(int flush, uint32_t dest) {
@@ -205,8 +209,7 @@ void pipe_stage_wb() {
   /* if this was a syscall, perform action */
   if (op->opcode == OP_SPECIAL && op->subop == SUBOP_SYSCALL) {
     if (op->reg_src1_value == 0xA) {
-      pipe.PC = op->pc + 4; /* fetch stalls so we have to inc. PC */
-      cache_free(&inst_cache);
+      pipe.PC = op->pc + 4; /* fetch could stall so we have to inc. PC */
       RUN_BIT = 0;
     }
   }
@@ -797,8 +800,15 @@ void pipe_stage_fetch() {
 
   pipe.decode_op = op;
 
-  /* update PC */
-  pipe.PC += 4;
+  if (RUN_BIT != 0) {
+    /*
+     * update PC only if RUN_BIT is on
+     *
+     * we modify PC in wb stage in case fetch stage is stalled
+     * so for the last cycle PC has already increased.
+     */
+    pipe.PC += 4;
+  }
 
   stat_inst_fetch++;
 }

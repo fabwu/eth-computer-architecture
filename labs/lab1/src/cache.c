@@ -66,23 +66,36 @@ static uint32_t get_set_idx(Cache_State *c, uint32_t addr) {
   return set_idx;
 }
 
-static void write_block(Cache_Block *block, uint32_t addr, int timestamp) {
+static uint32_t get_tag(Cache_State *c, uint32_t addr) {
+  return addr >> (c->set_idx_to + 1);
+}
+
+static void write_block(Cache_Block *block, uint32_t tag, int timestamp) {
   block->valid = true;
-  block->addr = addr;
+  block->tag = tag;
   block->last_access = timestamp;
 }
 
 enum Cache_Result cache_access(Cache_State *c, uint32_t addr) {
+  uint32_t tag = get_tag(c, addr);
+
   if (c->total_size == 0) {
     /* if cache is disabled return HIT on second access but evict address
      * immediately */
     Cache_Block *block = c->blocks;
 
-    if (block->addr == addr) {
-      block->addr = -1;
+    if (block->valid && (block->tag == tag)) {
+      block->valid = false;
+#ifdef DEBUG
+      printf("0x%X: HIT (cache disabled) tag 0x%X\n", addr, tag);
+#endif
       return CACHE_HIT;
     } else {
-      block->addr = addr;
+      block->tag = tag;
+      block->valid = true;
+#ifdef DEBUG
+      printf("0x%X: MISS (cache disabled) tag 0x%X\n", addr, tag);
+#endif
       return CACHE_MISS;
     }
   }
@@ -98,11 +111,11 @@ enum Cache_Result cache_access(Cache_State *c, uint32_t addr) {
   /* check if addr is in cache */
   for (int way = 0; way < c->num_ways; ++way) {
     block = set + way;
-    if (block->addr == addr) {
+    if (block->valid && (block->tag == tag)) {
 #ifdef DEBUG
-      printf("0x%X: HIT in set %d way %d\n", addr, set_idx, way);
+      printf("0x%X: HIT in set %d way %d tag 0x%X\n", addr, set_idx, way, tag);
 #endif
-      write_block(block, addr, c->timestamp);
+      write_block(block, tag, c->timestamp);
       return CACHE_HIT;
     }
   }
@@ -112,9 +125,10 @@ enum Cache_Result cache_access(Cache_State *c, uint32_t addr) {
     block = set + way;
     if (!block->valid) {
 #ifdef DEBUG
-      printf("0x%X: MISS (invalid) in set %d way %d\n", addr, set_idx, way);
+      printf("0x%X: MISS (invalid) in set %d way %d tag 0x%X\n", addr, set_idx,
+             way, tag);
 #endif
-      write_block(block, addr, c->timestamp);
+      write_block(block, tag, c->timestamp);
       return CACHE_MISS;
     }
   }
@@ -129,10 +143,10 @@ enum Cache_Result cache_access(Cache_State *c, uint32_t addr) {
   }
 
 #ifdef DEBUG
-  printf("0x%X: MISS (lru) in set %d way %d\n", addr, set_idx,
-         (int)(block - set));
+  printf("0x%X: MISS (lru) in set %d way %d tag 0x%X\n", addr, set_idx,
+         (int)(block - set), tag);
 #endif
 
-  write_block(block, addr, c->timestamp);
+  write_block(block, tag, c->timestamp);
   return CACHE_MISS;
 }

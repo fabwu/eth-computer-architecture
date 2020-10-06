@@ -8,7 +8,7 @@ enum Cache_Result { CACHE_MISS, CACHE_HIT };
 
 typedef struct Cache_Block {
   /* addr saved in this cache block */
-  uint32_t addr;
+  uint32_t tag;
   /* valid bit */
   bool valid;
   /* timestamp for last access */
