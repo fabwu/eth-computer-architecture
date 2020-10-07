@@ -1,0 +1,76 @@
+==+== Computer Architecture Paper Review Form
+==-== DO NOT CHANGE LINES THAT START WITH "==+==" UNLESS DIRECTED!
+==-== For further guidance, or to upload this file when you are done, go to:
+==-== https://safari.ethz.ch/review/architecture20/offline
+
+==+== =====================================================================
+==+== Begin Review #2.
+==+== Version 1
+==+== Reviewer: Fabian Wüthrich <fabianwu@student.ethz.ch>
+==-== Updated 25 Sep 2020 12:35:59am EDT
+
+==+== Paper #2
+==-== Title: Main Memory Scaling: Challenges and Solution Directions
+
+==+== Review Readiness
+==-== Enter "Ready" if the review is ready for others to see:
+
+Ready
+
+==+== A. Paper summary
+
+The chapter gives a general overview of main memory research. The author
+presents current trends on the systems/architecture front and derives new
+requirements on the memory system. He concludes that main memory is still
+the performance/energy bottleneck and scaling becomes increasingly difficult.
+
+To solve these issues the chapter describes three directions for possible
+solutions:
+
+* new DRAM architectures
+* new memory technologies
+* QoS for the memory system
+
+Every chapter summarizes promising research results and encourages the reader
+to come up with his own ideas.
+
+==+== B. Strengths
+
+* The chapter summarizes the problem and research for main memory 
+  compactly and serves as a good starting point for future memory
+  systems researchers
+
+* The memory system has always been a bottleneck so the challenges addressed
+  in this chapter are of great importance
+
+* Many proposed solutions have great potential and show encouraging results 
+
+==+== C. Weaknesses
+
+* Systems/Memory co-design is outlined as a promising approach but only
+  a few references are mentioned
+
+* The chapter requires a fair amount of background in the main memory field
+  which might be a blocker for an introduction
+
+==+== D. Thoughts and ideas
+
+* Replace the Flash aside with an in-depth introduction to DRAM
+
+* The chapter is from 2015 so it might be a good idea to revise some of
+  the concepts and present new ideas
+
+==+== E. Takeaways
+
+* This chapter serves as a great reference for main memory research and
+  will be helpful for my further studies
+
+* I'm especially interested in systems/memory co-design which seems to
+  have great potential
+
+==+== F. Other comments
+
+==+== Scratchpad (for unsaved private notes)
+
+==+== End Review
+

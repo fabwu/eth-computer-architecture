@@ -1,0 +1,66 @@
+==+== Computer Architecture Paper Review Form
+==-== DO NOT CHANGE LINES THAT START WITH "==+==" UNLESS DIRECTED!
+==-== For further guidance, or to upload this file when you are done, go to:
+==-== https://safari.ethz.ch/review/architecture20/offline
+
+==+== =====================================================================
+==+== Begin Review #3D
+==+== Version 5
+==+== Reviewer: Fabian Wüthrich <fabianwu@student.ethz.ch>
+==-== Updated 2 Oct 2020 5:18:28am EDT
+
+==+== Paper #3
+==-== Title: Memory Performance Attacks: Denial of Memory Service in
+==-==        Multi-Core Systems
+
+==+== Review Readiness
+==-== Enter "Ready" if the review is ready for others to see:
+
+Ready
+
+==+== A. Paper summary
+
+In multi-core processors, the memory controller is often shared between threads running on different cores. This enables a new class of Denial of Service (DoS) attacks where a malicious application can reduce the memory performance of another application running on the same chip.
+
+This paper presents a novel attack that exploits an unfairness in the scheduling algorithm of the memory controller. The simple execution and that nowadays almost all computers use a multi-core processor with a shared memory controller makes this attack even more critical.
+
+To mitigate this attack the paper presents FairMem, a fair scheduling algorithm for memory requests. The evaluation shows that this algorithm can effectively prevent these kinds of attacks although changes in the memory controller are required.
+
+==+== B. Strengths
+
+* The paper explains the attack in an accessible way and shows the unfairness in the scheduling algorithm with simple and understandable examples
+
+* The definition of fair memory scheduling is well-conceived, which makes it easier to develop an algorithm that prevents such attacks
+
+* Simulations show that FairMem prevents the attack successfully (Simulations and existing dual-core machines show the same behavior)
+
+==+== C. Weaknesses
+
+* The explanations on how to reduce the required circuitry (Reduce counters by sampling) are relatively dense and hard to understand
+
+* Two extremely memory-intensive applications have a lower throughput with FairMem than with FR-FCFS and the paper doesn't provide a solution for that
+
+* The paper doesn't discuss NUMA systems as a possible solution to the problem
+
+* FairMem has two parameters but the paper doesn't give any guideline how to select correct values
+
+==+== D. Thoughts and ideas
+
+* The memory controller could choose a scheduling algorithm dynamically for different access patterns
+
+* Research how to implement FairMem with less circuitry or how to improve accuracy
+
+==+== E. Takeaways
+
+* When I try to increase the performance of an application my focus was completely on the on-chip caches. After reading this paper I will also take the row buffer into consideration when optimizing performance
+
+* Shared resources are often a target for simple but very effective attacks (e.g. Spectre uses LLC side channel)
+
+==+== F. Other comments
+
+
+
+==+== Scratchpad (for unsaved private notes)
+
+==+== End Review
+

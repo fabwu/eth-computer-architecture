@@ -1,0 +1,89 @@
+==+== Computer Architecture Paper Review Form
+==-== DO NOT CHANGE LINES THAT START WITH "==+==" UNLESS DIRECTED!
+==-== For further guidance, or to upload this file when you are done, go to:
+==-== https://safari.ethz.ch/review/architecture20/offline
+
+==+== =====================================================================
+==+== Begin Review #4B
+==+== Version 3
+==+== Reviewer: Fabian Wüthrich <fabianwu@student.ethz.ch>
+==-== Updated 3 Oct 2020 1:35am EDT
+
+==+== Paper #4
+==-== Title: RAIDR: Retention-Aware Intelligent DRAM Refresh
+
+==+== Review Readiness
+==-== Enter "Ready" if the review is ready for others to see:
+
+Ready
+
+==+== A. Paper summary
+
+Modern computers use almost exclusively DRAM for their main memory although it
+becomes increasingly more difficult to scale this memory type. One prevalent
+problem is the periodic refresh of DRAM cells. It does not only decrease
+performance but consumes more energy as DRAM capacity increases. Existing
+memory controllers consider a worst case scenario and determine the refresh
+interval by the leakiest cell. In practice, most cells can retain data much
+longer so many refreshes are unnecessary.
+
+The paper presents a new refresh mechanism (RAIDR) which can skip unnecessary
+refreshes using the knowledge of a cell's retention time. Rows with similar
+retention times are grouped together and a different refresh rate is applied to
+each group. Thus, rows containing leaky cells are refreshed as before whereas
+most rows are refreshed less frequently. Keeping track of every row's refresh
+interval requires additional storage and logic so RAIDR uses Bloom filters to
+minimize storage overhead and two additional counters to perform refresh
+operations keeping changes to the memory controller minimal.
+
+RAIDR significantly reduces the number of refreshes which improves system
+performance and energy consumption. Their simulations also show that RAIDR
+scales well with future improvements in DRAM technology (e.g. 3D-stacked DRAM).
+
+==+== B. Strengths
+
+* Bloom filter is an excellent data structure for this particular problem.
+
+* Many ideas in the past on reducing DRAM refresh are either too complicated or
+  have a large overhead which hinders adoption by industry. This paper presents
+  a low-cost mechanism that is well thought out to reduce any possible overhead.
+
+* The evaluation is carefully conducted and includes simulated results for
+  future DRAM generations so the reader can see how the problem increases with
+  DRAM scaling
+
+==+== C. Weaknesses
+
+* Profiling is only described briefly although we now know that getting an
+  accurate profile can be tricky (e.g. DPD and VRT).
+
+* Prior works also exploited DRAM retention time to decrease cell refreshes so
+  the novelty of this paper is limited to the use of Bloom Filters to reduce
+  storage overhead.
+
+* The explanation why RAIDR outperforms a no-refresh scenario is a bit shaky so
+  this result might need further investigation.
+
+==+== D. Thoughts and ideas
+
+* Once we have a reliable retention time profile many solutions for improving
+  DRAM refresh become feasible so how to get these profiles seems an
+  interesting research direction.
+
+==+== E. Takeaways
+
+* DRAM refresh is a real threat to performance and energy consumption and the
+  problem increases with scaling.
+
+* A Bloom filter is an efficient data structure for testing set membership if
+  false-positives can be tolerated.
+
+==+== F. Other comments
+
+* Compare RAIDR to other works might have given a better overview because Smart
+  Refresh obviously performs poorly.
+
+==+== Scratchpad (for unsaved private notes)
+
+==+== End Review
+

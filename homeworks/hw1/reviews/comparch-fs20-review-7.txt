@@ -1,0 +1,85 @@
+==+== Computer Architecture Paper Review Form
+==-== DO NOT CHANGE LINES THAT START WITH "==+==" UNLESS DIRECTED!
+==-== For further guidance, or to upload this file when you are done, go to:
+==-== https://safari.ethz.ch/review/architecture20/offline
+
+==+== =====================================================================
+==+== Begin Review #7.
+==+== Version 1
+==+== Reviewer: Fabian Wüthrich <fabianwu@student.ethz.ch>
+==-== Updated 7 Oct 2020 8:42am EDT
+
+==+== Paper #7
+==-== Title: Revisiting RowHammer: An Experimental Analysis of Modern
+==-==        Devices and Mitigation Techniques
+
+==+== Review Readiness
+==-== Enter "Ready" if the review is ready for others to see:
+
+Ready
+
+==+== A. Paper summary
+
+This paper examined 1580 DRAM chips of different technology nodes for the 
+RowHammer vulnerability and the results show that newer DRAM chips are
+more vulnerable to RowHammer. The authors explain this trend with the 
+increased cell density which increases inference between adjacent rows.
+
+Then they used the collected data to evaluate five state-of-the-art 
+mitigation techniques. With simulations they uncovered that existing
+protection mechanisms are either not scalable or suffer from a large
+performance overhead for more vulnerable chips in the future.
+
+They concluded that more research on effective solutions to RowHammer
+is critical.
+
+==+== B. Strengths
+
+* In contrast to prior works this paper provides real data and makes no
+  assumptions that newer chips are more vulnerable to RowHammer
+
+* Superior methodology and carefully conducted simulations
+
+* Many interesting plots and observations
+
+==+== C. Weaknesses
+
+* The grouping of the technology nodes (new/old) is somewhat unclear (also
+  hard because confidential)
+
+* Certain observations don't support the hypothesis and the authors explain
+  these discrepancies with the incorrect classification of the chips. Why
+  not fix the classification and see if results are consistent?
+
+==+== D. Thoughts and ideas
+
+* Research refresh based/circuit level mitigation techniques
+
+* Observation 1 shows that the bitflips in manufacturer A's chips are very 
+  low. It would be interesting to find the reason for that.
+
+* Research how to effectively implement multi-bit ECC
+
+==+== E. Takeaways
+
+* Good example for rigorous methodology
+
+* RowHammer is not fixed and new DRAM chips become increasingly more vulnerable
+  so additional research is vital for secure and reliable systems.
+
+==+== F. Other comments
+
+* Goal of paper is mentioned twice (once in Section 1 and once in Section 3)
+
+* As there is a significant difference between the vulnerability of the tested
+  chips it would be useful to publish the manufacturer and exact type of the 
+  chips so people can decide which manufacturer/chip they should prefer.
+
+* ProHIT and MRLoc are promising mitigation techniques but they were only
+  evaluated for HC=2000. Maybe an exchange with the original authors leads
+  to solutions for different HC and to more complete results in the simulation.
+
+==+== Scratchpad (for unsaved private notes)
+
+==+== End Review
+
