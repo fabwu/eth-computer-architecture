@@ -5,7 +5,7 @@
 # Juan Gomez Luna, 2017
 # Minesh Patel, 2020
 
-import sys, os, subprocess, re, glob, argparse, configparser
+import sys, os, subprocess, re, glob, argparse
 
 ref = "./basesim"
 sim = "./sim"
@@ -17,77 +17,47 @@ normal="\033[0m"
 
 
 def main():
-    all_test_inputs = glob.glob("inputs/*/*.x")
-    all_benchmark_inputs = glob.glob("benchmarks/*/*.ini")
+    all_inputs = glob.glob("inputs/*/*.x")
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("mode", choices=["benchmark", "test"])
-    parser.add_argument("inputs", nargs="*", default="")
+    parser.add_argument("inputs", nargs="*", default=all_inputs)
     parser = parser.parse_args()
 
-    if parser.mode == "benchmark":
-        if not parser.inputs:
-            parser.inputs = all_benchmark_inputs
-        for i in parser.inputs:
-            config = configparser.ConfigParser()
-            config.read(i)
-            if not config.sections():
-                print(red + "ERROR -- input file (*.ini) not found: " + i + normal)
-                continue
+    for i in parser.inputs:
+        if not os.path.exists(i):
+            print(red + "ERROR -- input file (*.x) not found: " + i + normal)
+            continue
 
-            print(bold + "Benchmark: " + normal + i)
-            sim_out = benchmark(config)
-            if not sim_out:
-                print(red + "ERROR -- no output from simulator" + normal)
-                continue
-            stats = {}
-            for line in sim_out.split("\n"):
-                x = line.split(": ");
-                stats[x[0]] = x[1]
-            print("Cycles: " + stats['Cycles'])
-            print("IPC: " + stats['IPC'])
-            print("Data Hit/Miss: " + stats['DataHit'] + "/" + stats['DataMiss'])
-            print("Inst Hit/Miss: " + stats['InstHit'] + "/" + stats['InstMiss'])
+        print(bold + "Testing: " + normal + i)
+        ref_out, sim_out = run(i)
 
-    elif parser.mode == "test":
-        if not parser.inputs:
-            parser.inputs = all_test_inputs
-        for i in parser.inputs:
-            if not os.path.exists(i):
-                print(red + "ERROR -- input file (*.x) not found: " + i + normal)
-                continue
+        print("  " + "Stats".ljust(14) + "BaselineSim".center(14) + "YourSim".center(14))
 
-            print(bold + "Testing: " + normal + i)
-            ref_out, sim_out = run(i)
+        ref_out = ref_out.split("\n")
+        sim_out = sim_out.split("\n")
+        
+        nocheck = 0
+        error = 0
+        for r, s in zip(ref_out, sim_out):
 
-            print("  " + "Stats".ljust(14) + "BaselineSim".center(14) + "YourSim".center(14))
+            r0 = r.split()[0]
+            r1 = r.split()[1]
+            s1 = s.split()[1]
 
-            ref_out = ref_out.split("\n")
-            sim_out = sim_out.split("\n")
-            
-            nocheck = 0
-            error = 0
-            for r, s in zip(ref_out, sim_out):
+            print("  " + r0.ljust(14) + r1.center(14) + s1.center(14),)
 
-                r0 = r.split()[0]
-                r1 = r.split()[1]
-                s1 = s.split()[1]
-
-                print("  " + r0.ljust(14) + r1.center(14) + s1.center(14),)
-
-                if (r0 == "Cycles:"):
-                    nocheck = 1
-                if (r1 != s1 and nocheck == 0):
-                    print("  " + red + "ERROR" + normal)
-                    error = 1
-            else:
-                print()
-
-            if error == 0:
-                print("  " + green + "REGISTER CONTENTS OK" + normal)
-            else:
-                raise ValueError("REGISTER CONTENTS ERROR")
+            if (r0 == "Cycles:"):
+                nocheck = 1
+            if (r1 != s1 and nocheck == 0):
+                print("  " + red + "ERROR" + normal)
+                error = 1
+        else:
             print()
+
+        if error == 0:
+            print("  " + green + "REGISTER CONTENTS OK" + normal)
+        print()
+
 
 def run(i):
     global ref, sim
@@ -106,39 +76,10 @@ def run(i):
 
     return filter_stats(r.decode('utf-8')), filter_stats(s.decode('utf-8'))
 
-def benchmark(config):
-    global sim
-
-    i = config["DEFAULT"]["Input"]
-    simproc = subprocess.Popen(
-            [sim, i], 
-            executable=sim, 
-            stdin=subprocess.PIPE, 
-            stdout=subprocess.PIPE, 
-            stderr=subprocess.PIPE,
-            env = {
-                "INST_CACHE_TOTAL_SIZE": config["INSTRUCTION CACHE"]["TotalSize"],
-                "INST_CACHE_BLOCK_SIZE": config["INSTRUCTION CACHE"]["BlockSize"],
-                "INST_CACHE_NUM_WAY": config["INSTRUCTION CACHE"]["NumWay"],
-                "DATA_CACHE_TOTAL_SIZE": config["DATA CACHE"]["TotalSize"],
-                "DATA_CACHE_BLOCK_SIZE": config["DATA CACHE"]["BlockSize"],
-                "DATA_CACHE_NUM_WAY": config["DATA CACHE"]["NumWay"]
-            }
-        )
-
-    cmds = b""
-    cmdfile = os.path.splitext(i)[0] + ".cmd"
-    if os.path.exists(cmdfile):
-      cmds += open(cmdfile).read().encode('utf-8')
-
-    cmds += b"\ngo\nrdump\nquit\n"
-    (s, s_err) = simproc.communicate(input=cmds)
-
-    return filter_stats(s.decode('utf-8'))
 
 def filter_stats(out):
     lines = out.split("\n")
-    regex = re.compile("^(HI:)|(LO:)|(R\d+:)|(PC:)|(Cycles:)|(Fetched\w+:)|(Retired\w+:)|(IPC:)|(Flushes:)|(Data\w+:)|(Inst\w+:).*$")
+    regex = re.compile("^(HI:)|(LO:)|(R\d+:)|(PC:)|(Cycles:)|(Fetched\w+:)|(Retired\w+:)|(IPC:)|(Flushes:).*$")
     out = []
     for l in lines:
         if regex.match(l):
