@@ -1,0 +1,939 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_OUTPUT_FILESEP	slash	/slash or backslash/
+!_TAG_OUTPUT_MODE	u-ctags	/u-ctags or e-ctags/
+!_TAG_PROGRAM_AUTHOR	Universal Ctags Team	//
+!_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/
+!_TAG_PROGRAM_URL	https://ctags.io/	/official site/
+!_TAG_PROGRAM_VERSION	0.0.0	/a3c87ab5/
+BROP_BGEZ	src/mips.h	/^#define BROP_BGEZ /;"	d
+BROP_BGEZAL	src/mips.h	/^#define BROP_BGEZAL /;"	d
+BROP_BLTZ	src/mips.h	/^#define BROP_BLTZ /;"	d
+BROP_BLTZAL	src/mips.h	/^#define BROP_BLTZAL /;"	d
+Bad	inputs/long/repmovs.s	/^Bad:$/;"	l
+BlockSize	benchmarks/baseline.ini	/^BlockSize=0$/;"	k	section:DATA CACHE
+BlockSize	benchmarks/baseline.ini	/^BlockSize=0$/;"	k	section:INSTRUCTION CACHE
+BlockSize	benchmarks/example.ini	/^BlockSize=32$/;"	k	section:DATA CACHE
+BlockSize	benchmarks/example.ini	/^BlockSize=32$/;"	k	section:INSTRUCTION CACHE
+CACHE_HIT	src/cache.h	/^enum Cache_Result { CACHE_MISS, CACHE_HIT };$/;"	e	enum:Cache_Result
+CACHE_MISS	src/cache.h	/^enum Cache_Result { CACHE_MISS, CACHE_HIT };$/;"	e	enum:Cache_Result
+Cache_Block	src/cache.h	/^typedef struct Cache_Block {$/;"	s
+Cache_Block	src/cache.h	/^} Cache_Block;$/;"	t	typeref:struct:Cache_Block
+Cache_Result	src/cache.h	/^enum Cache_Result { CACHE_MISS, CACHE_HIT };$/;"	g
+Cache_State	src/cache.h	/^typedef struct Cache_State {$/;"	s
+Cache_State	src/cache.h	/^} Cache_State;$/;"	t	typeref:struct:Cache_State
+CheckLoop	inputs/long/repmovs.s	/^CheckLoop:$/;"	l
+CopyLoop	inputs/long/repmovs.s	/^CopyLoop:$/;"	l
+DATA CACHE	benchmarks/baseline.ini	/^[DATA CACHE]$/;"	s
+DATA CACHE	benchmarks/example.ini	/^[DATA CACHE]$/;"	s
+DATA_CACHE_DEFAULT_BLOCK_SIZE	src/pipe.c	/^#define DATA_CACHE_DEFAULT_BLOCK_SIZE /;"	d	file:
+DATA_CACHE_DEFAULT_NUM_WAY	src/pipe.c	/^#define DATA_CACHE_DEFAULT_NUM_WAY /;"	d	file:
+DATA_CACHE_DEFAULT_TOTAL_SIZE	src/pipe.c	/^#define DATA_CACHE_DEFAULT_TOTAL_SIZE /;"	d	file:
+DEBUG	src/pipe.c	/^#define DEBUG$/;"	d	file:
+DEFAULT	benchmarks/baseline.ini	/^[DEFAULT]$/;"	s
+DEFAULT	benchmarks/example.ini	/^[DEFAULT]$/;"	s
+FALSE	src/shell.h	/^#define FALSE /;"	d
+Finish	inputs/long/repmovs.s	/^Finish:$/;"	l
+HI	src/pipe.h	/^  uint32_t HI, LO;$/;"	m	struct:Pipe_State	typeref:typename:uint32_t
+INPUT	Makefile	/^INPUT ?= $(wildcard inputs\/*\/*.x)$/;"	m
+INSTRUCTION CACHE	benchmarks/baseline.ini	/^[INSTRUCTION CACHE]$/;"	s
+INSTRUCTION CACHE	benchmarks/example.ini	/^[INSTRUCTION CACHE]$/;"	s
+INST_CACHE_DEFAULT_BLOCK_SIZE	src/pipe.c	/^#define INST_CACHE_DEFAULT_BLOCK_SIZE /;"	d	file:
+INST_CACHE_DEFAULT_NUM_WAY	src/pipe.c	/^#define INST_CACHE_DEFAULT_NUM_WAY /;"	d	file:
+INST_CACHE_DEFAULT_TOTAL_SIZE	src/pipe.c	/^#define INST_CACHE_DEFAULT_TOTAL_SIZE /;"	d	file:
+Input	benchmarks/baseline.ini	/^Input=inputs\/cache\/test1.x$/;"	k	section:DEFAULT
+Input	benchmarks/example.ini	/^Input=inputs\/cache\/test1.x$/;"	k	section:DEFAULT
+L1	inputs/long/fibonacci.s	/^L1:$/;"	l
+LO	src/pipe.h	/^  uint32_t HI, LO;$/;"	m	struct:Pipe_State	typeref:typename:uint32_t
+Loop	inputs/branch/test1.s	/^Loop:$/;"	l
+Loop	inputs/cache/test1.s	/^Loop:$/;"	l
+MEM_DATA_SIZE	src/shell.c	/^#define MEM_DATA_SIZE /;"	d	file:
+MEM_DATA_START	src/shell.c	/^#define MEM_DATA_START /;"	d	file:
+MEM_KDATA_SIZE	src/shell.c	/^#define MEM_KDATA_SIZE /;"	d	file:
+MEM_KDATA_START	src/shell.c	/^#define MEM_KDATA_START /;"	d	file:
+MEM_KTEXT_SIZE	src/shell.c	/^#define MEM_KTEXT_SIZE /;"	d	file:
+MEM_KTEXT_START	src/shell.c	/^#define MEM_KTEXT_START /;"	d	file:
+MEM_NREGIONS	src/shell.c	/^#define MEM_NREGIONS /;"	d	file:
+MEM_REGIONS	src/shell.c	/^mem_region_t MEM_REGIONS[] = {{MEM_TEXT_START, MEM_TEXT_SIZE, NULL},$/;"	v	typeref:typename:mem_region_t[]
+MEM_STACK_SIZE	src/shell.c	/^#define MEM_STACK_SIZE /;"	d	file:
+MEM_STACK_START	src/shell.c	/^#define MEM_STACK_START /;"	d	file:
+MEM_TEXT_SIZE	src/shell.c	/^#define MEM_TEXT_SIZE /;"	d	file:
+MEM_TEXT_START	src/shell.c	/^#define MEM_TEXT_START /;"	d	file:
+NumWay	benchmarks/baseline.ini	/^NumWay=0$/;"	k	section:DATA CACHE
+NumWay	benchmarks/baseline.ini	/^NumWay=0$/;"	k	section:INSTRUCTION CACHE
+NumWay	benchmarks/example.ini	/^NumWay=4$/;"	k	section:INSTRUCTION CACHE
+NumWay	benchmarks/example.ini	/^NumWay=8$/;"	k	section:DATA CACHE
+OP_ADDI	src/mips.h	/^#define OP_ADDI /;"	d
+OP_ADDIU	src/mips.h	/^#define OP_ADDIU /;"	d
+OP_ANDI	src/mips.h	/^#define OP_ANDI /;"	d
+OP_BEQ	src/mips.h	/^#define OP_BEQ /;"	d
+OP_BGTZ	src/mips.h	/^#define OP_BGTZ /;"	d
+OP_BLEZ	src/mips.h	/^#define OP_BLEZ /;"	d
+OP_BNE	src/mips.h	/^#define OP_BNE /;"	d
+OP_BRSPEC	src/mips.h	/^#define OP_BRSPEC /;"	d
+OP_J	src/mips.h	/^#define OP_J /;"	d
+OP_JAL	src/mips.h	/^#define OP_JAL /;"	d
+OP_LB	src/mips.h	/^#define OP_LB /;"	d
+OP_LBU	src/mips.h	/^#define OP_LBU /;"	d
+OP_LH	src/mips.h	/^#define OP_LH /;"	d
+OP_LHU	src/mips.h	/^#define OP_LHU /;"	d
+OP_LUI	src/mips.h	/^#define OP_LUI /;"	d
+OP_LW	src/mips.h	/^#define OP_LW /;"	d
+OP_ORI	src/mips.h	/^#define OP_ORI /;"	d
+OP_SB	src/mips.h	/^#define OP_SB /;"	d
+OP_SH	src/mips.h	/^#define OP_SH /;"	d
+OP_SLTI	src/mips.h	/^#define OP_SLTI /;"	d
+OP_SLTIU	src/mips.h	/^#define OP_SLTIU /;"	d
+OP_SPECIAL	src/mips.h	/^#define OP_SPECIAL /;"	d
+OP_SW	src/mips.h	/^#define OP_SW /;"	d
+OP_XORI	src/mips.h	/^#define OP_XORI /;"	d
+PC	src/pipe.h	/^  uint32_t PC;$/;"	m	struct:Pipe_State	typeref:typename:uint32_t
+Pipe_Op	src/pipe.h	/^typedef struct Pipe_Op {$/;"	s
+Pipe_Op	src/pipe.h	/^} Pipe_Op;$/;"	t	typeref:struct:Pipe_Op
+Pipe_State	src/pipe.h	/^typedef struct Pipe_State {$/;"	s
+Pipe_State	src/pipe.h	/^} Pipe_State;$/;"	t	typeref:struct:Pipe_State
+REGS	src/pipe.h	/^  uint32_t REGS[32];$/;"	m	struct:Pipe_State	typeref:typename:uint32_t[32]
+RUN_BIT	src/shell.c	/^int RUN_BIT = TRUE;$/;"	v	typeref:typename:int
+SRC	Makefile	/^SRC = $(wildcard src\/*.c)$/;"	m
+SUBOP_ADD	src/mips.h	/^#define SUBOP_ADD /;"	d
+SUBOP_ADDU	src/mips.h	/^#define SUBOP_ADDU /;"	d
+SUBOP_AND	src/mips.h	/^#define SUBOP_AND /;"	d
+SUBOP_DIV	src/mips.h	/^#define SUBOP_DIV /;"	d
+SUBOP_DIVU	src/mips.h	/^#define SUBOP_DIVU /;"	d
+SUBOP_JALR	src/mips.h	/^#define SUBOP_JALR /;"	d
+SUBOP_JR	src/mips.h	/^#define SUBOP_JR /;"	d
+SUBOP_MFHI	src/mips.h	/^#define SUBOP_MFHI /;"	d
+SUBOP_MFLO	src/mips.h	/^#define SUBOP_MFLO /;"	d
+SUBOP_MTHI	src/mips.h	/^#define SUBOP_MTHI /;"	d
+SUBOP_MTLO	src/mips.h	/^#define SUBOP_MTLO /;"	d
+SUBOP_MULT	src/mips.h	/^#define SUBOP_MULT /;"	d
+SUBOP_MULTU	src/mips.h	/^#define SUBOP_MULTU /;"	d
+SUBOP_NOR	src/mips.h	/^#define SUBOP_NOR /;"	d
+SUBOP_OR	src/mips.h	/^#define SUBOP_OR /;"	d
+SUBOP_SLL	src/mips.h	/^#define SUBOP_SLL /;"	d
+SUBOP_SLLV	src/mips.h	/^#define SUBOP_SLLV /;"	d
+SUBOP_SLT	src/mips.h	/^#define SUBOP_SLT /;"	d
+SUBOP_SLTU	src/mips.h	/^#define SUBOP_SLTU /;"	d
+SUBOP_SRA	src/mips.h	/^#define SUBOP_SRA /;"	d
+SUBOP_SRAV	src/mips.h	/^#define SUBOP_SRAV /;"	d
+SUBOP_SRL	src/mips.h	/^#define SUBOP_SRL /;"	d
+SUBOP_SRLV	src/mips.h	/^#define SUBOP_SRLV /;"	d
+SUBOP_SUB	src/mips.h	/^#define SUBOP_SUB /;"	d
+SUBOP_SUBU	src/mips.h	/^#define SUBOP_SUBU /;"	d
+SUBOP_SYSCALL	src/mips.h	/^#define SUBOP_SYSCALL /;"	d
+SUBOP_XOR	src/mips.h	/^#define SUBOP_XOR /;"	d
+T1	inputs/branch/test1.s	/^T1: div $t0, $t2$/;"	l
+T2	inputs/branch/test1.s	/^T2: div $t0, $t3$/;"	l
+T3	inputs/branch/test1.s	/^T3: addiu $t0, $t0, -1$/;"	l
+TRUE	src/shell.h	/^#define TRUE /;"	d
+TotalSize	benchmarks/baseline.ini	/^TotalSize=0$/;"	k	section:DATA CACHE
+TotalSize	benchmarks/baseline.ini	/^TotalSize=0$/;"	k	section:INSTRUCTION CACHE
+TotalSize	benchmarks/example.ini	/^TotalSize=65536$/;"	k	section:DATA CACHE
+TotalSize	benchmarks/example.ini	/^TotalSize=8192$/;"	k	section:INSTRUCTION CACHE
+_CACHE_H_	src/cache.h	/^#define _CACHE_H_$/;"	d
+_MIPS_H_	src/mips.h	/^#define _MIPS_H_$/;"	d
+_PIPE_H_	src/pipe.h	/^#define _PIPE_H_$/;"	d
+_SIM_SHELL_H_	src/shell.h	/^#define _SIM_SHELL_H_$/;"	d
+__anon9b5c1f250108	src/shell.c	/^typedef struct {$/;"	s	file:
+__start	inputs/medium/addiu.s	/^__start:	addiu $v0, $zero, 10$/;"	l
+add	inputs/inst/add.s	/^add $10, $8, $8$/;"	l
+add	inputs/inst/add.s	/^add $11, $8, $9$/;"	l
+add	inputs/inst/add.s	/^add $12, $9, $8$/;"	l
+add	inputs/inst/add.s	/^add $13, $9, $9$/;"	l
+add	inputs/medium/bltztest.s	/^add $t0, $ra, $0$/;"	l
+addi	inputs/inst/addi.s	/^addi $10, $zero, 0x0001$/;"	l
+addi	inputs/inst/addi.s	/^addi $10, $zero, 0x0005$/;"	l
+addi	inputs/inst/addi.s	/^addi $8, $9, -0x0009$/;"	l
+addi	inputs/inst/addi.s	/^addi $9, $10, -0x0002$/;"	l
+addi	inputs/medium/additest.s	/^addi $t1, $t0, 4321$/;"	l
+addi	inputs/medium/bltztest.s	/^addi $ra, $ra, -12 # 4 * (foo3 - bltzal_r)$/;"	l
+addi	inputs/medium/bltztest.s	/^addi $ra, $ra, -12 # 4 * (foo5 - bgezal_r)$/;"	l
+addiu	inputs/inst/add.s	/^addiu $2, $0, 10$/;"	l
+addiu	inputs/inst/addi.s	/^addiu $2, $0, 10$/;"	l
+addiu	inputs/inst/addiu.s	/^addiu $10, $zero, 0x0001$/;"	l
+addiu	inputs/inst/addiu.s	/^addiu $10, $zero, 0x0005$/;"	l
+addiu	inputs/inst/addiu.s	/^addiu $2, $0, 10$/;"	l
+addiu	inputs/inst/addiu.s	/^addiu $8, $9, -0x0009$/;"	l
+addiu	inputs/inst/addiu.s	/^addiu $9, $10, -0x0002$/;"	l
+addiu	inputs/inst/addu.s	/^addiu $2, $0, 10$/;"	l
+addiu	inputs/inst/and.s	/^addiu $2, $0, 10$/;"	l
+addiu	inputs/inst/andi.s	/^addiu $2, $0, 10$/;"	l
+addiu	inputs/inst/beq.s	/^addiu $2, $0, 10$/;"	l
+addiu	inputs/inst/bgez.s	/^addiu $2, $0, 10$/;"	l
+addiu	inputs/inst/bgezal0.s	/^addiu $2, $0, 10$/;"	l
+addiu	inputs/inst/bgezal1.s	/^addiu $2, $0, 10$/;"	l
+addiu	inputs/inst/bgtz.s	/^addiu $2, $0, 10$/;"	l
+addiu	inputs/inst/blez.s	/^addiu $2, $0, 10$/;"	l
+addiu	inputs/inst/bltz.s	/^addiu $2, $0, 10$/;"	l
+addiu	inputs/inst/bltzal0.s	/^addiu $2, $0, 10$/;"	l
+addiu	inputs/inst/bltzal1.s	/^addiu $2, $0, 10$/;"	l
+addiu	inputs/inst/bne.s	/^addiu $2, $0, 10$/;"	l
+addiu	inputs/inst/div_neg_neg.s	/^addiu $2, $0, 10$/;"	l
+addiu	inputs/inst/div_pos_neg.s	/^addiu $2, $0, 10$/;"	l
+addiu	inputs/inst/div_pos_pos.s	/^addiu $2, $0, 10$/;"	l
+addiu	inputs/inst/divu_neg_neg.s	/^addiu $2, $0, 10$/;"	l
+addiu	inputs/inst/divu_pos_neg.s	/^addiu $2, $0, 10$/;"	l
+addiu	inputs/inst/divu_pos_pos.s	/^addiu $2, $0, 10$/;"	l
+addiu	inputs/inst/j.s	/^addiu $2, $0, 10$/;"	l
+addiu	inputs/inst/jal.s	/^addiu $2, $0, 10$/;"	l
+addiu	inputs/inst/jalr.s	/^addiu $2, $0, 10$/;"	l
+addiu	inputs/inst/jr.s	/^addiu $2, $0, 10$/;"	l
+addiu	inputs/inst/lui.s	/^addiu $2, $0, 10$/;"	l
+addiu	inputs/inst/mfhi.s	/^addiu $2, $0, 10$/;"	l
+addiu	inputs/inst/mflo.s	/^addiu $2, $0, 10$/;"	l
+addiu	inputs/inst/mthi.s	/^addiu $2, $0, 10$/;"	l
+addiu	inputs/inst/mtlo.s	/^addiu $2, $0, 10$/;"	l
+addiu	inputs/inst/mult_neg_neg.s	/^addiu $2, $0, 10$/;"	l
+addiu	inputs/inst/mult_pos_neg.s	/^addiu $2, $0, 10$/;"	l
+addiu	inputs/inst/mult_pos_pos.s	/^addiu $2, $0, 10$/;"	l
+addiu	inputs/inst/multu_neg_neg.s	/^addiu $2, $0, 10$/;"	l
+addiu	inputs/inst/multu_pos_neg.s	/^addiu $2, $0, 10$/;"	l
+addiu	inputs/inst/multu_pos_pos.s	/^addiu $2, $0, 10$/;"	l
+addiu	inputs/inst/nor.s	/^addiu $2, $0, 10$/;"	l
+addiu	inputs/inst/or.s	/^addiu $2, $0, 10$/;"	l
+addiu	inputs/inst/ori.s	/^addiu $2, $0, 10$/;"	l
+addiu	inputs/inst/sll.s	/^addiu $2, $0, 10$/;"	l
+addiu	inputs/inst/sllv.s	/^addiu $2, $0, 10$/;"	l
+addiu	inputs/inst/slt.s	/^addiu $2, $0, 10$/;"	l
+addiu	inputs/inst/slti.s	/^addiu $2, $0, 10$/;"	l
+addiu	inputs/inst/sltiu.s	/^addiu $2, $0, 10$/;"	l
+addiu	inputs/inst/sltu.s	/^addiu $2, $0, 10$/;"	l
+addiu	inputs/inst/sra.s	/^addiu $2, $0, 10$/;"	l
+addiu	inputs/inst/srav.s	/^addiu $2, $0, 10$/;"	l
+addiu	inputs/inst/srl.s	/^addiu $2, $0, 10$/;"	l
+addiu	inputs/inst/srlv.s	/^addiu $2, $0, 10$/;"	l
+addiu	inputs/inst/sub.s	/^addiu $2, $0, 10$/;"	l
+addiu	inputs/inst/subu.s	/^addiu $2, $0, 10$/;"	l
+addiu	inputs/inst/trial.s	/^addiu $10, $zero, 0x00000001$/;"	l
+addiu	inputs/inst/trial.s	/^addiu $10, $zero, 0x12340005$/;"	l
+addiu	inputs/inst/trial.s	/^addiu $2, $0, 10$/;"	l
+addiu	inputs/inst/trial.s	/^addiu $8, $9, -0x0009$/;"	l
+addiu	inputs/inst/trial.s	/^addiu $9, $10, -0x0002$/;"	l
+addiu	inputs/inst/xor.s	/^addiu $2, $0, 10$/;"	l
+addiu	inputs/inst/xori.s	/^addiu $2, $0, 10$/;"	l
+addiu	inputs/long/repmovs.s	/^addiu $10, 0xbaadbaad$/;"	l
+addiu	inputs/long/repmovs.s	/^addiu $2, $0, 10$/;"	l
+addiu	inputs/long/repmovs.s	/^addiu $2, $0, 100$/;"	l
+addiu	inputs/long/repmovs.s	/^addiu $2, $0, 400$/;"	l
+addiu	inputs/long/repmovs.s	/^addiu $2, $2, -1$/;"	l
+addiu	inputs/long/repmovs.s	/^addiu $2, $2, 4$/;"	l
+addiu	inputs/long/repmovs.s	/^addiu $3, $3, 1$/;"	l
+addiu	inputs/long/repmovs.s	/^addiu $4, $0, 100$/;"	l
+addiu	inputs/long/repmovs.s	/^addiu $4, $4, -1$/;"	l
+addiu	inputs/long/repmovs.s	/^addiu $4, $4, 1$/;"	l
+addiu	inputs/long/repmovs.s	/^addiu $4, $4, 4$/;"	l
+addiu	inputs/medium/additest.s	/^addiu $t0, $0, 1234$/;"	l
+addiu	inputs/medium/additest.s	/^addiu $t2, $0, 5555$/;"	l
+addiu	inputs/medium/additest.s	/^addiu $t8, $0, -0x8000$/;"	l
+addiu	inputs/medium/additest.s	/^addiu $v0, $0, 10$/;"	l
+addiu	inputs/medium/additest.s	/^addiu $v1, $0, 0x1234$/;"	l
+addiu	inputs/medium/additest.s	/^addiu $v1, $0, 0x5678$/;"	l
+addiu	inputs/medium/andor.s	/^addiu $t1, $0, 0x1234$/;"	l
+addiu	inputs/medium/andor.s	/^addiu $t1, $t1, 0x5678$/;"	l
+addiu	inputs/medium/andor.s	/^addiu $v0, $0, 10$/;"	l
+addiu	inputs/medium/andor.s	/^addiu $v1, $0, 0x1234$/;"	l
+addiu	inputs/medium/andor.s	/^addiu $v1, $0, 0x5678$/;"	l
+addiu	inputs/medium/beqtest.s	/^addiu $t0, $0, 10$/;"	l
+addiu	inputs/medium/beqtest.s	/^addiu $t1, $0, 10$/;"	l
+addiu	inputs/medium/beqtest.s	/^addiu $t1, $0, 11$/;"	l
+addiu	inputs/medium/beqtest.s	/^addiu $v0, $0, 10$/;"	l
+addiu	inputs/medium/beqtest.s	/^addiu $v1, $0, 0x1234$/;"	l
+addiu	inputs/medium/beqtest.s	/^addiu $v1, $0, 0x5678$/;"	l
+addiu	inputs/medium/bgtztest.s	/^addiu $t0, $0, -10$/;"	l
+addiu	inputs/medium/bgtztest.s	/^addiu $t0, $0, 0$/;"	l
+addiu	inputs/medium/bgtztest.s	/^addiu $t0, $0, 10$/;"	l
+addiu	inputs/medium/bgtztest.s	/^addiu $v0, $0, 10$/;"	l
+addiu	inputs/medium/bgtztest.s	/^addiu $v1, $0, 0x1234$/;"	l
+addiu	inputs/medium/bgtztest.s	/^addiu $v1, $0, 0x5678$/;"	l
+addiu	inputs/medium/bleztest.s	/^addiu $t0, $0, -10$/;"	l
+addiu	inputs/medium/bleztest.s	/^addiu $t0, $0, 0$/;"	l
+addiu	inputs/medium/bleztest.s	/^addiu $t0, $0, 10$/;"	l
+addiu	inputs/medium/bleztest.s	/^addiu $v0, $0, 10$/;"	l
+addiu	inputs/medium/bleztest.s	/^addiu $v1, $0, 0x1234$/;"	l
+addiu	inputs/medium/bleztest.s	/^addiu $v1, $0, 0x5678$/;"	l
+addiu	inputs/medium/bltztest.s	/^addiu $t0, $0, -10$/;"	l
+addiu	inputs/medium/bltztest.s	/^addiu $t0, $0, 0$/;"	l
+addiu	inputs/medium/bltztest.s	/^addiu $t0, $0, 10$/;"	l
+addiu	inputs/medium/bltztest.s	/^addiu $v0, $0, 10$/;"	l
+addiu	inputs/medium/bltztest.s	/^addiu $v1, $0, 0x1234$/;"	l
+addiu	inputs/medium/bltztest.s	/^addiu $v1, $0, 0x5678$/;"	l
+addiu	inputs/medium/jaltest.s	/^addiu $v0, $0, 10$/;"	l
+addiu	inputs/medium/jtest.s	/^addiu $a1, $0, 42$/;"	l
+addiu	inputs/medium/jtest.s	/^addiu $a1, $0, 43$/;"	l
+addiu	inputs/medium/jtest.s	/^addiu $v0, $0, 10$/;"	l
+addiu	inputs/medium/mem.s	/^addiu $t4, $0, 0xff$/;"	l
+addiu	inputs/medium/mem.s	/^addiu $t4, $0, 5$/;"	l
+addiu	inputs/medium/mem.s	/^addiu $t4, $0, 7$/;"	l
+addiu	inputs/medium/mem.s	/^addiu $t5, $0, 0x0102$/;"	l
+addiu	inputs/medium/mem.s	/^addiu $t5, $0, 0x0304$/;"	l
+addiu	inputs/medium/mem.s	/^addiu $t5, $0, 1$/;"	l
+addiu	inputs/medium/mem.s	/^addiu $t5, $0, 2$/;"	l
+addiu	inputs/medium/mem.s	/^addiu $t5, $0, 3$/;"	l
+addiu	inputs/medium/mem.s	/^addiu $t5, $0, 4$/;"	l
+addiu	inputs/medium/mem.s	/^addiu $t6, $0, 0xff$/;"	l
+addiu	inputs/medium/mem.s	/^addiu $v0, $0, 10$/;"	l
+addiu	inputs/medium/mem.s	/^addiu $v1, $0, 0x1234$/;"	l
+addiu	inputs/medium/mem.s	/^addiu $v1, $0, 0x5678$/;"	l
+addiu	inputs/medium/multtest.s	/^addiu $v0, $0, 10$/;"	l
+addiu	inputs/medium/multtest.s	/^addiu $v1, $0, 0x1234$/;"	l
+addiu	inputs/medium/multtest.s	/^addiu $v1, $0, 0x5678$/;"	l
+addiu	inputs/medium/setcondtest.s	/^addiu $t0, $0, -1$/;"	l
+addiu	inputs/medium/setcondtest.s	/^addiu $t0, $0, -2$/;"	l
+addiu	inputs/medium/setcondtest.s	/^addiu $t0, $0, 10$/;"	l
+addiu	inputs/medium/setcondtest.s	/^addiu $t0, $0, 42$/;"	l
+addiu	inputs/medium/setcondtest.s	/^addiu $t8, $0, 0$/;"	l
+addiu	inputs/medium/setcondtest.s	/^addiu $t8, $0, 1$/;"	l
+addiu	inputs/medium/setcondtest.s	/^addiu $v0, $0, 10$/;"	l
+addiu	inputs/medium/setcondtest.s	/^addiu $v1, $0, 0x1234$/;"	l
+addiu	inputs/medium/setcondtest.s	/^addiu $v1, $0, 0x5678$/;"	l
+addiu	inputs/medium/sllvtest.s	/^addiu $t1, 13$/;"	l
+addiu	inputs/medium/sllvtest.s	/^addiu $v0, $0, 10$/;"	l
+addiu	inputs/medium/sllvtest.s	/^addiu $v1, $0, 0x1234$/;"	l
+addiu	inputs/medium/sllvtest.s	/^addiu $v1, $0, 0x5678$/;"	l
+addu	inputs/inst/addu.s	/^addu $10, $8, $8$/;"	l
+addu	inputs/inst/addu.s	/^addu $11, $8, $9$/;"	l
+addu	inputs/inst/addu.s	/^addu $12, $9, $8$/;"	l
+addu	inputs/inst/addu.s	/^addu $13, $9, $9$/;"	l
+all	Makefile	/^all: sim$/;"	t
+and	inputs/inst/and.s	/^and $10, $8, $9$/;"	l
+and	inputs/inst/and.s	/^and $13, $11, $12$/;"	l
+and	inputs/inst/and.s	/^and $16, $14, $15$/;"	l
+and	inputs/inst/and.s	/^and $19, $17, $18$/;"	l
+and	inputs/inst/and.s	/^and $22, $20, $21$/;"	l
+and	inputs/inst/and.s	/^and $25, $23, $24$/;"	l
+and	inputs/medium/andor.s	/^and $t2, $t0, $t1$/;"	l
+andi	inputs/inst/andi.s	/^andi $10, $zero, 0x0001$/;"	l
+andi	inputs/inst/andi.s	/^andi $10, $zero, 0x0005$/;"	l
+andi	inputs/inst/andi.s	/^andi $8, $9, -0x0009$/;"	l
+andi	inputs/inst/andi.s	/^andi $9, $10, -0x0002$/;"	l
+andi	inputs/medium/andor.s	/^andi $t3, $t3, 0xffff$/;"	l
+bad	inputs/medium/additest.s	/^bad:$/;"	l
+bad	inputs/medium/andor.s	/^bad:$/;"	l
+bad	inputs/medium/beqtest.s	/^bad:$/;"	l
+bad	inputs/medium/bgtztest.s	/^bad:$/;"	l
+bad	inputs/medium/bleztest.s	/^bad:$/;"	l
+bad	inputs/medium/bltztest.s	/^bad:$/;"	l
+bad	inputs/medium/mem.s	/^bad:$/;"	l
+bad	inputs/medium/multtest.s	/^bad:$/;"	l
+bad	inputs/medium/setcondtest.s	/^bad:$/;"	l
+bad	inputs/medium/sllvtest.s	/^bad:$/;"	l
+bar	inputs/inst/j.s	/^bar:$/;"	l
+bar	inputs/inst/jal.s	/^bar:$/;"	l
+basesim	Makefile	/^basesim: $(SRC)$/;"	t
+benchmark	run.py	/^def benchmark(config):$/;"	f
+beq	inputs/inst/beq.s	/^beq $8, $11, taken2$/;"	l
+beq	inputs/inst/beq.s	/^beq $8, $9, nottaken$/;"	l
+beq	inputs/inst/beq.s	/^beq $zero, $zero, taken1$/;"	l
+beq	inputs/medium/beqtest.s	/^beq $t0, $t1, bad$/;"	l
+beq	inputs/medium/beqtest.s	/^beq $t0, $t1, good$/;"	l
+bgez	inputs/inst/bgez.s	/^bgez $8, nottaken$/;"	l
+bgez	inputs/inst/bgez.s	/^bgez $9, taken1$/;"	l
+bgez	inputs/inst/bgez.s	/^bgez $zero, taken2$/;"	l
+bgez	inputs/inst/bgezal0.s	/^bgez $zero, taken2$/;"	l
+bgezal	inputs/inst/bgezal0.s	/^bgezal $8, nottaken$/;"	l
+bgezal	inputs/inst/bgezal1.s	/^bgezal $8, nottaken$/;"	l
+bgezal	inputs/inst/bgezal1.s	/^bgezal $9, taken1$/;"	l
+bgezal	inputs/inst/bgezal1.s	/^bgezal $zero, taken2$/;"	l
+bgezal	inputs/medium/bltztest.s	/^bgezal $0, foo4$/;"	l
+bgezal_r	inputs/medium/bltztest.s	/^bgezal_r:$/;"	l
+bgtz	inputs/inst/bgtz.s	/^bgtz $8, nottaken$/;"	l
+bgtz	inputs/inst/bgtz.s	/^bgtz $9, taken1$/;"	l
+bgtz	inputs/inst/bgtz.s	/^bgtz $zero, nottaken$/;"	l
+bgtz	inputs/medium/bgtztest.s	/^bgtz $t0, bad$/;"	l
+bgtz	inputs/medium/bgtztest.s	/^bgtz $t0, foo$/;"	l
+bgtz	inputs/medium/bltztest.s	/^bgtz $t0, bad$/;"	l
+bit_length	src/cache.c	/^static int bit_length(uint32_t n) {$/;"	f	typeref:typename:int	file:
+blez	inputs/inst/blez.s	/^blez $8, taken2$/;"	l
+blez	inputs/inst/blez.s	/^blez $9, nottaken$/;"	l
+blez	inputs/inst/blez.s	/^blez $zero, taken1$/;"	l
+blez	inputs/medium/bleztest.s	/^blez $t0, bad$/;"	l
+blez	inputs/medium/bleztest.s	/^blez $t0, foo$/;"	l
+blez	inputs/medium/bleztest.s	/^blez $t0, good$/;"	l
+block_size	src/cache.h	/^  int block_size;$/;"	m	struct:Cache_State	typeref:typename:int
+blocks	src/cache.h	/^  Cache_Block *blocks;$/;"	m	struct:Cache_State	typeref:typename:Cache_Block *
+bltz	inputs/inst/bltz.s	/^bltz $8, taken$/;"	l
+bltz	inputs/inst/bltz.s	/^bltz $9, nottaken$/;"	l
+bltz	inputs/inst/bltz.s	/^bltz $zero, nottaken$/;"	l
+bltz	inputs/medium/bltztest.s	/^bltz $t0, bad$/;"	l
+bltz	inputs/medium/bltztest.s	/^bltz $t0, foo$/;"	l
+bltzal	inputs/inst/bltzal0.s	/^bltzal $9, nottaken$/;"	l
+bltzal	inputs/inst/bltzal1.s	/^bltzal $8, taken$/;"	l
+bltzal	inputs/inst/bltzal1.s	/^bltzal $9, nottaken$/;"	l
+bltzal	inputs/inst/bltzal1.s	/^bltzal $zero, nottaken$/;"	l
+bltzal	inputs/medium/bltztest.s	/^bltzal $t0, foo2$/;"	l
+bltzal_r	inputs/medium/bltztest.s	/^bltzal_r:$/;"	l
+bne	inputs/inst/bne.s	/^bne $8, $11, nottaken$/;"	l
+bne	inputs/inst/bne.s	/^bne $9, $11, taken$/;"	l
+bne	inputs/inst/bne.s	/^bne $zero, $zero, nottaken$/;"	l
+bne	inputs/long/repmovs.s	/^bne   $2, $0, CheckLoop $/;"	l
+bne	inputs/long/repmovs.s	/^bne   $2, $0, CopyLoop$/;"	l
+bne	inputs/long/repmovs.s	/^bne   $4, $0, loading$/;"	l
+bne	inputs/long/repmovs.s	/^bne   $5, $3, Bad$/;"	l
+bne	inputs/medium/additest.s	/^bne $t1, $t2, bad$/;"	l
+bne	inputs/medium/additest.s	/^bne $t8, $t9, bad$/;"	l
+bne	inputs/medium/andor.s	/^bne $t0, $t1, bad$/;"	l
+bne	inputs/medium/andor.s	/^bne $t2, $0, bad$/;"	l
+bne	inputs/medium/andor.s	/^bne $t2, $t3, bad$/;"	l
+bne	inputs/medium/andor.s	/^bne $t3, $t4, bad$/;"	l
+bne	inputs/medium/andor.s	/^bne $t4, $t5, bad$/;"	l
+bne	inputs/medium/andor.s	/^bne $t5, $t6, bad$/;"	l
+bne	inputs/medium/bltztest.s	/^bne $ra, $t0, bad$/;"	l
+bne	inputs/medium/mem.s	/^bne $t4, $t5, bad$/;"	l
+bne	inputs/medium/mem.s	/^bne $t4, $t6, bad$/;"	l
+bne	inputs/medium/multtest.s	/^bne $t0, $t1, bad$/;"	l
+bne	inputs/medium/multtest.s	/^bne $t2, $t4, bad$/;"	l
+bne	inputs/medium/multtest.s	/^bne $t3, $t5, bad$/;"	l
+bne	inputs/medium/setcondtest.s	/^bne $t1, $0, bad$/;"	l
+bne	inputs/medium/setcondtest.s	/^bne $t1, $t8, bad$/;"	l
+bne	inputs/medium/sllvtest.s	/^bne $t2, $t0, bad$/;"	l
+bne	inputs/medium/sllvtest.s	/^bne $t2, $t3, bad$/;"	l
+bold	run.py	/^bold="\\033[1m"$/;"	v
+branch_cond	src/pipe.h	/^  int branch_cond;      \/* is this a conditional branch? *\/$/;"	m	struct:Pipe_Op	typeref:typename:int
+branch_dest	src/pipe.h	/^  uint32_t branch_dest; \/* branch destination (if taken) *\/$/;"	m	struct:Pipe_Op	typeref:typename:uint32_t
+branch_dest	src/pipe.h	/^  uint32_t branch_dest; \/* next fetch will be from this PC *\/$/;"	m	struct:Pipe_State	typeref:typename:uint32_t
+branch_flush	src/pipe.h	/^  int branch_flush; \/* how many stages to flush during recover? (1 = fetch, 2 =$/;"	m	struct:Pipe_State	typeref:typename:int
+branch_recover	src/pipe.h	/^  int branch_recover;   \/* set to '1' to load a new PC *\/$/;"	m	struct:Pipe_State	typeref:typename:int
+branch_taken	src/pipe.h	/^  int branch_taken;     \/* branch taken? (set as soon as resolved: in decode$/;"	m	struct:Pipe_Op	typeref:typename:int
+cache_access	src/cache.c	/^enum Cache_Result cache_access(Cache_State *c, uint32_t addr) {$/;"	f	typeref:enum:Cache_Result
+cache_free	src/cache.c	/^void cache_free(Cache_State *c) { free(c->blocks); }$/;"	f	typeref:typename:void
+cache_init	src/cache.c	/^void cache_init(Cache_State *c, int total_size, int block_size, int num_ways) {$/;"	f	typeref:typename:void
+clean	Makefile	/^clean:$/;"	t
+cycle	src/shell.c	/^void cycle() {$/;"	f	typeref:typename:void
+data_cache	src/pipe.c	/^Cache_State data_cache;$/;"	v	typeref:typename:Cache_State
+data_cache_stall	src/pipe.h	/^  int data_cache_stall; \/* number of remaining cycles until data is loaded from$/;"	m	struct:Pipe_State	typeref:typename:int
+decode_op	src/pipe.h	/^  Pipe_Op *decode_op, *execute_op, *mem_op, *wb_op;$/;"	m	struct:Pipe_State	typeref:typename:Pipe_Op *
+div	inputs/inst/div_neg_neg.s	/^div $8, $9$/;"	l
+div	inputs/inst/div_pos_neg.s	/^div $8, $9$/;"	l
+div	inputs/inst/div_pos_pos.s	/^div $8, $9$/;"	l
+div	inputs/medium/multtest.s	/^div $t0, $t1$/;"	l
+divu	inputs/inst/divu_neg_neg.s	/^divu $8, $9$/;"	l
+divu	inputs/inst/divu_pos_neg.s	/^divu $8, $9$/;"	l
+divu	inputs/inst/divu_pos_pos.s	/^divu $8, $9$/;"	l
+divu	inputs/medium/multtest.s	/^divu $t0, $t1$/;"	l
+execute_op	src/pipe.h	/^  Pipe_Op *decode_op, *execute_op, *mem_op, *wb_op;$/;"	m	struct:Pipe_State	typeref:typename:Pipe_Op **
+filter_stats	run.py	/^def filter_stats(out):$/;"	f
+foo	inputs/inst/j.s	/^foo:$/;"	l
+foo	inputs/inst/jal.s	/^foo:$/;"	l
+foo	inputs/medium/bgtztest.s	/^foo:$/;"	l
+foo	inputs/medium/bleztest.s	/^foo:$/;"	l
+foo	inputs/medium/bltztest.s	/^foo:$/;"	l
+foo	inputs/medium/jaltest.s	/^foo:$/;"	l
+foo	inputs/medium/jtest.s	/^foo:$/;"	l
+foo2	inputs/medium/bltztest.s	/^foo2:$/;"	l
+foo2	inputs/medium/jaltest.s	/^foo2:$/;"	l
+foo3	inputs/medium/bltztest.s	/^foo3:$/;"	l
+foo4	inputs/medium/bltztest.s	/^foo4:$/;"	l
+foo5	inputs/medium/bltztest.s	/^foo5:$/;"	l
+get_command	src/shell.c	/^void get_command() {$/;"	f	typeref:typename:void
+get_set_idx	src/cache.c	/^static uint32_t get_set_idx(Cache_State *c, uint32_t addr) {$/;"	f	typeref:typename:uint32_t	file:
+get_tag	src/cache.c	/^static uint32_t get_tag(Cache_State *c, uint32_t addr) {$/;"	f	typeref:typename:uint32_t	file:
+go	src/shell.c	/^void go() {$/;"	f	typeref:typename:void
+good	inputs/medium/additest.s	/^good:$/;"	l
+good	inputs/medium/andor.s	/^good:$/;"	l
+good	inputs/medium/beqtest.s	/^good:$/;"	l
+good	inputs/medium/bgtztest.s	/^good:$/;"	l
+good	inputs/medium/bleztest.s	/^good:$/;"	l
+good	inputs/medium/bltztest.s	/^good:$/;"	l
+good	inputs/medium/mem.s	/^good:$/;"	l
+good	inputs/medium/multtest.s	/^good:$/;"	l
+good	inputs/medium/setcondtest.s	/^good:$/;"	l
+good	inputs/medium/sllvtest.s	/^good:$/;"	l
+green	run.py	/^green="\\033[0;32m"$/;"	v
+help	src/shell.c	/^void help() {$/;"	f	typeref:typename:void
+imm	inputs/random/randomgen.py	/^imm = None$/;"	v
+imm16	src/pipe.h	/^  uint32_t imm16, se_imm16;$/;"	m	struct:Pipe_Op	typeref:typename:uint32_t
+init_memory	src/shell.c	/^void init_memory() {$/;"	f	typeref:typename:void
+initialize	src/shell.c	/^void initialize(char *program_filename, int num_prog_files) {$/;"	f	typeref:typename:void
+innerloop	inputs/long/primes.s	/^innerloop:$/;"	l
+insn	inputs/random/randomgen.py	/^insn = [ itype_insns, rtype_insns, ldst_insns, muldiv_insns ]$/;"	v
+inst_cache	src/pipe.c	/^Cache_State inst_cache;$/;"	v	typeref:typename:Cache_State
+inst_cache_stall	src/pipe.h	/^  int inst_cache_stall; \/* number of remaining cycles until instruction is$/;"	m	struct:Pipe_State	typeref:typename:int
+instruction	src/pipe.h	/^  uint32_t instruction;$/;"	m	struct:Pipe_Op	typeref:typename:uint32_t
+is_branch	src/pipe.h	/^  int is_branch;        \/* is this a branch? *\/$/;"	m	struct:Pipe_Op	typeref:typename:int
+is_link	src/pipe.h	/^  int is_link;          \/* jump-and-link or branch-and-link inst? *\/$/;"	m	struct:Pipe_Op	typeref:typename:int
+is_mem	src/pipe.h	/^  int is_mem;         \/* is this a load\/store? *\/$/;"	m	struct:Pipe_Op	typeref:typename:int
+itype_args	inputs/random/randomgen.py	/^itype_args = (' ', regs, ',', regs, ',', imm)$/;"	v
+itype_insns	inputs/random/randomgen.py	/^itype_insns = (itype_ops, itype_args)$/;"	v
+itype_ops	inputs/random/randomgen.py	/^itype_ops = ['addiu', 'andi', 'ori', 'xori', 'sltiu']$/;"	v
+j	inputs/inst/j.s	/^j bar$/;"	l
+j	inputs/inst/j.s	/^j foo$/;"	l
+j	inputs/long/repmovs.s	/^j     Finish     $/;"	l
+j	inputs/medium/additest.s	/^j good$/;"	l
+j	inputs/medium/andor.s	/^j good$/;"	l
+j	inputs/medium/beqtest.s	/^j bad$/;"	l
+j	inputs/medium/bgtztest.s	/^j bad$/;"	l
+j	inputs/medium/bgtztest.s	/^j good$/;"	l
+j	inputs/medium/bleztest.s	/^j bad$/;"	l
+j	inputs/medium/bltztest.s	/^j bad$/;"	l
+j	inputs/medium/bltztest.s	/^j good$/;"	l
+j	inputs/medium/jaltest.s	/^j foo$/;"	l
+j	inputs/medium/jtest.s	/^j foo$/;"	l
+j	inputs/medium/setcondtest.s	/^j good$/;"	l
+jal	inputs/inst/jal.s	/^jal bar$/;"	l
+jal	inputs/inst/jal.s	/^jal foo$/;"	l
+jal	inputs/medium/bltztest.s	/^jal foo3$/;"	l
+jal	inputs/medium/bltztest.s	/^jal foo5$/;"	l
+jal	inputs/medium/jaltest.s	/^jal foo2$/;"	l
+jalr	inputs/inst/jalr.s	/^jalr $10$/;"	l
+jalr	inputs/inst/jalr.s	/^jalr $8$/;"	l
+jalr	inputs/inst/jalr.s	/^jalr $9$/;"	l
+jr	inputs/inst/jr.s	/^jr $8$/;"	l
+jr	inputs/inst/jr.s	/^jr $9$/;"	l
+l_0	inputs/medium/brtest0.s	/^l_0:    $/;"	l
+l_0	inputs/medium/brtest1.s	/^l_0:$/;"	l
+l_0	inputs/medium/brtest2.s	/^l_0:    $/;"	l
+l_1	inputs/medium/brtest0.s	/^l_1:$/;"	l
+l_1	inputs/medium/brtest1.s	/^l_1:$/;"	l
+l_1	inputs/medium/brtest2.s	/^l_1:$/;"	l
+l_10	inputs/medium/brtest1.s	/^l_10:    $/;"	l
+l_11	inputs/medium/brtest1.s	/^l_11:$/;"	l
+l_12	inputs/medium/brtest1.s	/^l_12:    $/;"	l
+l_13	inputs/medium/brtest1.s	/^l_13:    $/;"	l
+l_2	inputs/medium/brtest0.s	/^l_2:$/;"	l
+l_2	inputs/medium/brtest1.s	/^l_2:    $/;"	l
+l_2	inputs/medium/brtest2.s	/^l_2:$/;"	l
+l_3	inputs/medium/brtest0.s	/^l_3:$/;"	l
+l_3	inputs/medium/brtest1.s	/^l_3:$/;"	l
+l_3	inputs/medium/brtest2.s	/^l_3:$/;"	l
+l_4	inputs/medium/brtest0.s	/^l_4:$/;"	l
+l_4	inputs/medium/brtest1.s	/^l_4:$/;"	l
+l_4	inputs/medium/brtest2.s	/^l_4:$/;"	l
+l_5	inputs/medium/brtest1.s	/^l_5:$/;"	l
+l_6	inputs/medium/brtest1.s	/^l_6:$/;"	l
+l_7	inputs/medium/brtest1.s	/^l_7:$/;"	l
+l_8	inputs/medium/brtest1.s	/^l_8:    $/;"	l
+l_9	inputs/medium/brtest1.s	/^l_9:$/;"	l
+last_access	src/cache.h	/^  int last_access;$/;"	m	struct:Cache_Block	typeref:typename:int
+lb	inputs/long/repmovs.s	/^lb    $5, 0($3)$/;"	l
+lb	inputs/medium/mem.s	/^lb $t4, 0($a0)$/;"	l
+lb	inputs/medium/mem.s	/^lb $t4, 1($a0)$/;"	l
+lb	inputs/medium/mem.s	/^lb $t4, 2($a0)$/;"	l
+lb	inputs/medium/mem.s	/^lb $t4, 3($a0)$/;"	l
+lbu	inputs/medium/mem.s	/^lbu $t4, 0($a0)$/;"	l
+ldst_insns	inputs/random/randomgen.py	/^ldst_insns = [$/;"	v
+lh	inputs/medium/mem.s	/^lh $t4, 0($a0)$/;"	l
+lh	inputs/medium/mem.s	/^lh $t4, 2($a0)$/;"	l
+lhu	inputs/medium/mem.s	/^lhu $t4, 0($a0)$/;"	l
+li	inputs/random/random1.s	/^li $t1, 0$/;"	l
+li	inputs/random/random1.s	/^li $t2, 0$/;"	l
+li	inputs/random/random1.s	/^li $t3, 0$/;"	l
+li	inputs/random/random1.s	/^li $t4, 0$/;"	l
+li	inputs/random/random1.s	/^li $t5, 0$/;"	l
+li	inputs/random/random1.s	/^li $t6, 0$/;"	l
+li	inputs/random/random1.s	/^li $t7, 0$/;"	l
+li	inputs/random/random2.s	/^li $t1, 0$/;"	l
+li	inputs/random/random2.s	/^li $t2, 0$/;"	l
+li	inputs/random/random2.s	/^li $t3, 0$/;"	l
+li	inputs/random/random2.s	/^li $t4, 0$/;"	l
+li	inputs/random/random2.s	/^li $t5, 0$/;"	l
+li	inputs/random/random2.s	/^li $t6, 0$/;"	l
+li	inputs/random/random2.s	/^li $t7, 0$/;"	l
+li	inputs/random/random3.s	/^li $t1, 0$/;"	l
+li	inputs/random/random3.s	/^li $t2, 0$/;"	l
+li	inputs/random/random3.s	/^li $t3, 0$/;"	l
+li	inputs/random/random3.s	/^li $t4, 0$/;"	l
+li	inputs/random/random3.s	/^li $t5, 0$/;"	l
+li	inputs/random/random3.s	/^li $t6, 0$/;"	l
+li	inputs/random/random3.s	/^li $t7, 0$/;"	l
+li	inputs/random/random4.s	/^li $t1, 0$/;"	l
+li	inputs/random/random4.s	/^li $t2, 0$/;"	l
+li	inputs/random/random4.s	/^li $t3, 0$/;"	l
+li	inputs/random/random4.s	/^li $t4, 0$/;"	l
+li	inputs/random/random4.s	/^li $t5, 0$/;"	l
+li	inputs/random/random4.s	/^li $t6, 0$/;"	l
+li	inputs/random/random4.s	/^li $t7, 0$/;"	l
+li	inputs/random/random5.s	/^li $t1, 0$/;"	l
+li	inputs/random/random5.s	/^li $t2, 0$/;"	l
+li	inputs/random/random5.s	/^li $t3, 0$/;"	l
+li	inputs/random/random5.s	/^li $t4, 0$/;"	l
+li	inputs/random/random5.s	/^li $t5, 0$/;"	l
+li	inputs/random/random5.s	/^li $t6, 0$/;"	l
+li	inputs/random/random5.s	/^li $t7, 0$/;"	l
+link_reg	src/pipe.h	/^  int link_reg;         \/* register to place link into? *\/$/;"	m	struct:Pipe_Op	typeref:typename:int
+load_program	src/shell.c	/^void load_program(char *program_filename) {$/;"	f	typeref:typename:void
+loading	inputs/long/repmovs.s	/^loading:$/;"	l
+lui	inputs/inst/lui.s	/^lui $20,  0x4$/;"	l
+lui	inputs/inst/lui.s	/^lui $21,  0x4$/;"	l
+lui	inputs/inst/lui.s	/^lui $22,  0xfff $/;"	l
+lui	inputs/inst/lui.s	/^lui $3,  0x7fff$/;"	l
+lui	inputs/inst/lui.s	/^lui $4,  0x0000$/;"	l
+lui	inputs/inst/lui.s	/^lui $5,  -0x8000$/;"	l
+lui	inputs/inst/lui.s	/^lui $6,  0xffff$/;"	l
+lui	inputs/long/repmovs.s	/^lui   $2, 0x1000$/;"	l
+lui	inputs/long/repmovs.s	/^lui   $3, 0x1000$/;"	l
+lui	inputs/long/repmovs.s	/^lui   $3, 0x5050$/;"	l
+lui	inputs/long/repmovs.s	/^lui   $4, 0x1000$/;"	l
+lui	inputs/medium/additest.s	/^lui $t9, 0xffff$/;"	l
+lui	inputs/medium/andor.s	/^lui $t0, 0x1234$/;"	l
+lui	inputs/medium/andor.s	/^lui $t0, 0xffff$/;"	l
+lui	inputs/medium/andor.s	/^lui $t3, 0xffff$/;"	l
+lui	inputs/medium/andor.s	/^lui $t5, 0xffff$/;"	l
+lui	inputs/medium/andor.s	/^lui $t6, 0xffff$/;"	l
+lui	inputs/medium/mem.s	/^lui $a0, 0x1000$/;"	l
+lui	inputs/medium/mem.s	/^lui $t0, 0x0102$/;"	l
+lui	inputs/medium/mem.s	/^lui $t6, 0x0107$/;"	l
+lui	inputs/medium/mem.s	/^lui $t6, 0xfffe$/;"	l
+lui	inputs/medium/mem.s	/^lui $t6, 0xffff$/;"	l
+lui	inputs/medium/multtest.s	/^lui $t0, 0x1234$/;"	l
+lui	inputs/medium/multtest.s	/^lui $t0, 0x5678$/;"	l
+lui	inputs/medium/multtest.s	/^lui $t0, 0xfedc$/;"	l
+lui	inputs/medium/multtest.s	/^lui $t1, 0xfedc$/;"	l
+lui	inputs/medium/multtest.s	/^lui $t4, 0x121f$/;"	l
+lui	inputs/medium/multtest.s	/^lui $t4, 0xffeb$/;"	l
+lui	inputs/medium/multtest.s	/^lui $t4, 0xffff$/;"	l
+lui	inputs/medium/multtest.s	/^lui $t5, 0x0002$/;"	l
+lui	inputs/medium/multtest.s	/^lui $t5, 0x3506$/;"	l
+lui	inputs/medium/multtest.s	/^lui $t5, 0xffff$/;"	l
+lui	inputs/medium/sllvtest.s	/^lui $t0, 0x1234$/;"	l
+lui	inputs/medium/sllvtest.s	/^lui $t0, 0x8000$/;"	l
+lui	inputs/medium/sllvtest.s	/^lui $t3, 0xfffc$/;"	l
+lui	inputs/random/random1.s	/^lui $a0, 0x1000$/;"	l
+lui	inputs/random/random2.s	/^lui $a0, 0x1000$/;"	l
+lui	inputs/random/random3.s	/^lui $a0, 0x1000$/;"	l
+lui	inputs/random/random4.s	/^lui $a0, 0x1000$/;"	l
+lui	inputs/random/random5.s	/^lui $a0, 0x1000$/;"	l
+lw	inputs/long/repmovs.s	/^lw    $5, 0($4)$/;"	l
+lw	inputs/medium/mem.s	/^lw $t4, 0($a0)$/;"	l
+main	inputs/inst/divu_pos_pos.s	/^main:$/;"	l
+main	inputs/long/primes.s	/^main:$/;"	l
+main	inputs/medium/arithtest.s	/^main:   $/;"	l
+main	inputs/medium/brtest0.s	/^main:$/;"	l
+main	inputs/medium/brtest1.s	/^main:$/;"	l
+main	inputs/medium/brtest2.s	/^main:$/;"	l
+main	inputs/medium/memtest0.s	/^main:$/;"	l
+main	inputs/medium/memtest1.s	/^main:$/;"	l
+main	inputs/medium/multtest.s	/^main:$/;"	l
+main	run.py	/^def main():$/;"	f
+main	src/shell.c	/^int main(int argc, char *argv[]) {$/;"	f	typeref:typename:int
+mdump	src/shell.c	/^void mdump(int start, int stop) {$/;"	f	typeref:typename:void
+mem	src/shell.c	/^  uint8_t *mem;$/;"	m	struct:__anon9b5c1f250108	typeref:typename:uint8_t *	file:
+mem_addr	src/pipe.h	/^  uint32_t mem_addr;  \/* address if applicable *\/$/;"	m	struct:Pipe_Op	typeref:typename:uint32_t
+mem_op	src/pipe.h	/^  Pipe_Op *decode_op, *execute_op, *mem_op, *wb_op;$/;"	m	struct:Pipe_State	typeref:typename:Pipe_Op ***
+mem_read_32	src/shell.c	/^uint32_t mem_read_32(uint32_t address) {$/;"	f	typeref:typename:uint32_t
+mem_region_t	src/shell.c	/^} mem_region_t;$/;"	t	typeref:struct:__anon9b5c1f250108	file:
+mem_value	src/pipe.h	/^  uint32_t mem_value; \/* value loaded from memory or to be written to memory *\/$/;"	m	struct:Pipe_Op	typeref:typename:uint32_t
+mem_write	src/pipe.h	/^  int mem_write;      \/* is this a write to memory? *\/$/;"	m	struct:Pipe_Op	typeref:typename:int
+mem_write_32	src/shell.c	/^void mem_write_32(uint32_t address, uint32_t value) {$/;"	f	typeref:typename:void
+mfhi	inputs/inst/mfhi.s	/^mfhi $8$/;"	l
+mfhi	inputs/inst/mfhi.s	/^mfhi $9$/;"	l
+mfhi	inputs/medium/multtest.s	/^mfhi $t1$/;"	l
+mfhi	inputs/medium/multtest.s	/^mfhi $t2$/;"	l
+mflo	inputs/inst/mflo.s	/^mflo $8$/;"	l
+mflo	inputs/inst/mflo.s	/^mflo $9$/;"	l
+mflo	inputs/medium/multtest.s	/^mflo $t1$/;"	l
+mflo	inputs/medium/multtest.s	/^mflo $t3$/;"	l
+mthi	inputs/inst/mthi.s	/^mthi $8$/;"	l
+mthi	inputs/medium/multtest.s	/^mthi $t0$/;"	l
+mtlo	inputs/inst/mtlo.s	/^mtlo $8$/;"	l
+mtlo	inputs/medium/multtest.s	/^mtlo $t0$/;"	l
+muldiv_insns	inputs/random/randomgen.py	/^muldiv_insns = [$/;"	v
+mult	inputs/inst/mult_neg_neg.s	/^mult $8, $9$/;"	l
+mult	inputs/inst/mult_pos_neg.s	/^mult $8, $9$/;"	l
+mult	inputs/inst/mult_pos_pos.s	/^mult $8, $9$/;"	l
+mult	inputs/medium/multtest.s	/^mult $t0, $t1$/;"	l
+multiplier_stall	src/pipe.h	/^  int multiplier_stall; \/* number of remaining cycles until HI\/LO are ready *\/$/;"	m	struct:Pipe_State	typeref:typename:int
+multu	inputs/inst/multu_neg_neg.s	/^multu $8, $9$/;"	l
+multu	inputs/inst/multu_pos_neg.s	/^multu $8, $9$/;"	l
+multu	inputs/inst/multu_pos_pos.s	/^multu $8, $9$/;"	l
+multu	inputs/medium/multtest.s	/^multu $t0, $t1$/;"	l
+nor	inputs/inst/nor.s	/^nor $10, $8, $9$/;"	l
+nor	inputs/inst/nor.s	/^nor $13, $11, $12$/;"	l
+nor	inputs/inst/nor.s	/^nor $16, $14, $15$/;"	l
+nor	inputs/inst/nor.s	/^nor $19, $17, $18$/;"	l
+nor	inputs/inst/nor.s	/^nor $22, $20, $21$/;"	l
+nor	inputs/inst/nor.s	/^nor $25, $23, $24$/;"	l
+nor	inputs/medium/andor.s	/^nor $t4, $t4, $0$/;"	l
+normal	run.py	/^normal="\\033[0m"$/;"	v
+nottaken	inputs/inst/beq.s	/^nottaken:$/;"	l
+nottaken	inputs/inst/bgez.s	/^nottaken:$/;"	l
+nottaken	inputs/inst/bgezal0.s	/^nottaken:$/;"	l
+nottaken	inputs/inst/bgezal1.s	/^nottaken:$/;"	l
+nottaken	inputs/inst/bgtz.s	/^nottaken:$/;"	l
+nottaken	inputs/inst/blez.s	/^nottaken:$/;"	l
+nottaken	inputs/inst/bltz.s	/^nottaken:$/;"	l
+nottaken	inputs/inst/bltzal0.s	/^nottaken: $/;"	l
+nottaken	inputs/inst/bltzal1.s	/^nottaken:$/;"	l
+nottaken	inputs/inst/bne.s	/^nottaken:$/;"	l
+num_sets	src/cache.h	/^  int num_sets;$/;"	m	struct:Cache_State	typeref:typename:int
+num_ways	src/cache.h	/^  int num_ways;$/;"	m	struct:Cache_State	typeref:typename:int
+opcode	src/pipe.h	/^  int opcode, subop;$/;"	m	struct:Pipe_Op	typeref:typename:int
+or	inputs/inst/or.s	/^or $10, $8, $9$/;"	l
+or	inputs/inst/or.s	/^or $13, $11, $12$/;"	l
+or	inputs/inst/or.s	/^or $16, $14, $15$/;"	l
+or	inputs/inst/or.s	/^or $19, $17, $18$/;"	l
+or	inputs/medium/andor.s	/^or $t2, $t0, $t1$/;"	l
+ori	inputs/inst/ori.s	/^ori $10, $zero, 0x0001$/;"	l
+ori	inputs/inst/ori.s	/^ori $10, $zero, 0x0005$/;"	l
+ori	inputs/inst/ori.s	/^ori $8, $9, -0x0009$/;"	l
+ori	inputs/inst/ori.s	/^ori $9, $10, -0x0002$/;"	l
+ori	inputs/long/repmovs.s	/^ori   $3, $3, 0x5050 $/;"	l
+ori	inputs/long/repmovs.s	/^ori   $3, $3, 0x5050$/;"	l
+ori	inputs/long/repmovs.s	/^ori   $4, $3, 0x1000$/;"	l
+ori	inputs/long/repmovs.s	/^ori   $4, $4, 0x1000$/;"	l
+ori	inputs/medium/additest.s	/^ori $t9, 0x8000$/;"	l
+ori	inputs/medium/andor.s	/^ori $t0, $t0, 0x5678$/;"	l
+ori	inputs/medium/andor.s	/^ori $t1, $0, 0xffff$/;"	l
+ori	inputs/medium/andor.s	/^ori $t3, $t3, 0xffff$/;"	l
+ori	inputs/medium/andor.s	/^ori $t4, $0, 0xffff$/;"	l
+ori	inputs/medium/andor.s	/^ori $t6, $t6, 0xffff$/;"	l
+ori	inputs/medium/mem.s	/^ori $t0, $t0, 0x0304$/;"	l
+ori	inputs/medium/mem.s	/^ori $t4, $0, 0xfffe$/;"	l
+ori	inputs/medium/mem.s	/^ori $t4, $0, 0xffff$/;"	l
+ori	inputs/medium/mem.s	/^ori $t6, $0, 0xffff$/;"	l
+ori	inputs/medium/mem.s	/^ori $t6, $t6, 0x0305$/;"	l
+ori	inputs/medium/mem.s	/^ori $t6, $t6, 0xffff$/;"	l
+ori	inputs/medium/mem.s	/^ori $t9, $0, 0xfff0$/;"	l
+ori	inputs/medium/mem.s	/^ori $t9, $0, 0xfff1$/;"	l
+ori	inputs/medium/mem.s	/^ori $t9, $0, 0xfff2$/;"	l
+ori	inputs/medium/mem.s	/^ori $t9, $0, 0xfff3$/;"	l
+ori	inputs/medium/mem.s	/^ori $t9, $0, 0xfff4$/;"	l
+ori	inputs/medium/mem.s	/^ori $t9, $0, 0xfff5$/;"	l
+ori	inputs/medium/mem.s	/^ori $t9, $0, 0xfff6$/;"	l
+ori	inputs/medium/mem.s	/^ori $t9, $0, 0xfff7$/;"	l
+ori	inputs/medium/mem.s	/^ori $t9, $0, 0xfff8$/;"	l
+ori	inputs/medium/mem.s	/^ori $t9, $0, 0xfff9$/;"	l
+ori	inputs/medium/mem.s	/^ori $t9, $0, 0xfffa$/;"	l
+ori	inputs/medium/mem.s	/^ori $t9, $0, 0xfffb$/;"	l
+ori	inputs/medium/multtest.s	/^ori $t0, $t0, 0x5678$/;"	l
+ori	inputs/medium/multtest.s	/^ori $t0, $t0, 0xba98$/;"	l
+ori	inputs/medium/multtest.s	/^ori $t1, $0, 0x5678$/;"	l
+ori	inputs/medium/multtest.s	/^ori $t1, $t1, 0xba98$/;"	l
+ori	inputs/medium/multtest.s	/^ori $t4, $0, 0xf8$/;"	l
+ori	inputs/medium/multtest.s	/^ori $t4, $t4, 0x4992$/;"	l
+ori	inputs/medium/multtest.s	/^ori $t4, $t4, 0xa00a$/;"	l
+ori	inputs/medium/multtest.s	/^ori $t4, 0xe2a8$/;"	l
+ori	inputs/medium/multtest.s	/^ori $t5, $t5, 0x8740$/;"	l
+ori	inputs/medium/multtest.s	/^ori $t5, $t5, 0xf28c$/;"	l
+ori	inputs/medium/multtest.s	/^ori $t5, $t5, 0xfca2$/;"	l
+ori	inputs/medium/multtest.s	/^ori $t9, $0, 0xfff1$/;"	l
+ori	inputs/medium/multtest.s	/^ori $t9, $0, 0xfff2$/;"	l
+ori	inputs/medium/multtest.s	/^ori $t9, $0, 0xfff3$/;"	l
+ori	inputs/medium/multtest.s	/^ori $t9, $0, 0xfff4$/;"	l
+ori	inputs/medium/multtest.s	/^ori $t9, $0, 0xfff5$/;"	l
+ori	inputs/medium/multtest.s	/^ori $t9, $0, 0xfff6$/;"	l
+ori	inputs/medium/multtest.s	/^ori $t9, $0, 0xfff7$/;"	l
+ori	inputs/medium/multtest.s	/^ori $t9, $0, 0xfff8$/;"	l
+ori	inputs/medium/multtest.s	/^ori $t9, $0, 0xfff9$/;"	l
+ori	inputs/medium/multtest.s	/^ori $t9, $0, 0xfffa$/;"	l
+ori	inputs/medium/sllvtest.s	/^ori $t3, $0, 0x91a0$/;"	l
+ori	inputs/medium/sllvtest.s	/^ori $t9, $0, 0xfff1$/;"	l
+ori	inputs/medium/sllvtest.s	/^ori $t9, $0, 0xfff2$/;"	l
+ori	inputs/medium/sllvtest.s	/^ori $t9, $0, 0xfff3$/;"	l
+outerloop	inputs/long/primes.s	/^outerloop:$/;"	l
+pc	src/pipe.h	/^  uint32_t pc;$/;"	m	struct:Pipe_Op	typeref:typename:uint32_t
+pipe	src/pipe.c	/^Pipe_State pipe;$/;"	v	typeref:typename:Pipe_State
+pipe_cycle	src/pipe.c	/^void pipe_cycle() {$/;"	f	typeref:typename:void
+pipe_init	src/pipe.c	/^void pipe_init() {$/;"	f	typeref:typename:void
+pipe_init_data_cache	src/pipe.c	/^static void pipe_init_data_cache() {$/;"	f	typeref:typename:void	file:
+pipe_init_inst_cache	src/pipe.c	/^static void pipe_init_inst_cache() {$/;"	f	typeref:typename:void	file:
+pipe_recover	src/pipe.c	/^void pipe_recover(int flush, uint32_t dest) {$/;"	f	typeref:typename:void
+pipe_stage_decode	src/pipe.c	/^void pipe_stage_decode() {$/;"	f	typeref:typename:void
+pipe_stage_execute	src/pipe.c	/^void pipe_stage_execute() {$/;"	f	typeref:typename:void
+pipe_stage_fetch	src/pipe.c	/^void pipe_stage_fetch() {$/;"	f	typeref:typename:void
+pipe_stage_mem	src/pipe.c	/^void pipe_stage_mem() {$/;"	f	typeref:typename:void
+pipe_stage_wb	src/pipe.c	/^void pipe_stage_wb() {$/;"	f	typeref:typename:void
+prefix	inputs/random/randomgen.py	/^prefix = (".text\\nlui $a0, 0x1000\\n", "li $t0, 0x12345678\\n", "sw $t0, 0($a0)\\n",$/;"	v
+primeloop	inputs/long/primes.s	/^primeloop:$/;"	l
+printBits	src/cache.c	/^__attribute__((unused)) static void printBits(size_t const size,$/;"	f	typeref:typename:void	file:
+print_op	src/pipe.c	/^void print_op(Pipe_Op *op) {$/;"	f	typeref:typename:void
+process_tree	inputs/random/randomgen.py	/^def process_tree(x):$/;"	f
+program	inputs/random/randomgen.py	/^program = list()$/;"	v
+program	inputs/random/randomgen.py	/^program = tuple(program)$/;"	v
+ra_label	inputs/medium/bltztest.s	/^ra_label:$/;"	l
+rdump	src/shell.c	/^void rdump() {$/;"	f	typeref:typename:void
+red	run.py	/^red="\\033[0;31m"$/;"	v
+ref	run.py	/^ref = ".\/basesim"$/;"	v
+reg_dst	src/pipe.h	/^  int reg_dst;            \/* 0 -- 31 if this inst has a destination register, -1$/;"	m	struct:Pipe_Op	typeref:typename:int
+reg_dst_value	src/pipe.h	/^  uint32_t reg_dst_value; \/* value to write into dest reg. *\/$/;"	m	struct:Pipe_Op	typeref:typename:uint32_t
+reg_dst_value_ready	src/pipe.h	/^  int reg_dst_value_ready; \/* destination value produced yet? *\/$/;"	m	struct:Pipe_Op	typeref:typename:int
+reg_src1	src/pipe.h	/^  int reg_src1, reg_src2; \/* 0 -- 31 if this inst has register source(s), or$/;"	m	struct:Pipe_Op	typeref:typename:int
+reg_src1_value	src/pipe.h	/^  uint32_t reg_src1_value, reg_src2_value; \/* values of operands from source$/;"	m	struct:Pipe_Op	typeref:typename:uint32_t
+reg_src2	src/pipe.h	/^  int reg_src1, reg_src2; \/* 0 -- 31 if this inst has register source(s), or$/;"	m	struct:Pipe_Op	typeref:typename:int
+reg_src2_value	src/pipe.h	/^  uint32_t reg_src1_value, reg_src2_value; \/* values of operands from source$/;"	m	struct:Pipe_Op	typeref:typename:uint32_t
+regs	inputs/random/randomgen.py	/^regs = ['$t0', '$t1', '$t2', '$t3', '$t4', '$t5', '$t6', '$t7']$/;"	v
+rtype_args	inputs/random/randomgen.py	/^rtype_args = (' ', regs, ',', regs, ',', regs)$/;"	v
+rtype_insns	inputs/random/randomgen.py	/^rtype_insns = (rtype_ops, rtype_args)$/;"	v
+rtype_ops	inputs/random/randomgen.py	/^rtype_ops = ['addu', 'subu', 'and', 'or', 'nor', 'xor']$/;"	v
+run	Makefile	/^run: sim$/;"	t
+run	run.py	/^def run(i):$/;"	f
+run	src/shell.c	/^void run(int num_cycles) {$/;"	f	typeref:typename:void
+sb	inputs/long/repmovs.s	/^sb    $5, 0($4)$/;"	l
+sb	inputs/medium/mem.s	/^sb $t4, 0($a0)$/;"	l
+sb	inputs/medium/mem.s	/^sb $t4, 2($a0)$/;"	l
+se_imm16	src/pipe.h	/^  uint32_t imm16, se_imm16;$/;"	m	struct:Pipe_Op	typeref:typename:uint32_t
+set_idx_from	src/cache.h	/^  int set_idx_from;$/;"	m	struct:Cache_State	typeref:typename:int
+set_idx_to	src/cache.h	/^  int set_idx_to;$/;"	m	struct:Cache_State	typeref:typename:int
+sh	inputs/medium/mem.s	/^sh $t4, 2($a0)$/;"	l
+shamt	src/pipe.h	/^  int shamt;$/;"	m	struct:Pipe_Op	typeref:typename:int
+sim	Makefile	/^sim: $(SRC)$/;"	t
+sim	run.py	/^sim = ".\/sim"$/;"	v
+size	src/shell.c	/^  uint32_t start, size;$/;"	m	struct:__anon9b5c1f250108	typeref:typename:uint32_t	file:
+sll	inputs/medium/andor.s	/^sll $t1, $t1, 16$/;"	l
+sllv	inputs/inst/sllv.s	/^sllv $10, $8, $9$/;"	l
+sllv	inputs/inst/sllv.s	/^sllv $12, $8, $11$/;"	l
+sllv	inputs/inst/sllv.s	/^sllv $15, $13, $14$/;"	l
+sllv	inputs/inst/sllv.s	/^sllv $18, $16, $17$/;"	l
+sllv	inputs/medium/sllvtest.s	/^sllv $t2, $t2, $t1$/;"	l
+slt	inputs/inst/slt.s	/^slt $12, $8, $9$/;"	l
+slt	inputs/inst/slt.s	/^slt $13, $9, $8$/;"	l
+slt	inputs/inst/slt.s	/^slt $14, $8, $10$/;"	l
+slt	inputs/inst/slt.s	/^slt $15, $10, $8$/;"	l
+slt	inputs/inst/slt.s	/^slt $16, $10, $11$/;"	l
+slt	inputs/inst/slt.s	/^slt $17, $11, $10$/;"	l
+slti	inputs/inst/slti.s	/^slti $20, $8, 0x4$/;"	l
+slti	inputs/inst/slti.s	/^slti $21, $11, -0x4$/;"	l
+slti	inputs/inst/slti.s	/^slti $22, $11, 0xfff $/;"	l
+slti	inputs/inst/slti.s	/^slti $3, $zero, 0x7fff$/;"	l
+slti	inputs/inst/slti.s	/^slti $4, $zero, 0x0000$/;"	l
+slti	inputs/inst/slti.s	/^slti $5, $zero, -0x8000$/;"	l
+slti	inputs/inst/slti.s	/^slti $6, $8, 0xffff$/;"	l
+slti	inputs/medium/setcondtest.s	/^slti $t1, $t0, -1$/;"	l
+slti	inputs/medium/setcondtest.s	/^slti $t1, $t0, 0$/;"	l
+slti	inputs/medium/setcondtest.s	/^slti $t1, $t0, 10$/;"	l
+slti	inputs/medium/setcondtest.s	/^slti $t1, $t0, 11$/;"	l
+slti	inputs/medium/setcondtest.s	/^slti $t1, $t0, 9$/;"	l
+sltiu	inputs/inst/sltiu.s	/^sltiu $20, $8, 0x4$/;"	l
+sltiu	inputs/inst/sltiu.s	/^sltiu $21, $11, -0x4$/;"	l
+sltiu	inputs/inst/sltiu.s	/^sltiu $22, $11, 0xfff $/;"	l
+sltiu	inputs/inst/sltiu.s	/^sltiu $3, $zero, 0x7fff$/;"	l
+sltiu	inputs/inst/sltiu.s	/^sltiu $4, $zero, 0x0000$/;"	l
+sltiu	inputs/inst/sltiu.s	/^sltiu $5, $zero, -0x8000$/;"	l
+sltiu	inputs/inst/sltiu.s	/^sltiu $6, $8, 0xffff$/;"	l
+sltiu	inputs/medium/setcondtest.s	/^sltiu $t1, $t0, 0$/;"	l
+sltiu	inputs/medium/setcondtest.s	/^sltiu $t1, $t0, 42$/;"	l
+sltiu	inputs/medium/setcondtest.s	/^sltiu $t1, $t0, 84$/;"	l
+sltu	inputs/inst/sltu.s	/^sltu $12, $8, $9$/;"	l
+sltu	inputs/inst/sltu.s	/^sltu $13, $9, $8$/;"	l
+sltu	inputs/inst/sltu.s	/^sltu $14, $8, $10$/;"	l
+sltu	inputs/inst/sltu.s	/^sltu $15, $10, $8$/;"	l
+sltu	inputs/inst/sltu.s	/^sltu $16, $10, $11$/;"	l
+sltu	inputs/inst/sltu.s	/^sltu $17, $11, $10$/;"	l
+srav	inputs/inst/srav.s	/^srav $10, $8, $9$/;"	l
+srav	inputs/inst/srav.s	/^srav $13, $11, $12$/;"	l
+srav	inputs/inst/srav.s	/^srav $16, $14, $15$/;"	l
+srav	inputs/inst/srav.s	/^srav $19, $17, $18$/;"	l
+srav	inputs/medium/sllvtest.s	/^srav $t2, $t0, $t1$/;"	l
+srlv	inputs/inst/srlv.s	/^srlv $10, $8, $9$/;"	l
+srlv	inputs/inst/srlv.s	/^srlv $12, $8, $11$/;"	l
+srlv	inputs/inst/srlv.s	/^srlv $15, $13, $14$/;"	l
+srlv	inputs/inst/srlv.s	/^srlv $18, $16, $17$/;"	l
+srlv	inputs/medium/sllvtest.s	/^srlv $t2, $t0, $t1$/;"	l
+start	src/shell.c	/^  uint32_t start, size;$/;"	m	struct:__anon9b5c1f250108	typeref:typename:uint32_t	file:
+stat_cycles	src/shell.c	/^uint32_t stat_cycles = 0, stat_inst_retire = 0, stat_inst_fetch = 0;$/;"	v	typeref:typename:uint32_t
+stat_inst_fetch	src/shell.c	/^uint32_t stat_cycles = 0, stat_inst_retire = 0, stat_inst_fetch = 0;$/;"	v	typeref:typename:uint32_t
+stat_inst_retire	src/shell.c	/^uint32_t stat_cycles = 0, stat_inst_retire = 0, stat_inst_fetch = 0;$/;"	v	typeref:typename:uint32_t
+stat_squash	src/shell.c	/^uint32_t stat_squash = 0;$/;"	v	typeref:typename:uint32_t
+sub	inputs/inst/sub.s	/^sub $10, $8, $8$/;"	l
+sub	inputs/inst/sub.s	/^sub $11, $8, $9$/;"	l
+sub	inputs/inst/sub.s	/^sub $12, $9, $8$/;"	l
+sub	inputs/inst/sub.s	/^sub $13, $9, $9$/;"	l
+subop	src/pipe.h	/^  int opcode, subop;$/;"	m	struct:Pipe_Op	typeref:typename:int
+subu	inputs/inst/subu.s	/^subu $10, $8, $8$/;"	l
+subu	inputs/inst/subu.s	/^subu $11, $8, $9$/;"	l
+subu	inputs/inst/subu.s	/^subu $12, $9, $8$/;"	l
+subu	inputs/inst/subu.s	/^subu $13, $9, $9$/;"	l
+suffix	inputs/random/randomgen.py	/^suffix = ("addiu $v0, $0, 10\\n", "syscall\\n")$/;"	v
+sw	inputs/long/repmovs.s	/^sw    $3, 0($2)$/;"	l
+sw	inputs/medium/mem.s	/^sw $t0, 0($a0)$/;"	l
+sw	inputs/medium/mem.s	/^sw $t4, 0($a0)$/;"	l
+syscall	inputs/inst/add.s	/^syscall$/;"	l
+syscall	inputs/inst/addi.s	/^syscall$/;"	l
+syscall	inputs/inst/addiu.s	/^syscall$/;"	l
+syscall	inputs/inst/addu.s	/^syscall$/;"	l
+syscall	inputs/inst/and.s	/^syscall $/;"	l
+syscall	inputs/inst/andi.s	/^syscall$/;"	l
+syscall	inputs/inst/beq.s	/^syscall$/;"	l
+syscall	inputs/inst/bgez.s	/^syscall$/;"	l
+syscall	inputs/inst/bgezal0.s	/^syscall$/;"	l
+syscall	inputs/inst/bgezal1.s	/^syscall$/;"	l
+syscall	inputs/inst/bgtz.s	/^syscall$/;"	l
+syscall	inputs/inst/blez.s	/^syscall$/;"	l
+syscall	inputs/inst/bltz.s	/^syscall$/;"	l
+syscall	inputs/inst/bltzal0.s	/^syscall$/;"	l
+syscall	inputs/inst/bltzal1.s	/^syscall$/;"	l
+syscall	inputs/inst/bne.s	/^syscall$/;"	l
+syscall	inputs/inst/div_neg_neg.s	/^syscall$/;"	l
+syscall	inputs/inst/div_pos_neg.s	/^syscall$/;"	l
+syscall	inputs/inst/div_pos_pos.s	/^syscall$/;"	l
+syscall	inputs/inst/divu_neg_neg.s	/^syscall$/;"	l
+syscall	inputs/inst/divu_pos_neg.s	/^syscall$/;"	l
+syscall	inputs/inst/divu_pos_pos.s	/^syscall$/;"	l
+syscall	inputs/inst/j.s	/^syscall $/;"	l
+syscall	inputs/inst/j.s	/^syscall$/;"	l
+syscall	inputs/inst/jal.s	/^syscall$/;"	l
+syscall	inputs/inst/jalr.s	/^syscall$/;"	l
+syscall	inputs/inst/jr.s	/^syscall$/;"	l
+syscall	inputs/inst/lui.s	/^syscall$/;"	l
+syscall	inputs/inst/mfhi.s	/^syscall$/;"	l
+syscall	inputs/inst/mflo.s	/^syscall$/;"	l
+syscall	inputs/inst/mthi.s	/^syscall$/;"	l
+syscall	inputs/inst/mtlo.s	/^syscall$/;"	l
+syscall	inputs/inst/mult_neg_neg.s	/^syscall$/;"	l
+syscall	inputs/inst/mult_pos_neg.s	/^syscall$/;"	l
+syscall	inputs/inst/mult_pos_pos.s	/^syscall$/;"	l
+syscall	inputs/inst/multu_neg_neg.s	/^syscall$/;"	l
+syscall	inputs/inst/multu_pos_neg.s	/^syscall$/;"	l
+syscall	inputs/inst/multu_pos_pos.s	/^syscall$/;"	l
+syscall	inputs/inst/nor.s	/^syscall $/;"	l
+syscall	inputs/inst/or.s	/^syscall $/;"	l
+syscall	inputs/inst/ori.s	/^syscall$/;"	l
+syscall	inputs/inst/sll.s	/^syscall$/;"	l
+syscall	inputs/inst/sllv.s	/^syscall$/;"	l
+syscall	inputs/inst/slt.s	/^syscall$/;"	l
+syscall	inputs/inst/slti.s	/^syscall$/;"	l
+syscall	inputs/inst/sltiu.s	/^syscall$/;"	l
+syscall	inputs/inst/sltu.s	/^syscall$/;"	l
+syscall	inputs/inst/sra.s	/^syscall$/;"	l
+syscall	inputs/inst/srav.s	/^syscall$/;"	l
+syscall	inputs/inst/srl.s	/^syscall$/;"	l
+syscall	inputs/inst/srlv.s	/^syscall$/;"	l
+syscall	inputs/inst/sub.s	/^syscall$/;"	l
+syscall	inputs/inst/subu.s	/^syscall$/;"	l
+syscall	inputs/inst/trial.s	/^syscall$/;"	l
+syscall	inputs/inst/xor.s	/^syscall $/;"	l
+syscall	inputs/inst/xori.s	/^syscall$/;"	l
+syscall	inputs/long/repmovs.s	/^syscall$/;"	l
+syscall	inputs/medium/additest.s	/^syscall$/;"	l
+syscall	inputs/medium/andor.s	/^syscall$/;"	l
+syscall	inputs/medium/beqtest.s	/^syscall$/;"	l
+syscall	inputs/medium/bgtztest.s	/^syscall$/;"	l
+syscall	inputs/medium/bleztest.s	/^syscall$/;"	l
+syscall	inputs/medium/bltztest.s	/^syscall$/;"	l
+syscall	inputs/medium/jaltest.s	/^syscall$/;"	l
+syscall	inputs/medium/jtest.s	/^syscall$/;"	l
+syscall	inputs/medium/mem.s	/^syscall$/;"	l
+syscall	inputs/medium/multtest.s	/^syscall$/;"	l
+syscall	inputs/medium/setcondtest.s	/^syscall$/;"	l
+syscall	inputs/medium/sllvtest.s	/^syscall$/;"	l
+tag	src/cache.h	/^  uint32_t tag;$/;"	m	struct:Cache_Block	typeref:typename:uint32_t
+taken	inputs/inst/bltz.s	/^taken: $/;"	l
+taken	inputs/inst/bltzal1.s	/^taken: $/;"	l
+taken	inputs/inst/bne.s	/^taken:$/;"	l
+taken1	inputs/inst/beq.s	/^taken1:$/;"	l
+taken1	inputs/inst/bgez.s	/^taken1:$/;"	l
+taken1	inputs/inst/bgezal0.s	/^taken1:$/;"	l
+taken1	inputs/inst/bgezal1.s	/^taken1:$/;"	l
+taken1	inputs/inst/bgtz.s	/^taken1:$/;"	l
+taken1	inputs/inst/blez.s	/^taken1:$/;"	l
+taken2	inputs/inst/beq.s	/^taken2: $/;"	l
+taken2	inputs/inst/bgez.s	/^taken2:$/;"	l
+taken2	inputs/inst/bgezal0.s	/^taken2:$/;"	l
+taken2	inputs/inst/bgezal1.s	/^taken2:$/;"	l
+taken2	inputs/inst/blez.s	/^taken2: $/;"	l
+timestamp	src/cache.h	/^  int timestamp;$/;"	m	struct:Cache_State	typeref:typename:int
+total_size	src/cache.h	/^  int total_size;$/;"	m	struct:Cache_State	typeref:typename:int
+valid	src/cache.h	/^  bool valid;$/;"	m	struct:Cache_Block	typeref:typename:bool
+wb_op	src/pipe.h	/^  Pipe_Op *decode_op, *execute_op, *mem_op, *wb_op;$/;"	m	struct:Pipe_State	typeref:typename:Pipe_Op ****
+write_block	src/cache.c	/^static void write_block(Cache_Block *block, uint32_t addr, int timestamp) {$/;"	f	typeref:typename:void	file:
+xor	inputs/inst/xor.s	/^xor $10, $8, $9$/;"	l
+xor	inputs/inst/xor.s	/^xor $13, $11, $12$/;"	l
+xor	inputs/inst/xor.s	/^xor $16, $14, $15$/;"	l
+xor	inputs/inst/xor.s	/^xor $19, $17, $18$/;"	l
+xor	inputs/inst/xor.s	/^xor $22, $20, $21$/;"	l
+xor	inputs/inst/xor.s	/^xor $25, $23, $24$/;"	l
+xori	inputs/inst/xori.s	/^xori $10, $zero, 0x0001$/;"	l
+xori	inputs/inst/xori.s	/^xori $10, $zero, 0x0005$/;"	l
+xori	inputs/inst/xori.s	/^xori $8, $9, -0x0009$/;"	l
+xori	inputs/inst/xori.s	/^xori $9, $10, -0x0002$/;"	l
+xori	inputs/medium/andor.s	/^xori $t5, $t5, 0xffff$/;"	l
+zeroloop	inputs/long/primes.s	/^zeroloop:$/;"	l
