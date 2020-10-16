@@ -1,0 +1,157 @@
+\documentclass[a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[a4paper, margin=1in]{geometry}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{tabularx}
+\usepackage{xcolor}
+\usepackage{amsmath}
+\usepackage{mathtools}
+\DeclarePairedDelimiter\ceil{\lceil}{\rceil}
+\DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
+
+\renewcommand{\arraystretch}{1.5}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+\lstset{style=mystyle}
+
+\title{Computer Architecture HW2}
+\author{Fabian Wüthrich}
+
+\begin{document}
+
+\maketitle
+
+\section{Critical Paper Reviews [1000 points]}
+
+see \href{https://safari.ethz.ch/review/architecture20/}{here}
+
+\section{RowHammer [200 points]}
+
+\subsection{RowHammer Properties}
+
+\begin{enumerate}[label=\alph*)]
+    \item True
+    \item False
+    \item True (i.e. protector cells)
+    \item True (i.e. aggressor or protector cells)
+    \item True
+\end{enumerate}
+
+\subsection{RowHammer Mitigations}
+
+\begin{enumerate}[label=\alph*)]
+    \item If the refresh interval is reduced from 64ms to 8ms, each row is refreshed 8 more times.
+        Thus, bank utilization increases to $8U$ and energy consumption increases to $8E$
+
+    \item With a doubling of the rows, the mitigation is still possible, but the bank is occupied 80\%
+        by refresh operations ($U = 0.05 \times 8 \times 2 = 0.8$).
+
+        With another doubling of the rows, the mitigation cannot be implemented because we cannot refresh every
+        row in 8ms ($U = 0.05 \times 8 \times 4 = 1.6$).
+
+    \item No, we need to know which rows are adjacent.
+
+    \item With a 8ms refresh interval an attacker can issue a limited number of activations, constrained
+        by $t_{RC}$. If $T$ is less than the maximum number of activations issued in 8ms, we
+        can guarantee the same level of security. We have $t_{RC} = t_{RAS} + t_{RP} = 35ns + 13.5 ns = 48,5ns$
+        and therefore
+        \begin{equation*}
+        T = \frac{8ms}{48.5ns} = 164948.4536 \approx 164948
+        \end{equation*}
+
+    \item A single counter requires $log_2(164948) = 17.3317 \approx 18$bits and each row needs a counter.
+        Thus,
+        \begin{equation*}
+            18 \, bits/row \times 2^{15} \, rows/bank \times 8 \, banks \times 2 \, ranks = 9Mbit
+        \end{equation*}
+        When the number of rows per bank and the number of banks per chip are doubled we get
+        \begin{equation*}
+            18 \, bits/row \times 2^{16} \, rows/bank \times 16 \, banks \times 2 \, ranks = 36Mbit
+        \end{equation*}
+
+    \item The memory controller performs unnecessary activations which is bad for performance and
+        energy consumption.
+
+    \item Let X be a RV that describes the number of errors in a year. Each 64ms interval can be seen
+        as a independent experiment of getting an error. Therefore, X has a binomial distribution with
+        the parameters $p=1.9\cdot10^{-22}$ and  $n=\frac{365 \cdot 24 \cdot 3600s}{64ms} = 492'750'000$.
+        Therefore,
+        \begin{align*}
+            P(X\geq1) &= 1 - P(X=0) \\
+                      &= 1 - (1 - p)^n \\
+                      &= 9.3622 \cdot 10^{-14}
+        \end{align*}
+
+\end{enumerate}
+
+\section{Processing in Memory: Ambit [200 points]}
+
+\subsection{In-DRAM Bitmap Indices I}
+
+\begin{enumerate}[label=\alph*)]
+    \item All users occupy $\frac{u}{8}$bytes so we need $\frac{u}{8\cdot8k}$ subarrays. Including the
+        weeks, $\frac{u \cdot w}{8\cdot8k}$ rows are occupied.
+    \item Using Ambit we copy each row into the \textit{Operand} row and perform a bulk \verb|and|. This 
+        requires $\frac{u \cdot w}{8\cdot8k} \times (t_{rc} + t_{and})$ seconds overall. Then we need 
+        to transfer $\frac{u}{8}$bytes to the CPU and count the bits. This takes $\frac{u}{8X}$ seconds.
+        Therefore, the throughput is
+        \begin{equation*}
+            \frac{u}{
+                \frac{u \cdot w}{8\cdot8k} \times (t_{rc} + t_{and}) +
+                \frac{u}{8X}
+            } \, users/second
+        \end{equation*}
+
+    \item The CPU has to transfer all users and weeks from memory which takes $\frac{uv}{8X}$
+        seconds. Therefore, the throughput is
+        \begin{equation*}
+            \frac{u}{\frac{uv}{8X}} = \frac{8X}{w} \, users/second
+        \end{equation*}
+
+    \item We want that the execution time on the CPU is lower than in memory. Therefore,
+        \begin{equation*}
+        \frac{uv}{8X} < \frac{u \cdot w}{8\cdot8k} \times (t_{rc} + t_{and}) +
+                \frac{u}{8X}
+        \end{equation*}
+        Solving the inequality for $w$ gives
+        \begin{equation*}
+            w < \frac{1}{1 - \frac{X}{8k} \times (t_{rc} + t_{and})}
+        \end{equation*}
+\end{enumerate}
+
+\subsection{In-DRAM Bitmap Indices II}
+
+\begin{enumerate}[label=\alph*)]
+    \item
+\end{enumerate}
+
+\section{In-DRAM Bit Serial Computation [200 points]}
+
+\section{Caching vs. Processing-in-Memory [200 points]}
+
+\end{document}
+

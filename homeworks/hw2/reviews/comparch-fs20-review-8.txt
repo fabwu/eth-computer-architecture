@@ -1,0 +1,96 @@
+==+== Computer Architecture Paper Review Form
+==-== DO NOT CHANGE LINES THAT START WITH "==+==" UNLESS DIRECTED!
+==-== For further guidance, or to upload this file when you are done, go to:
+==-== https://safari.ethz.ch/review/architecture20/offline
+
+==+== =====================================================================
+==+== Begin Review #8.
+==+== Reviewer: Fabian Wüthrich <fabianwu@student.ethz.ch>
+
+==+== Paper #8
+==-== Title: Processing-in-memory: A workload-driven perspective
+
+==+== Review Readiness
+==-== Enter "Ready" if the review is ready for others to see:
+
+Ready
+
+==+== A. Paper summary
+
+Moving data between the memory system and the CPU reduces both performance
+and energy efficiency. Many modern and emerging applications, such as machine
+learning or genome sequencing, work on large datasets that overwhelm the data
+storage and movement resources of a modern system.
+
+The high cost of data movement requires a paradigm shift that changes the
+design of a computer fundamentally. Processing-in-memory (PIM) is one such
+novel design and it became more relevant due to recent advances in memory
+design (e.g. 3D-stacked memory).
+
+The paper gives a brief historical background about PIM, presents
+major innovations in modern memory systems and then describes two
+approaches to enable PIM (processing-near-memory vs. 
+processing-using-memory). Then the authors discuss how to identify
+parts of an application that can benefit from PIM. In an interesting
+case study they analyze the machine learning library TensorFlow and 
+move some functions to a PIM core. Although PIM has many promising
+aspects it also comes with many challenges like cache coherence or
+virtual memory. The paper proposes some solutions but also admits
+that more research is necessary for a wide adoption of PIM especially
+in consumer devices. 
+
+==+== B. Strengths
+
+* Provides a great overview about current research around PIM
+
+* The case study improves a popular framework which could foster
+  the adoption of PIM even more
+
+* The paper presents the challenges in a compact and clear way
+  so an interested reader can easily follow the references for
+  a more in-depth view
+
+==+== C. Weaknesses
+
+* How to map data correctly e.g. to the correct vault is a huge
+  challenge and the paper talks only briefly about it
+
+* The toolflow described for identifying PIM targets is not suitable
+  for arbitrary applications because evaluation would take too much
+  time and resources
+
+==+== D. Thoughts and ideas
+
+* I see great potential in improving the packaging/unpackaging functionality
+  as other techniques as AVX would greatly benefit from a nice data layout
+
+* Use a toolchain which allows the development of application code for the CPU
+  and HDL for the logic layer of 3D-stacked memories
+
+* Use machine learning to identify PIM targets
+
+* Research programming model or interface for PIM
+
+* Port a linear algebra library (e.g. BLAS) to PIM to increase adoption
+
+==+== E. Takeaways
+
+After reading this paper I've got a good view into PIM research and the challenges
+that must be solved before wide adoption kicks in. This architecture has definitely
+great potential but researchers and industry need to make this technology easy 
+accessible for programmers.
+
+==+== F. Other comments
+
+* Can the CPU still read from memory if e.g. a PIM core is executing instructions?
+
+* In section 3.1 one could add the average area of a modern CPU to get a feeling 
+  for the 50-60mm2 area available on the memory chip
+
+* In the case study when describing the NN one could also mention which function
+  gets executed on the PIM core 
+
+==+== Scratchpad (for unsaved private notes)
+
+==+== End Review
+
