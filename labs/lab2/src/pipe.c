@@ -7,7 +7,7 @@
  */
 
 #include "pipe.h"
-#include "cache.h"
+#include "l1_cache.h"
 #include "mips.h"
 #include "shell.h"
 #include <assert.h>
@@ -15,15 +15,13 @@
 #include <stdlib.h>
 #include <string.h>
 
-//#define DEBUG
+#define INST_CACHE_TOTAL_SIZE 8 * 1024
+#define INST_CACHE_BLOCK_SIZE 32
+#define INST_CACHE_NUM_WAY 4
 
-#define INST_CACHE_DEFAULT_TOTAL_SIZE 8 * 1024
-#define INST_CACHE_DEFAULT_BLOCK_SIZE 32
-#define INST_CACHE_DEFAULT_NUM_WAY 4
-
-#define DATA_CACHE_DEFAULT_TOTAL_SIZE 64 * 1024
-#define DATA_CACHE_DEFAULT_BLOCK_SIZE 32
-#define DATA_CACHE_DEFAULT_NUM_WAY 8
+#define DATA_CACHE_TOTAL_SIZE 64 * 1024
+#define DATA_CACHE_BLOCK_SIZE 32
+#define DATA_CACHE_NUM_WAY 8
 
 //TODO Inst Miss/Hits are wrong because 0x00000 is also counted
 
@@ -40,7 +38,7 @@ void print_op(Pipe_Op *op) {
         printf("(null)\n");
 }
 
-void print_cache(Cache_State *c, char *name) {
+void print_cache(L1_Cache_State *c, char *name) {
     printf(
         "%s: %d bytes total %d bytes block %d ways %d sets (addr[%d:%d])\n\n",
         name, c->total_size, c->block_size, c->num_ways, c->num_sets,
@@ -51,68 +49,27 @@ void print_cache(Cache_State *c, char *name) {
 Pipe_State pipe;
 
 /* global instrucion cache state */
-Cache_State inst_cache;
+L1_Cache_State inst_cache;
 
 /* global data cache state */
-Cache_State data_cache;
-
-static void pipe_init_inst_cache() {
-  char *env;
-  int inst_cache_total_size = INST_CACHE_DEFAULT_TOTAL_SIZE;
-  if ((env = getenv("INST_CACHE_TOTAL_SIZE"))) {
-    inst_cache_total_size = atoi(env);
-  }
-
-  int inst_cache_block_size = INST_CACHE_DEFAULT_BLOCK_SIZE;
-  if ((env = getenv("INST_CACHE_BLOCK_SIZE"))) {
-    inst_cache_block_size = atoi(env);
-  }
-
-  int inst_cache_num_way = INST_CACHE_DEFAULT_NUM_WAY;
-  if ((env = getenv("INST_CACHE_NUM_WAY"))) {
-    inst_cache_num_way = atoi(env);
-  }
-
-  /* init instruction cache */
-  cache_init(&inst_cache, inst_cache_total_size, inst_cache_block_size,
-             inst_cache_num_way);
-
-#ifdef DEBUG
-  print_cache(&inst_cache, "instruction cache");
-#endif
-}
-
-static void pipe_init_data_cache() {
-  char *env;
-  int data_cache_total_size = DATA_CACHE_DEFAULT_TOTAL_SIZE;
-  if ((env = getenv("DATA_CACHE_TOTAL_SIZE"))) {
-    data_cache_total_size = atoi(env);
-  }
-
-  int data_cache_block_size = DATA_CACHE_DEFAULT_BLOCK_SIZE;
-  if ((env = getenv("DATA_CACHE_BLOCK_SIZE"))) {
-    data_cache_block_size = atoi(env);
-  }
-
-  int data_cache_num_way = DATA_CACHE_DEFAULT_NUM_WAY;
-  if ((env = getenv("DATA_CACHE_NUM_WAY"))) {
-    data_cache_num_way = atoi(env);
-  }
-
-  /* init data cache */
-  cache_init(&data_cache, data_cache_total_size, data_cache_block_size,
-             data_cache_num_way);
-
-#ifdef DEBUG
-  print_cache(&data_cache, "data cache");
-#endif
-}
+L1_Cache_State data_cache;
 
 void pipe_init() {
   memset(&pipe, 0, sizeof(Pipe_State));
   pipe.PC = 0x00400000;
-  pipe_init_inst_cache();
-  pipe_init_data_cache();
+  
+  /* init instruction cache */
+  l1_cache_init(&inst_cache, INST_CACHE_TOTAL_SIZE, INST_CACHE_BLOCK_SIZE,
+                INST_CACHE_NUM_WAY);
+
+  /* init data cache */
+  l1_cache_init(&data_cache, DATA_CACHE_TOTAL_SIZE, DATA_CACHE_BLOCK_SIZE,
+                DATA_CACHE_NUM_WAY);
+
+#ifdef DEBUG
+  print_cache(&inst_cache, "instruction cache");
+  print_cache(&data_cache, "data cache");
+#endif 
 }
 
 void pipe_cycle() {
@@ -176,7 +133,7 @@ void pipe_cycle() {
   }
 
   if (RUN_BIT == 0) {
-    cache_free(&inst_cache);
+    l1_cache_free(&inst_cache);
   }
 }
 
@@ -242,7 +199,7 @@ void pipe_stage_mem() {
   uint32_t val = 0;
   if (op->is_mem) {
     /* both loads and stores read an addr so we stall pipeline only once */
-    if (cache_access(&data_cache, op->mem_addr) == CACHE_MISS) {
+    if (l1_cache_access(&data_cache, op->mem_addr) == CACHE_MISS) {
       pipe.data_cache_stall = 48;
       stat_data_cache_misses++;
       return;
@@ -793,7 +750,7 @@ void pipe_stage_fetch() {
    *
    * decode stage can use op at cycle 51
    */
-  if (cache_access(&inst_cache, pipe.PC) == CACHE_MISS) {
+  if (l1_cache_access(&inst_cache, pipe.PC) == CACHE_MISS) {
     pipe.inst_cache_stall = 48;
     stat_inst_cache_misses++;
     return;
