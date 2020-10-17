@@ -146,12 +146,89 @@ see \href{https://safari.ethz.ch/review/architecture20/}{here}
 \subsection{In-DRAM Bitmap Indices II}
 
 \begin{enumerate}[label=\alph*)]
-    \item
+    \item According to the cache specification we use \verb|addr[5:0]| for the offset,
+        \verb|addr[22:6]| for the set index and \verb|addr[31:23]| as tag. In each loop
+        iteration the addresses \verb|0x05000000+4*i|, \verb|0x06000000+4*i| and 
+        \verb|0x07000000+4*i| are loaded into cache. These addresses map to the same
+        set but have a different tag so they evict each other out of the cache. Thus, the
+        code has only cache misses and requires $3 \times 2^{15} \times 100$ cycles.
+
+    \item 
+        \begin{enumerate}[label=\roman*)]
+            \item Ambit can perform bitwise operations on the size of a row so the loop
+                iterates 
+                $\frac{database \, size}{row \, size} = \frac{32 \cdot 1024 \cdot 4 \, bytes}{8 \cdot 1024 \, bytes} = 16$
+                times. The query can be executed as in the listing below:
+\begin{lstlisting}[language=c]
+for(int i = 0; i < 16; i++){
+    bbop_xor 0x08000000, 0x05000000 + i*8192, 0x0A000000;
+    bbop_xor 0x09000000, 0x06000000 + i*8192, 0x0B000000;
+    bbop_or  0x07000000 + i*8192, 0x08000000 , 0x09000000;
+}
+\end{lstlisting}
+
+            \item Ambit requires 25 ACTIVATE and 11 PRECHARGE commands for \verb|bbop_xor| and
+                11 ACTIVATE and 5 PRECHARGE commands for \verb|bbop_or|. The query executed with
+                Ambit takes $16 \times (2 \times (25 \times 50 + 11 \times 20) + (11 \times 50 + 5 \times 20))$
+                cycles so the speedup is $\frac{9830400}{57440}\approx 171$x
+        \end{enumerate}
 \end{enumerate}
 
 \section{In-DRAM Bit Serial Computation [200 points]}
 
 \section{Caching vs. Processing-in-Memory [200 points]}
 
+\begin{enumerate}[label=\alph*)]
+    \item The inner loop has two iterations and two memory access. The outer loop iterates 16 times
+        and has one memory access. Therefore, the execution time is 
+        $50 \times (16 + 16 \times 2 \times 2) = 4000$ cycles.
+    
+    \item According to the cache specification two elements fit in each cache block. The code has 
+        the following access pattern per outer loop iteration:
+
+        \textbf{1. Iteration} \newline
+        Access: A[0], B[0], A[1], B[1], A[0] \newline
+        H/M patter: M M M M M \newline
+        Latency: $5 \times 50 = 250$ cycles \newline
+        Cache: Set 0: A[0:1] \newline
+        
+        \textbf{2. Iteration} \newline
+        Access: A[1], B[0], A[2], B[1], A[1] \newline
+        H/M patter: H M M H M \newline
+        Latency: $2 \times 5 + 3 \times 50 = 165$ cycles \newline
+        Cache: Set 0: A[0:1] Set 1: A[2:3] \newline
+
+        \textbf{3. Iteration} \newline
+        Access: A[2], B[0], A[3], B[1], A[2] \newline
+        H/M patter: H M H H H \newline
+        Latency: $4 \times 5 + 1 \times 50 = 70$ cycles \newline
+        Cache: Set 0: B[0:1] Set 1: A[2:3] \newline
+        
+        \textbf{4. Iteration} \newline
+        Access: A[3], B[0], A[4], B[1], A[3] \newline
+        H/M patter: H H M H H \newline
+        Latency: $4 \times 5 + 1 \times 50 = 70$ cycles \newline
+        Cache: Set 0: B[0:1] Set 1: A[2:3] Set 2: A[4:5] \newline
+        
+        \textbf{5. Iteration} \newline
+        Access: A[4], B[0], A[5], B[1], A[4] \newline
+        H/M patter: H H H H H \newline
+        Latency: $5 \times 5 = 25$ cycles \newline
+        Cache: Set 0: B[0:1] Set 1: A[2:3] Set 2: A[4:5] \newline
+
+        Now the single-miss and no-miss patterns are interleaved until the end.
+
+        Latency: $250 + 165 + 70 + 7 \times 70 + 6 \times 50 = 1275$ cycles
+    
+
+    \item This is the same as the processor without a core but with a latency of 10 instead of 50 cycles.
+        Therefore, we get a new latency of 800 cycles.
+    
+    \item Increasing the cache size would not eliminate the conflicts between A and B in the first set
+        so she is not correct.
+
+    \item One possibility would be to use a set-associative cache. With 2-ways we could eliminate the
+        conflict in set 0 so we have only compulsory misses.
+\end{enumerate}
 \end{document}
 
