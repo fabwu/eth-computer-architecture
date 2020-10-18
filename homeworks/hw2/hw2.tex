@@ -67,8 +67,8 @@ see \href{https://safari.ethz.ch/review/architecture20/}{here}
     \item If the refresh interval is reduced from 64ms to 8ms, each row is refreshed 8 more times.
         Thus, bank utilization increases to $8U$ and energy consumption increases to $8E$
 
-    \item With a doubling of the rows, the mitigation is still possible, but the bank is occupied 80\%
-        by refresh operations ($U = 0.05 \times 8 \times 2 = 0.8$).
+    \item With a doubling of the rows, the mitigation is still possible, but the bank is occupied 
+        by refresh operations 80\% of the time ($U = 0.05 \times 8 \times 2 = 0.8$).
 
         With another doubling of the rows, the mitigation cannot be implemented because we cannot refresh every
         row in 8ms ($U = 0.05 \times 8 \times 4 = 1.6$).
@@ -99,7 +99,7 @@ see \href{https://safari.ethz.ch/review/architecture20/}{here}
     \item Let X be a RV that describes the number of errors in a year. Each 64ms interval can be seen
         as a independent experiment of getting an error. Therefore, X has a binomial distribution with
         the parameters $p=1.9\cdot10^{-22}$ and  $n=\frac{365 \cdot 24 \cdot 3600s}{64ms} = 492'750'000$.
-        Therefore,
+        Then, the probability can be calculated as follows: 
         \begin{align*}
             P(X\geq1) &= 1 - P(X=0) \\
                       &= 1 - (1 - p)^n \\
@@ -113,11 +113,11 @@ see \href{https://safari.ethz.ch/review/architecture20/}{here}
 \subsection{In-DRAM Bitmap Indices I}
 
 \begin{enumerate}[label=\alph*)]
-    \item All users occupy $\frac{u}{8}$bytes so we need $\frac{u}{8\cdot8k}$ subarrays. Including the
+    \item All users occupy $\frac{u}{8}$ bytes so we need $\frac{u}{8\cdot8k}$ subarrays. Including the
         weeks, $\frac{u \cdot w}{8\cdot8k}$ rows are occupied.
-    \item Using Ambit we copy each row into the \textit{Operand} row and perform a bulk \verb|and|. This 
-        requires $\frac{u \cdot w}{8\cdot8k} \times (t_{rc} + t_{and})$ seconds overall. Then we need 
-        to transfer $\frac{u}{8}$bytes to the CPU and count the bits. This takes $\frac{u}{8X}$ seconds.
+    \item Using Ambit, we copy each row into the \textit{Operand} row and perform a bulk \verb|and|. This 
+        requires $\frac{u \cdot w}{8\cdot8k} \times (t_{rc} + t_{and})$ seconds overall. Then, we need 
+        to transfer $\frac{u}{8}$ bytes to the CPU and count the bits. This takes $\frac{u}{8X}$ seconds.
         Therefore, the throughput is
         \begin{equation*}
             \frac{u}{
@@ -161,9 +161,9 @@ see \href{https://safari.ethz.ch/review/architecture20/}{here}
                 times. The query can be executed as in the listing below:
 \begin{lstlisting}[language=c]
 for(int i = 0; i < 16; i++){
-    bbop_xor 0x08000000, 0x05000000 + i*8192, 0x0A000000;
-    bbop_xor 0x09000000, 0x06000000 + i*8192, 0x0B000000;
-    bbop_or  0x07000000 + i*8192, 0x08000000 , 0x09000000;
+    bbop_xor 0x08000000,            0x05000000 + i*8192,    0x0A000000
+    bbop_xor 0x09000000,            0x06000000 + i*8192,    0x0B000000
+    bbop_or  0x07000000 + i*8192,   0x08000000 ,            0x09000000
 }
 \end{lstlisting}
 
@@ -176,10 +176,50 @@ for(int i = 0; i < 16; i++){
 
 \section{In-DRAM Bit Serial Computation [200 points]}
 
+\begin{enumerate}[label=\alph*)]
+    \item The STREAM benchmark transfers two arrays with 102'400 4-bit elements and performs no computation.
+        In total, $\frac{2 \times 102'400 \times 4}{8} = 102'400$ bytes are moved to the CPU. Therefore,
+        \begin{equation*}
+            M = \frac{num\_bytes}{t_{cpu}} = \frac{102'400}{0.00001} = 10.24 \, GB/s
+        \end{equation*}
+        The first experiment runs 65'536 operations (additions) and transfers 
+        $\frac{3 \times 65'536 \times 4}{8}$ bytes between CPU and memory. With $M=10.24$ GB/s we get
+        \begin{equation*}
+            K = \frac{t_{cpu} - num\_bytes / M}{num\_operations} = \frac{0.0001 - 
+            \frac{3 \times 65'536 \times 4}{8} / 10.24 \cdot 10^9}{65'536} = 1.38 \, ns/operation
+        \end{equation*}
+    \item The Ambit base implementation is shown in the following listing:
+\begin{lstlisting}[language=C]
+// S = 0x00C00000
+// Cout/Cin = 0x00900000
+for(int i = 0; i < num_bits_per_element; ++i) {
+    bbop_xor 0x00700000,            0x00A00000+i*0x2000,    0x00B00000+i*0x2000
+    bbop_xor 0x00C00000+i*0x2000,   0x00700000,             0x00900000
+    boop_and 0x00700000,            0x00700000,             0x00900000
+    boop_and 0x00800000,            0x00A00000+i*0x2000,    0x00B00000+i*0x2000
+    boop_or  0x00900000,            0x00700000,             0x00800000
+}
+\end{lstlisting}
+
+    \item We get the maximum number of operations when we use each bit of a row as an element. With a row
+        size of 8KB we can perform $8 \times 1028 \times 8 = 65'536$ additions i.e. max. number of operations.
+        
+        Ambit requires 25 ACTIVATE and 11 PRECHARGE commands for \verb|bbop_xor| and
+        11 ACTIVATE and 5 PRECHARGE commands for \verb|bbop_or| and \verb|bbop_and|. The code executed with
+        Ambit takes 
+        $n \times (2 \times (25 \times 20ns + 11 \times 10ns) + 3 \times (11 \times 20ns + 5 \times 10ns) = n \times 2030 \, ns$. The maximum throughput is then $\frac{65'536}{2030 \cdot n \cdot 10^{-9}}$ operations per second.
+
+    \item As calculated in subtask (c) the Ambit-based implementation takes $2030n$ns to execute. The 
+        execution time of the CPU-based implementation is 
+        $1.38 \times 10^{-9} \times 65'536 + \frac{3 \times 65'536 \times n}{8 \times 10.24 \times 10^9} \approx 2.4 \times 10^{-6}$ns. 
+        Thus, there is no element size that makes the CPU-based implementation faster than the Ambit 
+        implementation.
+\end{enumerate}
+
 \section{Caching vs. Processing-in-Memory [200 points]}
 
 \begin{enumerate}[label=\alph*)]
-    \item The inner loop has two iterations and two memory access. The outer loop iterates 16 times
+    \item The inner loop has two iterations and two memory accesses. The outer loop iterates 16 times
         and has one memory access. Therefore, the execution time is 
         $50 \times (16 + 16 \times 2 \times 2) = 4000$ cycles.
     
@@ -197,7 +237,7 @@ for(int i = 0; i < 16; i++){
         H/M patter: H M M H M \newline
         Latency: $2 \times 5 + 3 \times 50 = 165$ cycles \newline
         Cache: Set 0: A[0:1] Set 1: A[2:3] \newline
-
+\newpage
         \textbf{3. Iteration} \newline
         Access: A[2], B[0], A[3], B[1], A[2] \newline
         H/M patter: H M H H H \newline
@@ -222,13 +262,13 @@ for(int i = 0; i < 16; i++){
     
 
     \item This is the same as the processor without a core but with a latency of 10 instead of 50 cycles.
-        Therefore, we get a new latency of 800 cycles.
+        The new latency is 800 cycles.
     
-    \item Increasing the cache size would not eliminate the conflicts between A and B in the first set
+    \item Increasing the cache size would not eliminate the conflicts between A and B in the first set,
         so she is not correct.
 
-    \item One possibility would be to use a set-associative cache. With 2-ways we could eliminate the
-        conflict in set 0 so we have only compulsory misses.
+    \item One possibility could be to use a set-associative cache. 2-ways would eliminate the
+        conflict in set 0 so only compulsory misses occur.
 \end{enumerate}
 \end{document}
 
