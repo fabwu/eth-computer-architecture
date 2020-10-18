@@ -17,27 +17,67 @@ Ready
 
 ==+== A. Paper summary
 
+After several unsuccessful solutions against RowHammer, industry delivers 
+target row refresh (TRR) as the definitive solution against this vulnerability. 
+The inner workings of this mitigation mechanism are not published by DRAM 
+vendors so nobody can verify the security of TRR.
 
+This paper analyzes TRR thoroughly and uncovers that TRR is actually an umbrella term
+for several mitigation techniques against RowHammer. A sophisticated reverse 
+engineering process led to new insights into the operation of these mitigation 
+techniques. The result of these observations was TRRespass, a RowHammer fuzzer to
+find access patterns that lead to bit flips. Using TRRespass, the authors showed
+that several state-of-the-art RowHammer attacks are still possible on TRR-enabled
+chips and that more robust mitigation techniques are required to defend against
+RowHammer.
 
 ==+== B. Strengths
 
+* Very interesting reverse engineering methodology which uncovered many parts of TRR
 
+* The combination of TRRespass with real-world exploits strongly supports the claim
+  that RowHammer is not solved yet.
+
+* Code artifacts are published on GitHub which can stimulate further RowHammer fuzzer 
+  research
 
 ==+== C. Weaknesses
 
+* The authors provide only little direction how a future solution could look like
 
+* The manufacturing date of the selected chips are not evenly distributed across
+  all vendors (e.g. vendor B and C has many chips from 2018-2019 while A is better
+  distributed)
+
+* The overall structure is not always clear (e.g. results are sometimes discussed 
+  twice)
+
+* TRRespass does no exhaustive testing so results could be more severe than presented
+  in this paper
 
 ==+== D. Thoughts and ideas
 
+* Use a better search strategy and performance improvements for TRRespass to allow
+  exhaustive testing
 
+* Investigate why manufacturer C has very little bit flips. Is an additional
+  mitigation technique employed in these chips?
+
+* More research with TRRespass on mobile devices
 
 ==+== E. Takeaways
 
-
+This paper is a really nice example of excellent reverse engineering work. I'll
+probably refer to it if I have to do similar work in the future. Furthermore, the
+paper shows in an impressive way that RowHammer is not solved and more research
+into mitigation techniques is required.
 
 ==+== F. Other comments
 
+* The distribution of the bitflips in Fig. 10 is really strange. This might 
+  requires further investigation.
 
+* Typo in section VII.A.Vendor in the first sentence (how)
 
 ==+== Scratchpad (for unsaved private notes)
 
