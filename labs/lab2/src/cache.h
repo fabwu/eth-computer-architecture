@@ -4,9 +4,15 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-//#define DEBUG
+#include "list.h"
+
+#define DEBUG
 
 enum Cache_Result { CACHE_MISS, CACHE_HIT };
+
+typedef struct L1_Cache_State L1_Cache_State;
+typedef struct L2_Cache_State L2_Cache_State;
+typedef struct L2_L1_Notification L2_L1_Notification;
 
 typedef struct Cache_Block {
   /* addr saved in this cache block */
@@ -16,5 +22,71 @@ typedef struct Cache_Block {
   /* timestamp for last access */
   int last_access;
 } Cache_Block;
+
+typedef struct L2_MSHR {
+  /* cache block address (i.e. address without offset) */
+  uint32_t address;
+  /* indicates if MSHR is valid */
+  bool valid;
+  /* indicates if MSHR was served */
+  bool done;
+} L2_MSHR;
+
+struct L2_L1_Notification {
+  /* address to insert into L1 cache */
+  uint32_t tag;
+  /* remaining cycles */
+  int cycles;
+  /* ptr to L1 cache */
+  L1_Cache_State *l1;
+};
+
+struct L2_Cache_State {
+  /* name of cache */
+  char *label;
+  /* total size of cache in bytes */
+  int total_size;
+  /* block size in bytes */
+  int block_size;
+  /* number of ways */
+  int num_ways;
+  /* number of sets */
+  int num_sets;
+  /* bit number of set idx start */
+  int set_idx_from;
+  /* bit number of set idx end */
+  int set_idx_to;
+  /* timestamp gets increased on every cache access */
+  int timestamp;
+  /* ptr to cache blocks */
+  Cache_Block *blocks;
+  /* miss status holding register */
+  L2_MSHR mshrs[16];
+  /* pending notifications for L1 caches */
+  list_t *l1_notifications;
+};
+
+struct L1_Cache_State {
+  /* name of cache */
+  char *label;
+  /* total size of cache in bytes */
+  int total_size;
+  /* block size in bytes */
+  int block_size;
+  /* number of ways */
+  int num_ways;
+  /* number of sets */
+  int num_sets;
+  /* bit number of set idx start */
+  int set_idx_from;
+  /* bit number of set idx end */
+  int set_idx_to;
+  /* timestamp gets increased on every cache access */
+  int timestamp;
+  /* ptr to cache blocks */
+  Cache_Block *blocks;
+  /* ptr to L2 cache */
+  L2_Cache_State *l2;
+};
 
 #endif

@@ -8,6 +8,7 @@
 
 #include "pipe.h"
 #include "l1_cache.h"
+#include "l2_cache.h"
 #include "mips.h"
 #include "shell.h"
 #include <assert.h>
@@ -38,13 +39,6 @@ void print_op(Pipe_Op *op) {
         printf("(null)\n");
 }
 
-void print_cache(L1_Cache_State *c, char *name) {
-    printf(
-        "%s: %d bytes total %d bytes block %d ways %d sets (addr[%d:%d])\n\n",
-        name, c->total_size, c->block_size, c->num_ways, c->num_sets,
-        c->set_idx_to, c->set_idx_from);
-}
-
 /* global pipeline state */
 Pipe_State pipe;
 
@@ -54,22 +48,20 @@ L1_Cache_State inst_cache;
 /* global data cache state */
 L1_Cache_State data_cache;
 
+/* global last level cache state */
+L2_Cache_State l2_cache;
+
 void pipe_init() {
   memset(&pipe, 0, sizeof(Pipe_State));
   pipe.PC = 0x00400000;
+
+  l2_cache_init(&l2_cache);
   
-  /* init instruction cache */
-  l1_cache_init(&inst_cache, INST_CACHE_TOTAL_SIZE, INST_CACHE_BLOCK_SIZE,
-                INST_CACHE_NUM_WAY);
+  l1_cache_init(&inst_cache, "inst cache", INST_CACHE_TOTAL_SIZE, INST_CACHE_BLOCK_SIZE,
+                INST_CACHE_NUM_WAY, &l2_cache);
 
-  /* init data cache */
-  l1_cache_init(&data_cache, DATA_CACHE_TOTAL_SIZE, DATA_CACHE_BLOCK_SIZE,
-                DATA_CACHE_NUM_WAY);
-
-#ifdef DEBUG
-  print_cache(&inst_cache, "instruction cache");
-  print_cache(&data_cache, "data cache");
-#endif 
+  l1_cache_init(&data_cache, "data cache", DATA_CACHE_TOTAL_SIZE, DATA_CACHE_BLOCK_SIZE,
+                DATA_CACHE_NUM_WAY, &l2_cache);
 }
 
 void pipe_cycle() {
@@ -85,6 +77,8 @@ void pipe_cycle() {
   print_op(pipe.wb_op);
   printf("\n");
 #endif
+
+  l2_process_l1_notifications(&l2_cache);
 
   pipe_stage_wb();
   pipe_stage_mem();
@@ -134,6 +128,8 @@ void pipe_cycle() {
 
   if (RUN_BIT == 0) {
     l1_cache_free(&inst_cache);
+    l1_cache_free(&data_cache);
+    l2_cache_free(&l2_cache);
   }
 }
 
