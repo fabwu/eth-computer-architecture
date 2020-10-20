@@ -18,23 +18,56 @@ Ready
 
 ==+== A. Paper summary
 
+Bulk data copy and initialization is a frequently used operation 
+in today's systems. As many computers have a CPU-centric design,
+large amounts of data are unecessarily moved across the memory
+channel which degrades system performance and energy efficiency.
 
+This paper presents a novel technique called RowClone that performs
+bulk copy and initialization completely in DRAM. RowClone uses the 
+row buffer to transfer data within the same subarray and the internal
+bus to move data between subarrays or banks. As a result, RowClone
+can significantly improve performance and energy consumption with
+only minimal changes to the DRAM chip.
 
 ==+== B. Strengths
 
+* Simple and elegant mechanism to solve an important problem
 
+* RowClone is intuitive and easy to understand which stimulates 
+  adoption
+
+* Although RowClone has some drawbacks for bulk copy, it's a
+  clear win for initialization
+
+* The paper describes the implementation of RowClone across
+  the complete computing stack
 
 ==+== C. Weaknesses
 
+* Data needs to be in the same subarray to get all benefits of
+  RowClone
 
+* Inter-subarray copy is inefficient
+
+* Cache coherence is tricky and causes overhead
 
 ==+== D. Thoughts and ideas
 
+* Research how to move data on smaller granularity i.e.
+  smaller than row size
 
+* Implement RowClone on real system
+
+* Research RowClone like techniques in emerging memory
+  techniques e.g. PCM
 
 ==+== E. Takeaways
 
-
+RowClone is a simple and effective mechanism to accelerate bulk
+copy and initialization. The paper is also a good example for 
+presenting an idea that goes across the entire stack. Many papers
+build on RowClone which shows that PIM is a promising research area.
 
 ==+== F. Other comments
 
