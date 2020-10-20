@@ -18,27 +18,66 @@ Ready
 
 ==+== A. Paper summary
 
+The performance demands of mobile consumer devices have increased
+dramatically in recent years due to emerging applications like 4K 
+video streaming or virtual reality (VR). Nevertheless, battery
+capacity and thermal power dissipation limit the performance of
+these devices so energy consumption is of great importance.
 
+This work analyses the following widely-used Google consumer workloads:
+
+* Chrome Web Browser
+* TensorFlow Mobile (Machine Learning Library)
+* video playback & capture (VP9 codec)
+
+The authors found that data movement between memory and compute units
+is a blocker for performance and energy efficiency.
+They proposed processing-in-memory (PIM) using the logic layer in 3D-stacked
+memory and showed that this approach significantly reduces total 
+energy consumption and execution time of each workload.
 
 ==+== B. Strengths
 
+* Very interesting case studies on real world applications which clearly
+  show the applicability of PIM
 
+* Moving small functions (PIM targets) to PIM cores/accelerators makes
+  implementation easy and encourages reusability
+
+* Simulating these different workloads is very time consuming but the
+  results support the claim that data movement is indeed a great 
+  bottleneck
+
+* The paper is well structured and easy to read
 
 ==+== C. Weaknesses
 
+* The implementation of PIM cores/accelerators was only covered from
+  a higher level without many details
 
+* The background section about PIM is very brief so readers without
+  extensive knowledge about PIM will have a hard time to understand
+  this paper
+
+* System integration is only mentioned briefly although it is the
+  main challenge towards widespread adoption of PIM
 
 ==+== D. Thoughts and ideas
 
+* The authors could drop a workload or two and cover the implementation of
+  another one in more detail
 
+* Implement multiple PIM targets in a simulator and see how if the interfere
+  with each other
 
 ==+== E. Takeaways
 
-
+This paper was a very interesting and enjoyable read which clearly shows
+that PIM should be considered especially in mobile consumer devices.
 
 ==+== F. Other comments
 
-
+* Typo in section 3.2 line 4 (misplaced the)
 
 ==+== Scratchpad (for unsaved private notes)
 
