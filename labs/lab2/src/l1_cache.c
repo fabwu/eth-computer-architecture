@@ -15,15 +15,14 @@ static int bit_length(uint32_t n) {
   return l;
 }
 
-void l1_cache_init(L1_Cache_State *c, char *label, int total_size,
-                   int block_size, int num_ways, L2_Cache_State *l2) {
+void l1_cache_init(L1_Cache_State *c, char *label, int total_size, int num_ways,
+                   L2_Cache_State *l2) {
   c->label = label;
   c->total_size = total_size;
-  c->block_size = block_size;
   c->num_ways = num_ways;
 
-  c->num_sets = (c->total_size / c->num_ways) / c->block_size;
-  c->set_idx_from = bit_length(c->block_size);
+  c->num_sets = (c->total_size / c->num_ways) / CACHE_BLOCK_SIZE;
+  c->set_idx_from = bit_length(CACHE_BLOCK_SIZE);
 
   if(c->num_sets == 1) {
     c->set_idx_to = c->set_idx_from;
@@ -38,10 +37,9 @@ void l1_cache_init(L1_Cache_State *c, char *label, int total_size,
   c->timestamp = 0;
   c->l2 = l2;
 
-  debug_l1(
-      "%s: %d bytes total %d bytes block %d ways %d sets (addr[%d:%d])\n\n",
-      c->label, c->total_size, c->block_size, c->num_ways, c->num_sets,
-      c->set_idx_to, c->set_idx_from);
+  debug_l1("%s: %d bytes total %d ways %d sets (addr[%d:%d])\n\n", c->label,
+           c->total_size, c->num_ways, c->num_sets, c->set_idx_to,
+           c->set_idx_from);
 }
 
 void l1_cache_free(L1_Cache_State *c) { free(c->blocks); }
@@ -60,10 +58,6 @@ static uint32_t get_set_idx(L1_Cache_State *c, uint32_t addr) {
     return set_idx;
 }
 
-static uint32_t get_tag(L1_Cache_State *c, uint32_t addr) {
-  return addr >> (c->set_idx_to + 1);
-}
-
 static void write_block(Cache_Block *block, uint32_t tag, int timestamp) {
   block->valid = true;
   block->tag = tag;
@@ -75,7 +69,7 @@ enum Cache_Result l1_cache_access(L1_Cache_State *c, uint32_t addr) {
   c->timestamp++;
 
   /* calculate set idx */
-  uint32_t tag = get_tag(c, addr);
+  uint32_t tag = CACHE_BLOCK_ALIGNED_ADDR(addr);
   uint32_t set_idx = get_set_idx(c, addr);
   Cache_Block *set = c->blocks + set_idx * c->num_ways;
   Cache_Block *block;
@@ -84,15 +78,14 @@ enum Cache_Result l1_cache_access(L1_Cache_State *c, uint32_t addr) {
   for (int way = 0; way < c->num_ways; ++way) {
     block = set + way;
     if (block->valid && (block->tag == tag)) {
-      debug_l1("%s: [0x%X] HIT in set %d way %d tag 0x%X\n", c->label, addr,
-               set_idx, way, tag);
+      debug_l1("%s: [0x%X] HIT in set %d way %d\n", c->label, tag, set_idx,
+               way);
       write_block(block, tag, c->timestamp);
       return CACHE_HIT;
     }
   }
 
-  debug_l1("%s: [0x%X] MISS in set %d tag 0x%X\n", c->label, addr, set_idx,
-           tag);
+  debug_l1("%s: [0x%X] MISS in set %d\n", c->label, tag, set_idx);
 
   /* addr not in cache -> probe L2 cache */
   l2_cache_probe(c->l2, addr, c);
@@ -102,8 +95,7 @@ enum Cache_Result l1_cache_access(L1_Cache_State *c, uint32_t addr) {
 
 void l1_insert_block(L1_Cache_State *c, uint32_t addr) {
   c->timestamp++;
-  /* calculate set idx */
-  uint32_t tag = get_tag(c, addr);
+  uint32_t tag = CACHE_BLOCK_ALIGNED_ADDR(addr);
   uint32_t set_idx = get_set_idx(c, addr);
   Cache_Block *set = c->blocks + set_idx * c->num_ways;
   Cache_Block *block;
@@ -118,8 +110,8 @@ void l1_insert_block(L1_Cache_State *c, uint32_t addr) {
   for (int way = 0; way < c->num_ways; ++way) {
     block = set + way;
     if (!block->valid) {
-      debug_l1("%s: [0x%X] inserted (invalid) into set %d way %d tag 0x%X\n",
-               c->label, addr, set_idx, way, tag);
+      debug_l1("%s: [0x%X] inserted (invalid) into set %d way %d\n", c->label,
+               tag, set_idx, way);
       write_block(block, tag, c->timestamp);
       return;
     }
@@ -134,8 +126,8 @@ void l1_insert_block(L1_Cache_State *c, uint32_t addr) {
     }
   }
 
-  debug_l1("%s: [0x%X] inserted (lru) in set %d way %d tag 0x%X\n", c->label,
-           addr, set_idx, (int)(block - set), tag);
+  debug_l1("%s: [0x%X] inserted (lru) in set %d way %d\n", c->label, tag,
+           set_idx, (int)(block - set));
 
   write_block(block, tag, c->timestamp);
 }

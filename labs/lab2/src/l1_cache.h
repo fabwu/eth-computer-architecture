@@ -7,8 +7,8 @@
 #include "cache.h"
 
 /* initialize a cache with the ususal values */
-void l1_cache_init(L1_Cache_State *c, char *label, int total_size,
-                   int block_size, int num_ways, L2_Cache_State *l2);
+void l1_cache_init(L1_Cache_State *c, char *label, int total_size, int num_ways,
+                   L2_Cache_State *l2);
 
 /* free memory used by cache */
 void l1_cache_free(L1_Cache_State *c);

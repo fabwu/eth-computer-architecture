@@ -18,11 +18,9 @@
 #include <string.h>
 
 #define INST_CACHE_TOTAL_SIZE 8 * 1024
-#define INST_CACHE_BLOCK_SIZE 32
 #define INST_CACHE_NUM_WAY 4
 
 #define DATA_CACHE_TOTAL_SIZE 64 * 1024
-#define DATA_CACHE_BLOCK_SIZE 32
 #define DATA_CACHE_NUM_WAY 8
 
 //TODO Inst Miss/Hits are wrong because 0x00000 is also counted
@@ -57,11 +55,11 @@ void pipe_init() {
   pipe.PC = 0x00400000;
 
   l2_cache_init(&l2_cache);
-  
-  l1_cache_init(&inst_cache, "L1 (inst):", INST_CACHE_TOTAL_SIZE, INST_CACHE_BLOCK_SIZE,
+
+  l1_cache_init(&inst_cache, "L1 (inst)", INST_CACHE_TOTAL_SIZE,
                 INST_CACHE_NUM_WAY, &l2_cache);
 
-  l1_cache_init(&data_cache, "L1 (data):", DATA_CACHE_TOTAL_SIZE, DATA_CACHE_BLOCK_SIZE,
+  l1_cache_init(&data_cache, "L1 (data)", DATA_CACHE_TOTAL_SIZE,
                 DATA_CACHE_NUM_WAY, &l2_cache);
 }
 

@@ -8,7 +8,6 @@
 
 void l2_cache_init(L2_Cache_State *c) {
   c->total_size = 256 * 1024;
-  c->block_size = 32;
   c->num_ways = 16;
   c->num_sets = 512;
 
@@ -35,10 +34,6 @@ static uint32_t get_set_idx(L2_Cache_State *c, uint32_t addr) {
     return set_idx;
 }
 
-static uint32_t get_tag(L2_Cache_State *c, uint32_t addr) {
-  return addr >> (c->set_idx_to + 1);
-}
-
 static void write_block(Cache_Block *block, uint32_t tag, int timestamp) {
   block->valid = true;
   block->tag = tag;
@@ -47,7 +42,7 @@ static void write_block(Cache_Block *block, uint32_t tag, int timestamp) {
 
 static void notify_l1_cache(L2_Cache_State *l2, uint32_t addr, L1_Cache_State *l1) {
   /* tag is address minus offset */
-  uint32_t tag = (addr >> l2->set_idx_from) << l2->set_idx_from;
+  uint32_t tag = CACHE_BLOCK_ALIGNED_ADDR(addr);
   L2_L1_Notification *notification;
   /* check for pending notification */
   list_node_t *node;
@@ -84,7 +79,7 @@ void l2_cache_probe(L2_Cache_State *l2, uint32_t addr, L1_Cache_State *l1) {
 
   /* calculate set idx */
   uint32_t set_idx = get_set_idx(l2, addr);
-  uint32_t tag = get_tag(l2, addr);
+  uint32_t tag = CACHE_BLOCK_ALIGNED_ADDR(addr);
   Cache_Block *set = l2->blocks + set_idx * l2->num_ways;
   Cache_Block *block;
 
@@ -92,8 +87,7 @@ void l2_cache_probe(L2_Cache_State *l2, uint32_t addr, L1_Cache_State *l1) {
   for (int way = 0; way < l2->num_ways; ++way) {
     block = set + way;
     if (block->valid && (block->tag == tag)) {
-      debug_l2("[0x%X] HIT in set %d way %d tag 0x%X\n", addr, set_idx, way,
-               tag);
+      debug_l2("[0x%X] HIT in set %d way %d\n", tag, set_idx, way);
       write_block(block, tag, l2->timestamp);
       notify_l1_cache(l2, addr, l1);
 
@@ -101,14 +95,14 @@ void l2_cache_probe(L2_Cache_State *l2, uint32_t addr, L1_Cache_State *l1) {
     }
   }
 
-  debug_l2("[0x%X] MISS in set %d tag 0x%X\n", addr, set_idx, tag);
+  debug_l2("[0x%X] MISS in set %d\n", tag, set_idx);
 
   /* addr not in cache -> allocate MSHR */
   for (int i = 0; i < L2_MSHR_SIZE; ++i) {
     L2_MSHR *mshr = l2->mshrs + i;
     if (mshr->valid == true && mshr->done == false && mshr->tag == tag) {
       /* MSHR already allocated -> done */
-      debug_l2("[0x%X] MSHR with tag 0%X already allocated\n", addr, tag);
+      debug_l2("[0x%X] MSHR already allocated\n", tag);
       return;
     }
   }
@@ -119,7 +113,7 @@ void l2_cache_probe(L2_Cache_State *l2, uint32_t addr, L1_Cache_State *l1) {
       mshr->valid = true;
       mshr->done = false;
       mshr->tag = tag;
-      debug_l2("[0x%X] allocated MSHR with tag 0%X\n", addr, tag);
+      debug_l2("[0x%X] MSHR allocated\n", tag);
       return;
     }
   }

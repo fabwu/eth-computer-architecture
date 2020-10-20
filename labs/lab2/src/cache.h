@@ -8,6 +8,10 @@
 
 enum Cache_Result { CACHE_MISS, CACHE_HIT };
 
+#define CACHE_BLOCK_SIZE 32 
+#define CACHE_BLOCK_MASK (CACHE_BLOCK_SIZE - 1)
+#define CACHE_BLOCK_ALIGNED_ADDR(ADDR) ((ADDR) & ~CACHE_BLOCK_MASK)
+
 typedef struct L1_Cache_State L1_Cache_State;
 typedef struct L2_Cache_State L2_Cache_State;
 typedef struct L2_L1_Notification L2_L1_Notification;
@@ -44,8 +48,6 @@ struct L2_L1_Notification {
 struct L2_Cache_State {
   /* total size of cache in bytes */
   int total_size;
-  /* block size in bytes */
-  int block_size;
   /* number of ways */
   int num_ways;
   /* number of sets */
@@ -69,8 +71,6 @@ struct L1_Cache_State {
   char *label;
   /* total size of cache in bytes */
   int total_size;
-  /* block size in bytes */
-  int block_size;
   /* number of ways */
   int num_ways;
   /* number of sets */
