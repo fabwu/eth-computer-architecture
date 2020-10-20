@@ -6,8 +6,6 @@
 
 #include "list.h"
 
-#define DEBUG
-
 enum Cache_Result { CACHE_MISS, CACHE_HIT };
 
 typedef struct L1_Cache_State L1_Cache_State;
@@ -25,7 +23,7 @@ typedef struct Cache_Block {
 
 typedef struct L2_MSHR {
   /* cache block address (i.e. address without offset) */
-  uint32_t address;
+  uint32_t tag;
   /* indicates if MSHR is valid */
   bool valid;
   /* indicates if MSHR was served */
@@ -41,9 +39,9 @@ struct L2_L1_Notification {
   L1_Cache_State *l1;
 };
 
+#define L2_MSHR_SIZE 16
+
 struct L2_Cache_State {
-  /* name of cache */
-  char *label;
   /* total size of cache in bytes */
   int total_size;
   /* block size in bytes */
@@ -61,7 +59,7 @@ struct L2_Cache_State {
   /* ptr to cache blocks */
   Cache_Block *blocks;
   /* miss status holding register */
-  L2_MSHR mshrs[16];
+  L2_MSHR mshrs[L2_MSHR_SIZE];
   /* pending notifications for L1 caches */
   list_t *l1_notifications;
 };

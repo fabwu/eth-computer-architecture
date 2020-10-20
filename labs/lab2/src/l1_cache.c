@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "debug.h"
 #include "l1_cache.h"
 #include "l2_cache.h"
 
@@ -37,11 +38,10 @@ void l1_cache_init(L1_Cache_State *c, char *label, int total_size,
   c->timestamp = 0;
   c->l2 = l2;
 
-#ifdef DEBUG
-  printf("%s: %d bytes total %d bytes block %d ways %d sets (addr[%d:%d])\n\n",
-         c->label, c->total_size, c->block_size, c->num_ways, c->num_sets,
-         c->set_idx_to, c->set_idx_from);
-#endif
+  debug_l1(
+      "%s: %d bytes total %d bytes block %d ways %d sets (addr[%d:%d])\n\n",
+      c->label, c->total_size, c->block_size, c->num_ways, c->num_sets,
+      c->set_idx_to, c->set_idx_from);
 }
 
 void l1_cache_free(L1_Cache_State *c) { free(c->blocks); }
@@ -84,13 +84,15 @@ enum Cache_Result l1_cache_access(L1_Cache_State *c, uint32_t addr) {
   for (int way = 0; way < c->num_ways; ++way) {
     block = set + way;
     if (block->valid && (block->tag == tag)) {
-#ifdef DEBUG
-      printf("%s: [0x%X] HIT in set %d way %d tag 0x%X\n", c->label, addr, set_idx, way, tag);
-#endif
+      debug_l1("%s: [0x%X] HIT in set %d way %d tag 0x%X\n", c->label, addr,
+               set_idx, way, tag);
       write_block(block, tag, c->timestamp);
       return CACHE_HIT;
     }
   }
+
+  debug_l1("%s: [0x%X] MISS in set %d tag 0x%X\n", c->label, addr, set_idx,
+           tag);
 
   /* addr not in cache -> probe L2 cache */
   l2_cache_probe(c->l2, addr, c);
@@ -116,10 +118,8 @@ void l1_insert_block(L1_Cache_State *c, uint32_t addr) {
   for (int way = 0; way < c->num_ways; ++way) {
     block = set + way;
     if (!block->valid) {
-#ifdef DEBUG
-      printf("%s: [0x%X] inserted (invalid) into set %d way %d tag 0x%X\n",
-             c->label, addr, set_idx, way, tag);
-#endif
+      debug_l1("%s: [0x%X] inserted (invalid) into set %d way %d tag 0x%X\n",
+               c->label, addr, set_idx, way, tag);
       write_block(block, tag, c->timestamp);
       return;
     }
@@ -134,10 +134,8 @@ void l1_insert_block(L1_Cache_State *c, uint32_t addr) {
     }
   }
 
-#ifdef DEBUG
-  printf("%s: [0x%X] inserted (lru) in set %d way %d tag 0x%X\n", c->label,
-         addr, set_idx, (int)(block - set), tag);
-#endif
+  debug_l1("%s: [0x%X] inserted (lru) in set %d way %d tag 0x%X\n", c->label,
+           addr, set_idx, (int)(block - set), tag);
 
   write_block(block, tag, c->timestamp);
 }

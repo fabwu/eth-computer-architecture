@@ -7,6 +7,7 @@
  */
 
 #include "pipe.h"
+#include "debug.h"
 #include "l1_cache.h"
 #include "l2_cache.h"
 #include "mips.h"
@@ -57,10 +58,10 @@ void pipe_init() {
 
   l2_cache_init(&l2_cache);
   
-  l1_cache_init(&inst_cache, "inst cache", INST_CACHE_TOTAL_SIZE, INST_CACHE_BLOCK_SIZE,
+  l1_cache_init(&inst_cache, "L1 (inst):", INST_CACHE_TOTAL_SIZE, INST_CACHE_BLOCK_SIZE,
                 INST_CACHE_NUM_WAY, &l2_cache);
 
-  l1_cache_init(&data_cache, "data cache", DATA_CACHE_TOTAL_SIZE, DATA_CACHE_BLOCK_SIZE,
+  l1_cache_init(&data_cache, "L1 (data):", DATA_CACHE_TOTAL_SIZE, DATA_CACHE_BLOCK_SIZE,
                 DATA_CACHE_NUM_WAY, &l2_cache);
 }
 
@@ -729,12 +730,6 @@ void pipe_stage_decode() {
 }
 
 void pipe_stage_fetch() {
-  /* we have to wait until instruction is fetched */
-  if (pipe.inst_cache_stall > 0) {
-    pipe.inst_cache_stall--;
-    return;
-  }
-
   /* if pipeline is stalled (our output slot is not empty), return */
   if (pipe.decode_op != NULL)
     return;
@@ -747,7 +742,6 @@ void pipe_stage_fetch() {
    * decode stage can use op at cycle 51
    */
   if (l1_cache_access(&inst_cache, pipe.PC) == CACHE_MISS) {
-    pipe.inst_cache_stall = 48;
     stat_inst_cache_misses++;
     return;
   }
