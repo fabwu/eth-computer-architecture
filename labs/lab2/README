@@ -1,0 +1,72 @@
+# Lab 2 - Memory Hierarchy
+
+## Usage
+
+To compile the simulator execute `make` and to run it execute one of the
+following commands: 
+``` 
+$ make run INPUT=inputs/inst/addiu.x 
+$ make run INPUT=inputs/inst/*.x 
+$ make run 
+```
+
+The file `src/debug.h` contains various debugging options e.g. set DEBUG=1 to
+enable global debugging.
+
+## Overview 
+
+The components of the memory hierarchy are independent of each other and
+communicate over an interconnect (see `src/interconnect.c`). The interconnect
+forwards messages between the different layers and simulates various latencies.
+
+For every memory access the L1 cache is probed and on a cache hit the pipeline
+continues execution. If a cache miss occurs the L1 cache creates a `Cache_Block`
+struct with the tag and a pointer to himself. Internally every cache maintains
+its own cache blocks (i.e. L1_Cache_Block and L2_Cache_Block) so the
+`Cache_Block` struct is used to track the request along the memory hierarchy and
+insert the data into the correct instruction/data cache. The L1 cache puts the
+`Cache_Block` on the interconnect where it get forwarded to the L2 cache. 
+
+On a hit in the L2 cache, the internal L2 cache block is promoted to MRU and the
+global cache block is again placed on the interconnect. After 
+15 cycles the cache block is inserted into the L1 cache and the pipeline gets
+   unstalled. This design has two drawbacks. First, during these 15 cycles the
+L1 cache always returns a miss to stall the pipeline which makes counting cache
+misses difficult. Second, The L2 cache hit latency of 15 cycles is modeled in
+the interconnect instead of the L2 cache because the interconnect has all the
+required infrastructure (latency queue that get processed every cycle).
+
+On a miss, the L2 cache allocates a MSHR to keep track of the request. The MSHR
+is only allocated if no MSHR with the same tag and origin cache exists. Then,
+the cache block is placed on the interconnect and arrives after 5 cycles at the
+memory (see `interconnect_l2_to_mem()`).
+
+If a cache block arrives at memory, it is enqueued into the request queue (see
+`memory_add_request()`). In each cycle ongoing requests are retired and pending
+requests are scheduled. To schedule a request, the pending request queue is
+traversed from oldest to newest. For each request the bus/bank usages are
+calculated according to the current cycle. Then we go through all ongoing
+requests and check for conflicts. If no conflicts exist, the request is moved to
+the ongoing requests (prioritizing row hits). 
+
+The scheduler makes the assumption that all commands of a request are executed
+together i.e. no aggressive pipelining is performed. For instance, assume two
+request to bank 0 and bank 1. The scheduler picks the first request and the
+command/address bus is busy during cycles 0-4. Now the second request could
+start at cycle 5 but then the data bus has a conflict. Now the scheduler has two
+choices to avoid a conflict. First, split the command sequence and move the
+READ/WRITE command to a later cycle. Second, move the whole command sequence
+together to a later cycle. The simulator uses the later approach as it is easier
+to implement but sacrifices some performance.
+
+Once the cache block is available on the data bus, the memory uses the
+interconnect to insert the block into the L2 cache. The L2 cache frees the
+corresponding MSHR and checks if the memory request was canceled in the meantime
+(e.g. branch recovery).  If no cancellation occurred i.e. MSHR is valid, the
+cache block is inserted into the original L1 cache. Finally, the L1 cache
+returns a hit and the pipeline gets unstalled.
+
+## References
+
+- `list.c`: https://github.com/clibs/list 
+

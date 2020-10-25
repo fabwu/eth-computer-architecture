@@ -90,8 +90,7 @@ typedef struct Pipe_State {
   int multiplier_stall; /* number of remaining cycles until HI/LO are ready */
 
   /* place other information here as necessary */
-  int data_cache_stall; /* number of remaining cycles until data is loaded from
-                           memory */
+  int cycle_count;
 } Pipe_State;
 
 /* global variable -- pipeline state */

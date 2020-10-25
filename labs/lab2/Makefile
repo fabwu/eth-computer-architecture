@@ -7,7 +7,7 @@ INPUT ?= $(wildcard inputs/*/*.x)
 all: sim
 
 sim: $(SRC) $(HEADER)
-	gcc -Wall -Wextra -g -O2 $^ -o $@
+	gcc -Wall -Wextra -Wno-implicit-fallthrough -g -O2 $^ -o $@
 
 basesim: $(SRC)
 	gcc -Wall -Wextra -g -O2 $^ -o $@

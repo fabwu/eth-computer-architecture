@@ -10,6 +10,8 @@
 #include "debug.h"
 #include "l1_cache.h"
 #include "l2_cache.h"
+#include "memory.h"
+#include "interconnect.h"
 #include "mips.h"
 #include "shell.h"
 #include <assert.h>
@@ -38,34 +40,33 @@ void print_op(Pipe_Op *op) {
         printf("(null)\n");
 }
 
-/* global pipeline state */
 Pipe_State pipe;
-
-/* global instrucion cache state */
 L1_Cache_State inst_cache;
-
-/* global data cache state */
 L1_Cache_State data_cache;
-
-/* global last level cache state */
 L2_Cache_State l2_cache;
+Memory_State memory;
+Interconnect_State interconnect;
 
 void pipe_init() {
   memset(&pipe, 0, sizeof(Pipe_State));
   pipe.PC = 0x00400000;
 
-  l2_cache_init(&l2_cache);
+  memory_init(&memory, &interconnect);
+
+  l2_cache_init(&l2_cache, &interconnect);
 
   l1_cache_init(&inst_cache, "L1 (inst)", INST_CACHE_TOTAL_SIZE,
-                INST_CACHE_NUM_WAY, &l2_cache);
+                INST_CACHE_NUM_WAY, &interconnect);
 
   l1_cache_init(&data_cache, "L1 (data)", DATA_CACHE_TOTAL_SIZE,
-                DATA_CACHE_NUM_WAY, &l2_cache);
+                DATA_CACHE_NUM_WAY, &interconnect);
+
+  interconnect_init(&interconnect, &l2_cache, &memory);
 }
 
 void pipe_cycle() {
-#ifdef DEBUG
-  printf("\n\n----\n\nPIPELINE:\n");
+#if DEBUG
+  printf("\n\n----\n\nPIPELINE (cycle %d):\n", pipe.cycle_count);
   printf("DCODE: ");
   print_op(pipe.decode_op);
   printf("EXEC : ");
@@ -77,8 +78,9 @@ void pipe_cycle() {
   printf("\n");
 #endif
 
-  l2_process_l1_notifications(&l2_cache);
-
+  interconnect_cycle(&interconnect);
+  memory_cycle(&memory);
+  
   pipe_stage_wb();
   pipe_stage_mem();
   pipe_stage_execute();
@@ -87,10 +89,11 @@ void pipe_cycle() {
 
   /* handle branch recoveries */
   if (pipe.branch_recover) {
-#ifdef DEBUG
+#if DEBUG
     printf("branch recovery: new dest %08x flush %d stages\n", pipe.branch_dest,
            pipe.branch_flush);
 #endif
+    l1_cancel_cache_access(&inst_cache, pipe.PC);
 
     pipe.PC = pipe.branch_dest;
 
@@ -107,8 +110,10 @@ void pipe_cycle() {
     }
 
     if (pipe.branch_flush >= 4) {
-      if (pipe.mem_op)
+      if (pipe.mem_op) {
+        l1_cancel_cache_access(&data_cache, pipe.mem_op->mem_addr);
         free(pipe.mem_op);
+      }
       pipe.mem_op = NULL;
     }
 
@@ -125,10 +130,14 @@ void pipe_cycle() {
     stat_squash++;
   }
 
+  pipe.cycle_count++;
+
   if (RUN_BIT == 0) {
     l1_cache_free(&inst_cache);
     l1_cache_free(&data_cache);
     l2_cache_free(&l2_cache);
+    memory_free(&memory);
+    interconnect_free(&interconnect);
   }
 }
 
@@ -158,7 +167,7 @@ void pipe_stage_wb() {
   /* if this instruction writes a register, do so now */
   if (op->reg_dst != -1 && op->reg_dst != 0) {
     pipe.REGS[op->reg_dst] = op->reg_dst_value;
-#ifdef DEBUG
+#if DEBUG
     printf("R%d = %08x\n", op->reg_dst, op->reg_dst_value);
 #endif
   }
@@ -178,12 +187,6 @@ void pipe_stage_wb() {
 }
 
 void pipe_stage_mem() {
-  /* we have to wait until data is fetched */
-  if (pipe.data_cache_stall > 0) {
-    pipe.data_cache_stall--;
-    return;
-  }
-
   /* if there is no instruction in this pipeline stage, we are done */
   if (!pipe.mem_op)
     return;
@@ -195,13 +198,10 @@ void pipe_stage_mem() {
   if (op->is_mem) {
     /* both loads and stores read an addr so we stall pipeline only once */
     if (l1_cache_access(&data_cache, op->mem_addr) == CACHE_MISS) {
-      pipe.data_cache_stall = 48;
-      stat_data_cache_misses++;
       return;
     }
 
     val = mem_read_32(op->mem_addr & ~3);
-    stat_data_cache_hits++;
   }
 
   switch (op->opcode) {
@@ -267,7 +267,7 @@ void pipe_stage_mem() {
     break;
 
   case OP_SH:
-#ifdef DEBUG
+#if DEBUG
     printf("SH: addr %08x val %04x old word %08x\n", op->mem_addr,
            op->mem_value & 0xFFFF, val);
 #endif
@@ -275,7 +275,7 @@ void pipe_stage_mem() {
       val = (val & 0x0000FFFF) | (op->mem_value) << 16;
     else
       val = (val & 0xFFFF0000) | (op->mem_value & 0xFFFF);
-#ifdef DEBUG
+#if DEBUG
     printf("new word %08x\n", val);
 #endif
 
@@ -732,19 +732,11 @@ void pipe_stage_fetch() {
   if (pipe.decode_op != NULL)
     return;
 
-  /* if cache miss we have to stall fetch stage for 50 cycles
-   *
-   * 1 cycle mem access + 48 cycles stalling + 1 cycle insert op into decode
-   * stage
-   *
-   * decode stage can use op at cycle 51
-   */
   if (l1_cache_access(&inst_cache, pipe.PC) == CACHE_MISS) {
-    stat_inst_cache_misses++;
+      /* stall the pipeline on a cache miss */
     return;
   }
 
-  stat_inst_cache_hits++;
   /* Allocate an op and send it down the pipeline. */
   Pipe_Op *op = malloc(sizeof(Pipe_Op));
   memset(op, 0, sizeof(Pipe_Op));
