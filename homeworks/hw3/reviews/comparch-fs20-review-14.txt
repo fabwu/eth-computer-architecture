@@ -1,0 +1,74 @@
+==+== Computer Architecture Paper Review Form
+==-== DO NOT CHANGE LINES THAT START WITH "==+==" UNLESS DIRECTED!
+==-== For further guidance, or to upload this file when you are done, go to:
+==-== https://safari.ethz.ch/review/architecture20/offline
+
+==+== =====================================================================
+==+== Begin Review #14.
+==+== Reviewer: Fabian Wüthrich <fabianwu@student.ethz.ch>
+
+==+== Paper #14
+==-== Title: Accelerating Genome Analysis: A Primer on an Ongoing Journey
+
+==+== Review Readiness
+==-== Enter "Ready" if the review is ready for others to see:
+
+Ready
+
+==+== A. Paper summary
+
+This article presents several approaches to accelerate read mapping. As read
+mapping is a major bottleneck in the genome sequencing pipeline, improving
+the performance of read mapping will lead to faster DNA sequencing. Faster DNA
+sequencing enables e.g. rapid surveillance of disease outbreaks (COVID-19).
+
+Read mapping is divided into indexing, pre-alignment filtering and sequence
+alignment. The article summarizes several improvements for each step and
+concludes with remaining challenges and future opportunities.
+
+==+== B. Strengths
+
+* The article addresses a important problem as read mapping is a huge 
+  blocker for fast genome analysis and sequencing a complete genome
+  is extremely difficult
+
+* Excellent overview with a quick summary about a technique and valuable
+  references for further research
+
+* The article has a good structure and is easy to read
+
+==+== C. Weaknesses
+
+* Despite the title _Accelerating Genome Analysis_ the focus is entirely
+  on read mapping which might neglect other acceleration techniques (e.g.
+  novel genome assembly techniques)
+
+* Quite some background in computer science is required to understand many 
+  concepts which could potentially put off readers from related areas 
+
+==+== D. Thoughts and ideas
+
+* Provide a framework to quickly adapt specialized hardware
+
+* How to design an architecture for a device that combines the sequencer
+  and a technique like GenASM?
+
+==+== E. Takeaways
+
+After reading this article I understand why genome sequencing is a hard
+problem and what the performance bottleneck is. Many interesting 
+approaches exists but I miss a solution that spans across the whole
+genome analysis pipeline.
+
+==+== F. Other comments
+
+* In Figure 1 (a) seeds are called k-mers but the text makes no connection
+  between the two
+
+* Edit distance should be defined at the beginning of the read mapping section
+  not at the end.
+
+==+== Scratchpad (for unsaved private notes)
+
+==+== End Review
+
