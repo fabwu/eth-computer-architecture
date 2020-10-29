@@ -174,8 +174,27 @@ see \href{https://safari.ethz.ch/review/architecture20/}{here}
 \section{RowClone [150 points]}
 
 \begin{enumerate}[label=\alph*)]
-    \item a
-    \item b
+    \item 
+        Step 1: 
+
+        The memory controller writes back any dirty cache line from
+        the source region.
+
+        Step 2: 
+
+        The memory controller invalidates any cache line (clean or
+        dirty) from the destination region that is cached in the on-chip caches.
+
+    \item To perform the copy operation without RowClone, the memory controller
+        transfers the source page (physical page 10) over the data bus to the
+        caches. Then, the destination page (physical page 12) is written back
+        to main memory. A page has 8KB and the memory controller moves two 
+        pages i.e. 16KB over the memory bus.
+
+        With RowClone the copy is performed inside the DRAM, so now data is
+        transferred over the memory bus.
+
+        Amount of data eliminated: 16KB
 \end{enumerate}
 
 \section{Tiered-difficulty [150 points]}
