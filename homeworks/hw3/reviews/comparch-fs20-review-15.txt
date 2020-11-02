@@ -18,27 +18,66 @@ Ready
 
 ==+== A. Paper summary
 
+While DRAM capacity has been increasing year after year, the latency of a DRAM
+access remained almost constant. Long memory latencies are a critical
+performance bottleneck in today's systems (e.g. memory wall). Reducing the
+latency is increasing cost-per-bit (more sense-amps necessary) so DRAM
+manufacturers make a deliberate trade-off to keep costs down.
 
+This paper proposes a novel DRAM architecture called TL-DRAM to get low latency
+while retaining a low cost-per-bit overall. Long bit lines increase latency for
+various reasons but short bit lines require more circuitry increasing
+cost-per-bit. TL-DRAM adds an isolation transistor to each bit line, dividing
+a subarray in a segment with high latency (far segment) and segment with low
+latency (near segment). This change adds only minimal area overhead i.e. keeps
+cost-per-bit low while allowing different approaches to improve latency (e.g.
+hardware-managed cache, expose near segment to OS).
+
+The evaluation shows that TL-DRAM significantly improve both performance and
+energy consumption while keeping cost-per-bit on par with commodity DRAM.
 
 ==+== B. Strengths
 
+* Simple but effective solution for a long standing problem (e.g. memory wall)
 
+* The paper identifies clearly the reasons for the lack of latency improvements
+  (i.e. long bit lines)
+
+* The authors discuss many approaches on how to effectively use the near segment
+
+* Very nice introduction to DRAM timing constraints
 
 ==+== C. Weaknesses
 
+* A careful analysis of cost-per-bit is missing. Just adding the isolation
+  transistor does obviously not increase cost-per-bit dramatically, but many
+changes are necessary to fully benefit from a reduced latency.
 
+* TL-DRAM assumes RowClone which has not been implemented yet
+
+* Many changes to memory controller or OS required
+
+* Many details for hardware-managed cache omitted (due to space constraints)
 
 ==+== D. Thoughts and ideas
 
+* Reduces the resistance of the access transistor somehow (e.g. use different
+  electronic component)
 
+* Try different cache policies and intelligent placing techniques to benefit
+  from near segment
 
 ==+== E. Takeaways
 
-
+After reading this paper, I have a clear understanding of what induces long DRAM
+latency and how a possible solution can look like. Additionally, the
+introduction provides a readable and easy to understand introduction to DRAM
+timing constraints.
 
 ==+== F. Other comments
 
-
+* A reference to RowClone in section 4.4 could help readers to understand
+  inter-segment data transfer better
 
 ==+== Scratchpad (for unsaved private notes)
 
