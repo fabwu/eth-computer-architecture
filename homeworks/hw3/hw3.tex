@@ -19,21 +19,21 @@
 \definecolor{backcolour}{rgb}{0.95,0.95,0.92}
 
 \lstdefinestyle{mystyle}{
-    backgroundcolor=\color{backcolour},   
+    backgroundcolor=\color{backcolour},
     commentstyle=\color{codegreen},
     keywordstyle=\color{magenta},
     numberstyle=\tiny\color{codegray},
     stringstyle=\color{codepurple},
     basicstyle=\ttfamily\footnotesize,
-    breakatwhitespace=false,         
-    breaklines=true,                 
-    captionpos=b,                    
-    keepspaces=true,                 
-    numbers=left,                    
-    numbersep=5pt,                  
-    showspaces=false,                
+    breakatwhitespace=false,
+    breaklines=true,
+    captionpos=b,
+    keepspaces=true,
+    numbers=left,
+    numbersep=5pt,
+    showspaces=false,
     showstringspaces=false,
-    showtabs=false,                  
+    showtabs=false,
     tabsize=2
 }
 \lstset{style=mystyle}
@@ -54,22 +54,22 @@ see \href{https://safari.ethz.ch/review/architecture20/}{here}
 \subsection{Edit Distance}
 
 \begin{enumerate}[label=\alph*)]
-    \item \texttt{M O N - - - - T A G} 
+    \item \texttt{M O N - - - - T A G}
 
-          \texttt{s - - i i i i - - -} 
-        
-          \texttt{D O N N E R S T A G} 
+          \texttt{s - - i i i i - - -}
+
+          \texttt{D O N N E R S T A G}
 
           Edit Distance: 5
     \item \texttt{F R E I T A G}
 
           \texttt{s s s s - - -}
-          
+
           \texttt{S A M S T A G}
 
           Edit Distance: 4
     \item \texttt{D O N N E R S T A G}
-              
+
           \texttt{d d d d d d d d d d}
 
           \texttt{- - - - - - - - - -}
@@ -81,7 +81,7 @@ see \href{https://safari.ethz.ch/review/architecture20/}{here}
 
 \begin{enumerate}[label=\alph*)]
     \item read1: 6 + 3 + 3 = 12
-          
+
           read2: 2 + 5 + 6 = 13
 
           read3: 2 + 0 + 0 = 2
@@ -91,9 +91,9 @@ see \href{https://safari.ethz.ch/review/architecture20/}{here}
           read5: 6 + 5 + 3 = 14
 
           \textbf{51 invocations}
-    
+
       \item read1: 10, 15, 20 $\rightarrow$ 1
-           
+
             read2: 50, 55, 60 \& 615, 620, 625 $\rightarrow$ 2
 
             read3: - $\rightarrow$ 0
@@ -107,13 +107,13 @@ see \href{https://safari.ethz.ch/review/architecture20/}{here}
     \item AAAAA and GGCCT are above threshold.
 
           read1: 0 + 3 + 3 = 6
-          
+
           read2: 2 + 0 + 0 = 2
 
           read3: 2 + 0 + 0 = 2
 
           read4: 0 + 3 + 2 = 5
-          
+
           read5: 0 + 0 + 3 = 3
 
           \textbf{18 invocations}
@@ -122,7 +122,7 @@ see \href{https://safari.ethz.ch/review/architecture20/}{here}
 \section{Genome Analysis II [150 points]}
 
 \begin{enumerate}[label=\alph*)]
-    \item \{AAAA\} $\rightarrow$ \{1\} 
+    \item \{AAAA\} $\rightarrow$ \{1\}
 
           \{ATAC\} $\rightarrow$ \{5, 17, 41\}
 
@@ -135,7 +135,7 @@ see \href{https://safari.ethz.ch/review/architecture20/}{here}
           \{TAAG\} $\rightarrow$ \{25, 45\}
 
           \{GTTT\} $\rightarrow$ \{29\}
-          
+
           \{CAAA\} $\rightarrow$ \{33\}
 
     \item \{AAAA\} $\rightarrow$ \{1\}
@@ -174,13 +174,13 @@ see \href{https://safari.ethz.ch/review/architecture20/}{here}
 \section{RowClone [150 points]}
 
 \begin{enumerate}[label=\alph*)]
-    \item 
-        Step 1: 
+    \item
+        Step 1:
 
         The memory controller writes back any dirty cache line from
         the source region.
 
-        Step 2: 
+        Step 2:
 
         The memory controller invalidates any cache line (clean or
         dirty) from the destination region that is cached in the on-chip caches.
@@ -188,7 +188,7 @@ see \href{https://safari.ethz.ch/review/architecture20/}{here}
     \item To perform the copy operation without RowClone, the memory controller
         transfers the source page (physical page 10) over the data bus to the
         caches. Then, the destination page (physical page 12) is written back
-        to main memory. A page has 8KB and the memory controller moves two 
+        to main memory. A page has 8KB and the memory controller moves two
         pages i.e. 16KB over the memory bus.
 
         With RowClone the copy is performed inside the DRAM, so now data is
@@ -200,23 +200,56 @@ see \href{https://safari.ethz.ch/review/architecture20/}{here}
 \section{Tiered-difficulty [150 points]}
 
 \begin{enumerate}[label=\alph*)]
-    \item a
-    \item b
-    \item c
-    \item d
-    \item e
+    \item row 0 and row 2 
+    \item row 1 and row 3
+    \item Place rows that support other requests in near segment instead of frequently used rows.
+    \item \textbf{Exclusive Design}
+
+          + almost full DRAM capacity available
+
+          -- swapping requires 3 operations (increased latency)
+
+          \textbf{Inclusive Design}
+
+          + smaller tag storage
+
+          -- DRAM capacity is reduced by the size of the near segment
+    \item A: 5 rows B: 3 rows C: 0 rows
 \end{enumerate}
 
 \section{Low-Latency DRAM [150 points]}
 
 \begin{enumerate}[label=\alph*)]
-    \item a
-    \item b
-    \item c
-    \item d
-    \item e
-    \item f
-    \item g
+    \item In the near segment, the bitlines to a row are shorter so that a smaller electrical load
+        is required, which reduces the access latency.
+
+    \item In the far segment, the bitlines to a row are longer so that a higher electrical load is
+        required, which increases access latency.
+
+    \item $\frac{16}{512}$
+
+    \item Each entry in the tag store has a $\ceil*{\log_2(496)} = 9$ bit tag, 1 valid bit and 1 
+        dirty bit. With 16 rows in the near segment, 4 bits are used to track the MRU entry. Thus,
+        the total tag store size is $16\times11 + 4=180$ bits.
+
+    \item $\frac{1}{512}$ (swap operation requires one row)
+
+    \item Now each row requires the tag of the physical page whose data is stored in that row. Thus,
+        each row requires a 9-bit tag store. An exclusive cache doesn't require a valid or dirty bit
+        so the near segment needs just 4 bits to track MRU. Total Size: $511 \times 9 + 4 = 4603$ bits
+        (swap row excluded).
+
+    \item \textit{True} The virtual address translation doesn't work with chunks smaller than the page
+        size.
+
+          \textit{False} The OS controls the virtual-to-physical mapping so it can also model an
+          inclusive cache (map frequently used page in near and far segment).
+
+          \textit{False} An inclusive cache has obviously a capacity loss and even the exclusive
+          cache requires one row for the swap operation.
+
+          \textit{True} This is only true if the cache is exclusively managed by the OS and now
+          support from the memory controller (e.g. store tags efficiently) is provided.
 \end{enumerate}
 
 \end{document}
