@@ -72,7 +72,9 @@ protected:
 
   long max_address;
   MapScheme mapping_scheme;
-  
+
+  // ATLAS - fields
+  std::vector<double> total_as;
 public:
     enum class Type {
         ChRaBaRoCo,
@@ -104,11 +106,16 @@ public:
     
     int tx_bits;
 
+    int core_num;
+
     Memory(const Config& configs, vector<Controller<T>*> ctrls)
         : ctrls(ctrls),
           spec(ctrls[0]->channel->spec),
           addr_bits(int(T::Level::MAX))
     {
+        core_num = configs.get_core_num();
+        total_as = std::vector<double>(core_num);
+
         // make sure 2^N channels/ranks
         // TODO support channel number that is not powers of 2
         int *sz = spec->org_entry.count;
@@ -281,6 +288,30 @@ public:
     void tick()
     {
         ++num_dram_cycles;
+
+        // ATLAS - re-prioritize threads at the end of each quantum
+        if(((long) num_dram_cycles.value()) % ATLAS<T>::QUANTUM_LENGTH == 0) {
+            // accumulate and reset all local AS
+            std::vector<long> accumulated_as(core_num);
+            for(auto ctrl : ctrls) {
+                for(int core = 0; core < core_num; ++core) {
+                    accumulated_as[core] += ctrl->get_attained_service(core);
+                }
+                ctrl->reset_attained_service();
+            }
+
+            for(int core = 0; core < core_num; ++core) {
+                // calculate new TotalAS
+                double alpha = ATLAS<T>::ALPHA;
+                total_as[core] = alpha * total_as[core] + (1 - alpha) * accumulated_as[core];
+
+                // broadcast new TotalAS to all controllers
+                for(auto ctrl : ctrls) {
+                    ctrl->set_total_as(core, total_as[core]);
+                }
+            }
+        }
+
         int cur_que_req_num = 0;
         int cur_que_readreq_num = 0;
         int cur_que_writereq_num = 0;

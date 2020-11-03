@@ -227,6 +227,46 @@ private:
 };
 
 template <typename T>
+class ATLAS: public Scheduling_Policy<T> {
+public:
+    static const long QUANTUM_LENGTH = 10000000;
+    static const long THRESHOLD = 100000;
+    static constexpr double ALPHA = 0.875;
+
+    ATLAS(Controller<T>* ctrl) : Scheduling_Policy<T>(ctrl) {}
+
+private:
+    ReqIter compare(ReqIter req1, ReqIter req2) {
+        // over-threshold-requests-first
+        if (req1->arrive + THRESHOLD <= this->ctrl->clk)
+            return req1;
+        if (req2->arrive + THRESHOLD <= this->ctrl->clk)
+            return req2;
+
+        // lower TotalAS first
+        double totalAS_1 = this->ctrl->get_total_as(req1->coreid);
+        double totalAS_2 = this->ctrl->get_total_as(req2->coreid);
+        if (totalAS_1 < totalAS_2)
+          return req1;
+        if (totalAS_2 < totalAS_1)
+          return req2;
+
+        // row-hit-first
+        bool ready1 = this->ctrl->is_ready(req1) && this->ctrl->is_row_hit(req1);
+        bool ready2 = this->ctrl->is_ready(req2) && this->ctrl->is_row_hit(req2);
+
+        if (ready1 ^ ready2) {
+            if (ready1) return req1;
+            return req2;
+        }
+
+        // oldest-first
+        if (req1->arrive <= req2->arrive) return req1;
+        return req2;
+    };
+};
+
+template <typename T>
 class Scheduler
 {
 public:
@@ -241,8 +281,9 @@ public:
          * - FRFCFS
          * - FRFCFS_Cap
          * - FRFCFS_PriorHit
+         * - ATLAS
          */
-        policy = new FCFS<T>(ctrl);
+        policy = new FRFCFS_PriorHit<T>(ctrl);
     }
 
     list<Request>::iterator get_head(list<Request>& q)

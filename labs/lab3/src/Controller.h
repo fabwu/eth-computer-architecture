@@ -65,6 +65,9 @@ protected:
     VectorStat record_write_conflicts;
 #endif
 
+    // ATLAS - fields
+    std::vector<long> attained_service;
+    std::vector<double> total_as;
 public:
     /* Member Variables */
     long clk = 0;
@@ -123,6 +126,11 @@ public:
             for (unsigned int i = 0; i < channel->children.size(); i++)
                 cmd_trace_files[i].open(prefix + to_string(i) + suffix);
         }
+
+        // ATLAS - allocate counters for each core
+        int core_num = configs.get_core_num();
+        attained_service = std::vector<long>(core_num);
+        total_as = std::vector<double>(core_num);
 
         // regStats
 
@@ -429,6 +437,9 @@ public:
         auto cmd = get_first_cmd(req);
         issue_cmd(cmd, get_addr_vec(cmd, req));
 
+        // ATLAS - increase attained service for the core of that request
+        attained_service[req->coreid]++;
+
         // check whether this is the last command (which finishes the request)
         //if (cmd != channel->spec->translate[int(req->type)]){
         if (!(channel->spec->is_accessing(cmd) || channel->spec->is_refreshing(cmd))) {
@@ -524,7 +535,15 @@ public:
 #endif
     }
 
-private:
+    long get_attained_service(int coreid) { return attained_service[coreid]; }
+
+    void reset_attained_service() { std::fill(attained_service.begin(), attained_service.end(), 0); }
+
+    void set_total_as(int coreid, double val) { total_as[coreid] = val; }
+
+    double get_total_as(int coreid) { return total_as[coreid]; }
+
+  private:
     typename T::Command get_first_cmd(list<Request>::iterator req)
     {
         typename T::Command cmd = channel->spec->translate[int(req->type)];
