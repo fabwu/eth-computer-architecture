@@ -68,6 +68,12 @@ protected:
     // ATLAS - fields
     std::vector<long> attained_service;
     std::vector<double> total_as;
+
+    // BLISS - fields
+    std::vector<bool> blacklisted;
+    int last_request_coreid;
+    long request_served_counter;
+
 public:
     /* Member Variables */
     long clk = 0;
@@ -131,6 +137,11 @@ public:
         int core_num = configs.get_core_num();
         attained_service = std::vector<long>(core_num);
         total_as = std::vector<double>(core_num);
+
+        // BLISS - init fields
+        blacklisted = std::vector<bool>(core_num);
+        last_request_coreid = -1;
+        request_served_counter = 0;
 
         // regStats
 
@@ -344,6 +355,10 @@ public:
         read_req_queue_length_sum += readq.size() + pending.size();
         write_req_queue_length_sum += writeq.size();
 
+        if (clk % BLISS<T>::CLEARING_INTERVAL == 0) {
+            std::fill(blacklisted.begin(), blacklisted.end(), false);
+        }
+
         /*** 1. Serve completed reads ***/
         if (pending.size()) {
             Request& req = pending[0];
@@ -439,6 +454,20 @@ public:
 
         // ATLAS - increase attained service for the core of that request
         attained_service[req->coreid]++;
+
+        // BLISS - update served requests counter
+        if (last_request_coreid == req->coreid) {
+            request_served_counter++;
+        } else {
+            last_request_coreid = req->coreid;
+            request_served_counter = 0;
+        }
+
+        // BLISS - blacklist applications that are over a threshold
+        if (request_served_counter > BLISS<T>::THRESHOLD) {
+            blacklisted[last_request_coreid] = true;
+            request_served_counter = 0;
+        }
 
         // check whether this is the last command (which finishes the request)
         //if (cmd != channel->spec->translate[int(req->type)]){
@@ -542,6 +571,8 @@ public:
     void set_total_as(int coreid, double val) { total_as[coreid] = val; }
 
     double get_total_as(int coreid) { return total_as[coreid]; }
+
+    bool is_blacklisted(int coreid) { return blacklisted[coreid]; }
 
   private:
     typename T::Command get_first_cmd(list<Request>::iterator req)

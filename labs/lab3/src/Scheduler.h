@@ -267,6 +267,41 @@ private:
 };
 
 template <typename T>
+class BLISS: public Scheduling_Policy<T> {
+public:
+    static const long CLEARING_INTERVAL = 10000;
+    static const long THRESHOLD = 4;
+
+    BLISS(Controller<T>* ctrl) : Scheduling_Policy<T>(ctrl) {}
+
+private:
+    ReqIter compare(ReqIter req1, ReqIter req2) {
+        // non-blacklisted first
+        bool blacklisted1 = this->ctrl->is_blacklisted(req1->coreid);
+        bool blacklisted2 = this->ctrl->is_blacklisted(req2->coreid);
+
+        printf("b1: %d b2: %d\n", blacklisted1, blacklisted2);
+        if (blacklisted1 ^ blacklisted2) {
+            if (blacklisted1) return req2;
+            return req1;
+        }
+
+        // row-hit-first
+        bool ready1 = this->ctrl->is_ready(req1) && this->ctrl->is_row_hit(req1);
+        bool ready2 = this->ctrl->is_ready(req2) && this->ctrl->is_row_hit(req2);
+
+        if (ready1 ^ ready2) {
+            if (ready1) return req1;
+            return req2;
+        }
+
+        // oldest-first
+        if (req1->arrive <= req2->arrive) return req1;
+        return req2;
+    };
+};
+
+template <typename T>
 class Scheduler
 {
 public:
@@ -283,7 +318,7 @@ public:
          * - FRFCFS_PriorHit
          * - ATLAS
          */
-        policy = new FRFCFS_PriorHit<T>(ctrl);
+        policy = new BLISS<T>(ctrl);
     }
 
     list<Request>::iterator get_head(list<Request>& q)
