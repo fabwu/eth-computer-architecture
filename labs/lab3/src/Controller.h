@@ -379,12 +379,12 @@ public:
         /*** 3. Should we schedule writes? ***/
         if (!write_mode) {
             // yes -- write queue is almost full or read queue is empty
-            if (writeq.size() > int(wr_high_watermark * writeq.max) || readq.size() == 0)
+            if (writeq.size() > (unsigned int)wr_high_watermark * writeq.max || readq.size() == 0)
                 write_mode = true;
         }
         else {
             // no -- write queue is almost empty and read queue is not empty
-            if (writeq.size() < int(wr_low_watermark * writeq.max) && readq.size() != 0)
+            if (writeq.size() < (unsigned int)wr_low_watermark * writeq.max && readq.size() != 0)
                 write_mode = false;
         }
 

@@ -98,7 +98,7 @@ void run_cputrace(const Config& configs, Memory<T, Controller>& memory, const st
                 memory.tick();
 
         is_warming_up = false;
-        for(int c = 0; c < proc.cores.size(); c++){
+        for(unsigned int c = 0; c < proc.cores.size(); c++){
             if(proc.cores[c]->get_insts() < warmup_insts)
                 is_warming_up = true;
         }

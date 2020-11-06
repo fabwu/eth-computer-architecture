@@ -474,8 +474,8 @@ bool Trace::get_filtered_request2(long& bubble_cnt, long& req_addr, Request::Typ
                 req_addr = -1;
                 return true;
             }
-            int type_position = 0;
-            for(int i = 0; i < tokens.size(); i++){
+            unsigned int type_position = 0;
+            for(unsigned int i = 0; i < tokens.size(); i++){
                 if((tokens[i] == "L") || (tokens[i] == "S")){
                     type_position = i;
                     break;
@@ -496,7 +496,7 @@ bool Trace::get_filtered_request2(long& bubble_cnt, long& req_addr, Request::Typ
                 return true;
             }
         }
-        catch(std::exception e){
+        catch(std::exception &e){
             req_addr = -1;
             return true;
         }
