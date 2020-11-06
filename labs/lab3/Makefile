@@ -7,9 +7,9 @@ OBJS := $(patsubst $(SRCDIR)/%.cpp, $(OBJDIR)/%.o, $(SRCS))
 
 # Ramulator currently supports g++ 5.1+ or clang++ 3.4+.  It will NOT work with
 #   g++ 4.x due to an internal compiler error when processing lambda functions.
-CXX := clang++
-# CXX := g++-5
-CXXFLAGS := -O3 -std=c++11 -g -Wall
+#CXX := clang++
+CXX := g++
+CXXFLAGS := -O3 -std=c++11 -g -Wall -Wno-unused-lambda-capture
 
 .PHONY: all clean depend
 

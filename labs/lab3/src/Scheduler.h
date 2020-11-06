@@ -280,7 +280,6 @@ private:
         bool blacklisted1 = this->ctrl->is_blacklisted(req1->coreid);
         bool blacklisted2 = this->ctrl->is_blacklisted(req2->coreid);
 
-        printf("b1: %d b2: %d\n", blacklisted1, blacklisted2);
         if (blacklisted1 ^ blacklisted2) {
             if (blacklisted1) return req2;
             return req1;

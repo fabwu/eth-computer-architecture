@@ -2,3 +2,4 @@ ramulator
 obj/
 *.stats
 tags
+.vimrc
