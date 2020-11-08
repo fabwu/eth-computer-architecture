@@ -218,6 +218,11 @@ int main(int argc, const char *argv[])
       configs.add("mapping", "defaultmapping");
     }
 
+    if (strcmp(argv[trace_start], "--policy") == 0) {
+        configs.add("scheduling_policy", argv[trace_start + 1]);
+        trace_start += 2;
+    }
+
     std::vector<const char*> files(&argv[trace_start], &argv[argc]);
     configs.set_core_num(argc - trace_start);
 

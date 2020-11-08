@@ -296,7 +296,7 @@ public:
     Controller<T>* ctrl;
     Scheduling_Policy<T>* policy;
 
-    Scheduler(Controller<T>* ctrl) : ctrl(ctrl) {
+    Scheduler(Controller<T>* ctrl, const Config& configs) : ctrl(ctrl) {
         /*
          * Change class name to one of the following:
          *
@@ -305,8 +305,35 @@ public:
          * - FRFCFS_Cap
          * - FRFCFS_PriorHit
          * - ATLAS
+         * - BLISS
          */
-        policy = new ATLAS<T>(ctrl);
+        auto default_policy = new FCFS<T>(ctrl);
+
+        if (configs.contains("scheduling_policy")) {
+            std::string policy_str = configs["scheduling_policy"];
+
+            if (policy_str.compare("FCFS") == 0) {
+                printf("Scheduling Policy: FCFS\n");
+                policy = new FCFS<T>(ctrl);
+            } else if (policy_str.compare("FRFCFS") == 0) {
+                printf("Scheduling Policy: FRFCFS\n");
+                policy = new FRFCFS<T>(ctrl);
+            } else if (policy_str.compare("FRFCFS_Cap") == 0) {
+                printf("Scheduling Policy: FRFCFS_Cap\n");
+                policy = new FRFCFS_Cap<T>(ctrl);
+            } else if (policy_str.compare("FRFCFS_PriorHit") == 0) {
+                printf("Scheduling Policy: FRFCFS_PriorHit\n");
+                policy = new FRFCFS_PriorHit<T>(ctrl);
+            } else if (policy_str.compare("ATLAS") == 0) {
+                printf("Scheduling Policy: ATLAS\n");
+                policy = new ATLAS<T>(ctrl);
+            } else if (policy_str.compare("BLISS") == 0) {
+                printf("Scheduling Policy: BLISS\n");
+                policy = new BLISS<T>(ctrl);
+            }
+        } else {
+            policy = default_policy;
+        }
     }
 
     list<Request>::iterator get_head(list<Request>& q)

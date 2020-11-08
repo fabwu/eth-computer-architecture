@@ -115,7 +115,7 @@ public:
     /* Constructor */
     Controller(const Config& configs, DRAM<T>* channel) :
         channel(channel),
-        scheduler(new Scheduler<T>(this)),
+        scheduler(new Scheduler<T>(this, configs)),
         rowpolicy(new RowPolicy<T>(this)),
         rowtable(new RowTable<T>(this)),
         refresh(new Refresh<T>(this)),
