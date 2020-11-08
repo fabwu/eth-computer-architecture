@@ -75,6 +75,7 @@ public:
     bool finished();
     bool has_reached_limit();
     long get_insts(); // the number of the instructions issued to the core
+    long get_retired();
     function<void(Request&)> callback;
 
     bool no_core_caches = true;
@@ -144,6 +145,7 @@ public:
     Cache llc;
 
     ScalarStat cpu_cycles;
+    ScalarStat inst_throughput;
 };
 
 }

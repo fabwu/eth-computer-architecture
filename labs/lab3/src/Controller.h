@@ -355,7 +355,7 @@ public:
         read_req_queue_length_sum += readq.size() + pending.size();
         write_req_queue_length_sum += writeq.size();
 
-        if (clk % BLISS<T>::CLEARING_INTERVAL == 0) {
+        if ((clk % BLISS<T>::CLEARING_INTERVAL) == 0) {
             std::fill(blacklisted.begin(), blacklisted.end(), false);
         }
 
@@ -379,12 +379,12 @@ public:
         /*** 3. Should we schedule writes? ***/
         if (!write_mode) {
             // yes -- write queue is almost full or read queue is empty
-            if (writeq.size() > (unsigned int)wr_high_watermark * writeq.max || readq.size() == 0)
+            if (writeq.size() > int(wr_high_watermark * writeq.max) || readq.size() == 0)
                 write_mode = true;
         }
         else {
             // no -- write queue is almost empty and read queue is not empty
-            if (writeq.size() < (unsigned int)wr_low_watermark * writeq.max && readq.size() != 0)
+            if (writeq.size() < int(wr_low_watermark * writeq.max) && readq.size() != 0)
                 write_mode = false;
         }
 
@@ -574,7 +574,7 @@ public:
 
     bool is_blacklisted(int coreid) { return blacklisted[coreid]; }
 
-  private:
+private:
     typename T::Command get_first_cmd(list<Request>::iterator req)
     {
         typename T::Command cmd = channel->spec->translate[int(req->type)];

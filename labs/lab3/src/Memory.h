@@ -75,6 +75,7 @@ protected:
 
   // ATLAS - fields
   std::vector<double> total_as;
+
 public:
     enum class Type {
         ChRaBaRoCo,

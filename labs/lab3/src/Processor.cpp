@@ -50,6 +50,12 @@ Processor::Processor(const Config& configs,
             .precision(0)
             ;
   cpu_cycles = 0;
+
+  inst_throughput.name("inst_throughput")
+                 .desc("sum of all retired instructions of all cores divided by overall cpu cycles")
+                 .precision(2)
+                 ;
+  inst_throughput = 0;
 }
 
 void Processor::tick() {
@@ -61,10 +67,14 @@ void Processor::tick() {
   if (!(no_core_caches && no_shared_cache)) {
     cachesys->tick();
   }
+  long retired_inst = 0;
   for (unsigned int i = 0 ; i < cores.size() ; ++i) {
     Core* core = cores[i].get();
     core->tick();
+    retired_inst += cores[i]->get_retired();
   }
+  // calculate instruction throughput
+  inst_throughput = retired_inst / cpu_cycles.value();
 }
 
 void Processor::receive(Request& req) {
@@ -304,6 +314,10 @@ long Core::get_insts() {
     return long(cpu_inst.value());
 }
 
+long Core::get_retired() {
+    return retired;
+}
+
 void Core::receive(Request& req)
 {
     window.set_ready(req.addr, ~(l1_blocksz - 1l));
@@ -474,8 +488,8 @@ bool Trace::get_filtered_request2(long& bubble_cnt, long& req_addr, Request::Typ
                 req_addr = -1;
                 return true;
             }
-            unsigned int type_position = 0;
-            for(unsigned int i = 0; i < tokens.size(); i++){
+            int type_position = 0;
+            for(int i = 0; i < tokens.size(); i++){
                 if((tokens[i] == "L") || (tokens[i] == "S")){
                     type_position = i;
                     break;
@@ -496,7 +510,7 @@ bool Trace::get_filtered_request2(long& bubble_cnt, long& req_addr, Request::Typ
                 return true;
             }
         }
-        catch(std::exception &e){
+        catch(std::exception e){
             req_addr = -1;
             return true;
         }

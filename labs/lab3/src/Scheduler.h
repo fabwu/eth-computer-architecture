@@ -1,37 +1,27 @@
 /***************************** SCHEDULER.H ***********************************
 - SAFARI GROUP
-
 This file contains the different scheduling policies and row policies that the 
 memory controller can use to schedule requests.
-
 Current Memory Scheduling Policies:
-
 1) FCFS - First Come First Serve
         This scheduling policy schedules memory requests chronologically
-
 2) FRFCFS - Frist Ready First Come First Serve
         This scheduling policy first checks if a request is READY(meets all 
         timing parameters), if yes then it is prioritized. If multiple requests
         are ready, they they are scheduled chronologically. Otherwise, it 
         behaves the same way as FCFS. 
-
 3) FRFCFS_Cap - First Ready First Come First Serve Cap
        This scheduling policy behaves the same way as FRFCS, except that it has
        a cap on the number of hits you can get in a certain row. The CAP VALUE
        can be altered by changing the number for the "cap" variable in 
        line number 76. 
-
 4) FRFCFS_PriorHit - First Ready First Come First Serve Prioritize Hits
        This scheduling policy behaves the same way as FRFCFS, except that it
        prioritizes row hits more than readiness. 
-
 You can select which scheduler you want to use by changing the value of 
 "type" variable on line number 74.
-
                 _______________________________________
-
 Current Row Policies:
-
 1) Closed   - Precharges a row as soon as there are no pending references to 
               the active row.
 2) ClosedAP - Closed Auto Precharge
@@ -40,7 +30,6 @@ Current Row Policies:
 4) Timeout  - Precharges a row after X time if there are no pending references.
               'X' time can be changed by changing the variable timeout 
               on line number 221
-
 *****************************************************************************/
 
 #ifndef __SCHEDULER_H
@@ -317,7 +306,7 @@ public:
          * - FRFCFS_PriorHit
          * - ATLAS
          */
-        policy = new BLISS<T>(ctrl);
+        policy = new ATLAS<T>(ctrl);
     }
 
     list<Request>::iterator get_head(list<Request>& q)

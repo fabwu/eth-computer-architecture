@@ -9,7 +9,7 @@ OBJS := $(patsubst $(SRCDIR)/%.cpp, $(OBJDIR)/%.o, $(SRCS))
 #   g++ 4.x due to an internal compiler error when processing lambda functions.
 #CXX := clang++
 CXX := g++
-CXXFLAGS := -O3 -std=c++11 -g -Wall -Wno-unused-lambda-capture
+CXXFLAGS := -O3 -std=c++11 -g -Wall -Wno-unused-lambda-capture -Wno-sign-compare -Wno-catch-value
 
 .PHONY: all clean depend
 
