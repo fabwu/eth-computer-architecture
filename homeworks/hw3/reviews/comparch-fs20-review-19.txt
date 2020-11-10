@@ -19,23 +19,56 @@ Ready
 
 ==+== A. Paper summary
 
+Sparse linear algebra operations are heavily used in machine learning and graph
+analytics applications. To make these operations efficient, various compression
+techniques like Compressed Sparse Row (CSR) are used. These formats introduce
+a significant instruction overhead and need pointer chasing to find non-zero
+elements.
 
+In this paper, discovering non-zero elements is identified as the main
+performance bottleneck so they propose SMASH to efficiently index and store
+a sparse matrix using hardware-software cooperative mechanisms.  SMASH consists
+of two parts. First, a hierarchy of bitmaps is used for efficient compression in
+software. Second, a Bit Management Unit (BMU) scans the bitmaps to find indices
+of non-zero elements efficiently.
+
+They evaluated SMASH on four use cases and showed significant performance
+improvements with a minimal area overhead.
 
 ==+== B. Strengths
 
+* One of the first proposals for a hardware/software scheme to accelerate sparse
+  matrix indexing
 
+* Identifies indexing as key bottleneck in sparse matrix compression schemes
+
+* Widely applicable (e.g. CPU, GPU, hardware accelerators)
+
+* Excellent evaluation with many practical use cases
+
+* Implementation is open source and paper is well written
 
 ==+== C. Weaknesses
 
+* Complicated to find optimal compression ratios
 
+* The paper doesn't explain how to select the number of bitmap levels
+
+* Dynamic updates of sparse matrix is expensive as it requires a reload of the
+  bitmaps into the BMU
 
 ==+== D. Thoughts and ideas
 
+* Use a lossy compression format to approximate matrix would reduce the memory
+  footprint
 
+* Apply blocking optimizations of formats like BCSR
 
 ==+== E. Takeaways
 
-
+A software/architecture that operates on very large and sparse matrices has to
+take sparsity into account to enable various optimizations. Otherwise, these
+operations wouldn't be possible.
 
 ==+== F. Other comments
 
