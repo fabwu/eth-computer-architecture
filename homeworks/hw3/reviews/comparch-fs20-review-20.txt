@@ -18,23 +18,55 @@ Ready
 
 ==+== A. Paper summary
 
+Most deep neural networks (DNN) are very memory intensive, resulting in a high
+need for energy and latency. An effective approach to reduce energy consumption
+and improve performance is to use approximate memory.  Using this memory type
+reduces the reliability, which increases the bit error rate. Due to their
+probabilistic properties, DNNs are error tolerant so they are a perfect
+application for approximate memory.
 
+The paper introduces the EDEN framework to enable DNNs to handle bit errors that
+approximate DRAM causes. The framework consists of two components.  First, it
+supports DNN retraining to improve error tolerance by slowly increasing the
+error rate without causing accuracy collapse. Second, EDEN maps each DNN data
+type to a corresponding approximate DRAM partition to meet the users
+requirements.
+
+Eden was evaluated on multi-core CPUs, GPUs and DNN accelerators and the results
+show a significant reduction of energy consumption and a moderate performance
+boost.
 
 ==+== B. Strengths
 
+* Innovative approach to a well-known problem
 
+* Only small changes required to run on conventional systems (e.g. processing in
+  memory much more invasive)
+
+* Framework can be adapted to adjust other DRAM parameters (e.g. refresh rate)
 
 ==+== C. Weaknesses
 
+* Profiling of DRAM is required and retraining is required if device changes
 
+* A speedup is only possible if DNN is memory latency bound on the used system
 
 ==+== D. Thoughts and ideas
 
+* Apply fine grained mappings to inference
 
+* Explore other DRAM parameters (refresh rate sounds promising as it can reduce
+  energy consumption and latency at the same time)
+
+* Make the framework more portable (Is a full retraining required on a device
+  with similar error patterns?)
 
 ==+== E. Takeaways
 
-
+DRAM manufacturers trade performance for reliability so commodity DRAM often
+doesn't have the properties required for a given application. A good example are
+DNNs, where a loss of accuracy is acceptable if we get performance and energy
+efficiency back.
 
 ==+== F. Other comments
 
