@@ -446,6 +446,20 @@ public:
               }
               write_transaction_bytes += tx;
             }
+
+            // BLISS - update served requests counter
+            if (last_request_coreid == req->coreid) {
+                request_served_counter++;
+            } else {
+                last_request_coreid = req->coreid;
+                request_served_counter = 0;
+            }
+
+            // BLISS - blacklist applications that are over a threshold
+            if (request_served_counter > BLISS<T>::THRESHOLD) {
+                blacklisted[last_request_coreid] = true;
+                request_served_counter = 0;
+            }
         }
 
         // issue command on behalf of request
@@ -454,20 +468,6 @@ public:
 
         // ATLAS - increase attained service for the core of that request
         attained_service[req->coreid]++;
-
-        // BLISS - update served requests counter
-        if (last_request_coreid == req->coreid) {
-            request_served_counter++;
-        } else {
-            last_request_coreid = req->coreid;
-            request_served_counter = 0;
-        }
-
-        // BLISS - blacklist applications that are over a threshold
-        if (request_served_counter > BLISS<T>::THRESHOLD) {
-            blacklisted[last_request_coreid] = true;
-            request_served_counter = 0;
-        }
 
         // check whether this is the last command (which finishes the request)
         //if (cmd != channel->spec->translate[int(req->type)]){

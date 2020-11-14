@@ -1,5 +1,7 @@
 ramulator
 obj/
 *.stats
+*.csv
 tags
 .vimrc
+.venv/
