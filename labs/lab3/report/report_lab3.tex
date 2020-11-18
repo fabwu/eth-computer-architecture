@@ -2,6 +2,8 @@
 \usepackage{graphicx}
 \graphicspath{ {./img/} }
 
+\newcommand{\wl}[1]{\textsf{\small #1}}
+
 \begin{document}
 \title{Computer Architecture Lab 3 Report}
 \author{Fabian Wüthrich}
@@ -46,6 +48,8 @@ request from the memory controller and picks the request with the lowest value
 (see line 235-241).  If both AS values are the same, the scheduler prioritizes
 row hits and then oldest requests first.
 
+\newpage
+
 \section*{Task 2: Implementing BLISS}
 
 BLISS requires even less machinery than ATLAS and is implemented in
@@ -61,11 +65,58 @@ row hits/oldest first if a decision based on the blacklist is not possible.
 
 %TODO Say that BLISS got faster when I moved it into first_command if
 
+The evaluation compares ATLAS and BLISS to three scheduling policies (FCFS,
+FRFCFS, FRFCFS\_Cap) which are already implemented in Ramulator. For each
+scheduling policy, we simulated the following workloads:
+\begin{itemize}
+    \item Workload 1: \wl{HLLL} (four-core)
+    \item Workload 2: \wl{HHLL} (four-core)
+    \item Workload 3: \wl{HHHH} (four-core)
+    \item Workload 4: \wl{HHHHHHHH} (eight-core)
+\end{itemize}
+where \texttt{H} stands for a workload with high memory intensity and \texttt{L}
+is a workload with low memory intensity. Each simulation runs until every core
+retires 20 million instructions. We evaluated the instruction throughput (IT)
+and max. slowdown (MS), as defined in the lab sheet, for each workload using
+each policy.
+
+Figure \ref{fig:inst-throughput} shows the IT for each scheduling policy using
+different workloads. For the two mixed workloads (\wl{HLLL/HHLL}), all policies
+have a similar IT. For the two intensive workloads (\wl{HHHH/HHHHHHHH}), ATLAS has
+the lowest IT of all policies and BLISS outperforms the other policies for the
+eight core workload.
+
+Figure \ref{fig:max-slowdown} shows the MS for each policy. Similarly to the IT,
+we cannot observe substantial differences for the two mixed workloads. For the
+\wl{HHHH} workload the MS increases for FCFS and ATLAS. For the eight core workload,
+only BLISS is able to keep the MS low i.e. guarantee fairness among the cores.
+
+We expected that ATLAS outperforms the other policies for the mixed workloads because
+threads with less attained service i.e. the L workloads are prioritized. Our
+simulation uses a system with just one memory controller and four cores, whereas
+ATLAS was designed for multiple memory controllers in a many core system, which
+explains the poor performance of ATLAS.
+
+The performance of ATLAS degrades significantly for the memory intensive workloads
+(\wl{HHHH/HHHHHHHH}). This has primarily two reasons. First, the wrong workloads are
+used to show the benefits of ATLAS. The simulation runs the same trace accessing the
+same addresses on four (eight) cores simultaneously. Such workloads are rare in practice
+and schedulers which prioritize row buffer locality, benefit from such workloads. Second,
+ATLAS is not a fair scheduling algorithm, so instead of dividing the DRAM equally among
+all cores, requests of one core could be stalled for a long time degrading throughput.
+This unfairness is also reflected in the MS for ATLAS. For the eight core workload, some
+cores are over 4x slower in a multi-core setting as when running alone on the system.
+
+BLISS on the other hand is a fair scheduling algorithm. The MS for BLISS running the
+eight-core workload is fairly low, whereas the unfairness of the other scheduling
+algorithms increases. For the same reason, BLISS has a better IT for the eight-core
+workload than the other scheduling policies.
+
 \begin{figure}
     \centering
     \includegraphics[width=\textwidth]{inst_throughput}
     \caption{Instruction Throughput}
-    \label{fig:inst-througput}
+    \label{fig:inst-throughput}
 \end{figure}
 
 \begin{figure}
@@ -74,6 +125,5 @@ row hits/oldest first if a decision based on the blacklist is not possible.
     \caption{Max. Slowdown}
     \label{fig:max-slowdown}
 \end{figure}
-
 
 \end{document}

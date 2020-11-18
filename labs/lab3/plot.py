@@ -63,23 +63,26 @@ def run_simulation():
     df.to_csv(csv_file, index=False)
     return df
 
-def plot(df, name, label):
+def plot(df, name, label, save):
     sns.set_theme()
     sns.set_style("whitegrid")
     sns.set_context("paper")
     g = sns.catplot(x="workload", y=name, hue="policy", data=df, kind="bar")
     g.set_axis_labels("", label)
     g.legend.set_title(None)
-    #g.fig.set_size_inches(4.7747, 3.5)
-    plt.savefig(f"report/img/{name}.pdf", format="pdf")
-    #plt.show()
+    if save:
+        plt.savefig(f"report/img/{name}.pdf", format="pdf")
+    else:
+        plt.show()
 
 def main():
     parser = argparse.ArgumentParser(description='Simulate and plot scheduling policies.')
     parser.add_argument('--sim', const=True, default=False, help="Run simulation", nargs="?")
+    parser.add_argument('--save', const=True, default=False, help="Save plots as pdf", nargs="?")
 
     args = parser.parse_args()
     do_simulation = args.sim
+    do_save = args.save
 
     try:
         df  = pd.read_csv(csv_file)
@@ -89,8 +92,8 @@ def main():
     if do_simulation:
         df = run_simulation()
 
-    plot(df, "inst_throughput", "Instruction Throughput")
-    plot(df, "max_slowdown", "Max. Slowdown")
+    plot(df, "inst_throughput", "Instruction Throughput", do_save)
+    plot(df, "max_slowdown", "Max. Slowdown", do_save)
 
 if __name__ == "__main__":
     main()
