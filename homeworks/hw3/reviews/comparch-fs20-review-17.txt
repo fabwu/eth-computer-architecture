@@ -1,0 +1,92 @@
+==+== Computer Architecture Paper Review Form
+==-== DO NOT CHANGE LINES THAT START WITH "==+==" UNLESS DIRECTED!
+==-== For further guidance, or to upload this file when you are done, go to:
+==-== https://safari.ethz.ch/review/architecture20/offline
+
+==+== =====================================================================
+==+== Begin Review #17.
+==+== Reviewer: Fabian Wüthrich <fabianwu@student.ethz.ch>
+
+==+== Paper #17
+==-== Title: SoftMC: A Flexible and Practical Open-Source Infrastructure
+==-==        for Enabling Experimental DRAM Studies
+
+==+== Review Readiness
+==-== Enter "Ready" if the review is ready for others to see:
+
+Ready
+
+==+== A. Paper summary
+
+DRAM is the most widely used memory in modern systems, although scaling down to
+smaller technology introduces new challenges such as data integrity and latency.
+To guarantee fast and reliable DRAM chips for future systems, a thorough
+analysis of existing chips is necessary. Unfortunately, the DRAM industry is not
+very open and manufacturers don't share many details about their products.
+What's more, their is no publicly-available DRAM testing infrastructure that can
+test DRAM chips in an accessible way.
+
+This paper introduces SoftMC, which is an FPGA-based testing infrastructure that
+allows even software developers to control and test chips designed for the DDR
+interface. With SoftMC, a user can issue any command specified in the DDR
+standard with customized timing parameters. Additionally, SoftMC has
+configurable auto-refresh support, which makes it easier for a user to write
+realistic tests.
+
+The easy handling of SoftMC is demonstrated with two examples. First, they
+characterize the retention time of DRAM cells. Profiling retention times, even
+at runtime, is a promising research direction and got just simpler due to
+SoftMC. Second, the authors study two mechanisms to reduce latency. They try to
+find out if the effects that enable these mechanisms are observable in existing
+DRAMs.
+
+SoftMC is published on GitHub with all tools necessary to reproduce the
+infrastructure.
+
+==+== B. Strengths
+
+* First publicly available DRAM testing infrastructure that is flexible and easy
+  to use
+
+* Great reference implementation for a memory controller (otw. rare to find)
+
+* Intuitive and simple to use API which is still flexible enough to build any
+  kind of tests
+
+* Very good introduction to DRAM operations and commands (useful as this paper
+  will be mostly likely read by DRAM beginners)
+
+==+== C. Weaknesses
+
+* No system performance tests or trace based tests are possible (important to
+  test e.g. new scheduling policies with existing DRAM)
+
+* Instruction queue does limit the test possibilities, so control flow
+  instructions are absolutely necessary
+
+* No open source tool chain for Xilinx FPGAs (e.g. Lattice is better supported
+  see http://www.clifford.at/icestorm/)
+
+==+== D. Thoughts and ideas
+
+* Enable trace based tests somehow (e.g. in combination with Ramulator)
+
+* Add control flow instructions to SoftMC
+
+* Use SoftMC to profile DRAM at home which enables variable retention times
+
+* Port SoftMC to other FPGAs
+
+==+== E. Takeaways
+
+This paper provides an excellent tool for DRAM research and I can hopefully use
+it for my own research in the future.
+
+==+== F. Other comments
+
+
+
+==+== Scratchpad (for unsaved private notes)
+
+==+== End Review
+
