@@ -18,23 +18,61 @@ Ready
 
 ==+== A. Paper summary
 
+DRAM is experiencing difficult scaling challenges that make it harder to improve
+capacity, energy efficiency and reliability. Industry and academia are looking
+for alternative memory technologies to either complement DRAM or to replace DRAM
+entirely. One promising candidate is Phase Change Memory (PCM), which has great
+potential for scalability but also several drawbacks such as long latencies,
+high energy writes and finite endurance.
 
+This paper proposes two enhancements to address these drawbacks and make PCM
+competitive to DRAM. First, they reorganize the internal buffers such that the
+latency gap is 1.2x and the energy gap is 1.0x compared to a DRAM baseline.
+Second, they introduce partial write which enhances memory endurance, providing
+5.6 years of lifetime. In the conclusion the authors give some pointers to
+  exploit the non-volatile characteristics to create completely new
+architectures.
 
 ==+== B. Strengths
 
+* PCM scales to smaller technology nodes (increases capacity, reduces energy
+  consumption)
 
+* PCM is persistent which enables a wide range of applications (e.g. faster boot
+  time)
+
+* PCM requires no refresh which reduces idle energy consumption
+
+* Buffer reorganization is easy to implement (area-neutral) and reduces
+  latency/energy consumption significantly
+
+* Useful technology survey for further PCM research
+
+* Superior methodology explained in great detail
 
 ==+== C. Weaknesses
 
+* worst case lifetime is much shorter for some workloads
 
+* memory intensive applications have a larger performance/energy penalty
+
+* the simulation could be imprecise or the PCM parameters are too optimistic
+
+* hard to understand for a person not familiar with chip manufacturing
 
 ==+== D. Thoughts and ideas
 
+* Research other caching policies for PCM buffer
 
+* Explore applications/challenges enabled by persistent main memory
+
+* Reverse engineer Intel Optane Memory
 
 ==+== E. Takeaways
 
-
+PCM is a promising new memory technology which could complement or replace DRAM
+in the future. This paper laid the foundation for Intel Optane memory and is
+a good example how research ideas is implemented in industry.
 
 ==+== F. Other comments
 
