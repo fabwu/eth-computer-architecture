@@ -17,23 +17,38 @@ Ready
 
 ==+== A. Paper summary
 
-
+This paper presents Ramulator, a fast and extensible DRAM simulator. Ramulator
+supports many DRAM standards (e.g. DDR3/4, LPDDR3/4, HBM) and some academic
+proposals (SALP, AL-DRAM, TL-DRAM). The modular design of Ramulator decouples
+the logic for updating the state machines from the details of a particular DRAM
+standard. Ramulator is also 2.5x faster than the next fastest simulator. The
+combination of extensibility and speed promotes Ramulator as the perfect tool
+for future DRAM research.
 
 ==+== B. Strengths
 
+* Modular design that is easy to extent
 
+* 2.5x faster than next fastest simulator
+
+* Many DRAM standards supported
+
+* Released under BSD license on GitHub
 
 ==+== C. Weaknesses
 
+* The excessive use of C++ templates slows down compilation
 
+* No power consumption model for all standards
 
 ==+== D. Thoughts and ideas
 
-
+* Replace some of the C++ templates with inheritance to make compilation faster
 
 ==+== E. Takeaways
 
-
+This paper helped me to get a head start for the lab because it explained
+Ramulator in a concise and interesting way.
 
 ==+== F. Other comments
 

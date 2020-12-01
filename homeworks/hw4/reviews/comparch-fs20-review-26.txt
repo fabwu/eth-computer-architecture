@@ -18,23 +18,57 @@ Ready
 
 ==+== A. Paper summary
 
+In a multi-core system, DRAM is shared among all cores which can cause
+interferences between requests of different threads. These interferences can not
+only lead to row-buffer conflicts but they can also destroy a threads
+bank-level-parallelism. Systems with more cores increase the interference making
+the problem even worse.
 
+This paper presents a novel scheduling policy, PAR-BS, that guarantees fairness while
+improving system performance. PAR-BS is based on two key ideas. First, DRAM
+requests are grouped together into batches to provide fairness and eliminate
+thread starvation. Second, PAR-BS uses a parallelism-aware scheduling policy
+within a batch that increases system performance.
+
+PAR-BS improves fairness by 1.11x and system throughput by 8.3% compared to the
+best previous scheduling policy (STFM) and is also easier to implement.
 
 ==+== B. Strengths
 
+* Improves fairness and system throughput in many core systems
 
+* Easier to implement than previous scheduling policies that provide similar
+  metrics (minimal hardware cost)
+
+* Request batching is a simple but powerful technique to improve fairness and
+  guarantee starvation freedom
+
+* Within-batch scheduling policy exploits row-buffer locality and
+  bank-level-parallelism
+
+* Other design choices are briefly explained
 
 ==+== C. Weaknesses
 
+* Marking-Cap does influence the scheduler performance and it can be hard to find a correct
+  value for it
 
+* Doesn't always prioritize latency-sensitive applications
+
+* Destroys row-buffer locality across batch boundaries (correct selection of
+  Marking-Cap is important)
 
 ==+== D. Thoughts and ideas
 
-
+* DRAM request scheduler are far from perfect and need more attention from
+  academia and industry
 
 ==+== E. Takeaways
 
-
+This paper introduced the concept of request batching to improve fairness and
+eliminate starvation as a simple and effective technique with many application.
+What's more, preserving within-thread bank-parallelism improves performance of
+a multi-core system with a shared DRAM controller.
 
 ==+== F. Other comments
 
