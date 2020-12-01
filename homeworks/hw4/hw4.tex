@@ -52,18 +52,104 @@ see \href{https://safari.ethz.ch/review/architecture20/}{here}
 \section{Memory Systems [200 points]}
 
 \begin{enumerate}[label=\alph*)]
-    \item a
-    \item b
-    \item c
-    \item d
+    \item
+        \begin{tabular}{l l}
+            Byte on bus: & \verb|Addr[2:0]| \\
+            Channel bits:  & \verb|Addr[11:10]| \\
+            Bank bits: & \verb|Addr[13:12]| \\
+            Column bits: & \verb|Addr[9:3]| \\
+            Row bits: & \verb|Addr[31:14]| \\
+        \end{tabular}
+    \item
+        \textbf{App 1}
+
+        All requests of App 1 can be served from the same row, because App
+        1 accesses 16 64-bytes cache blocks i.e. the size of a row (1024 bytes).
+        As A comes before B and all later requests are row hits, App 2 never
+        interrupts the request of App 1 so App 1 has the same running time
+        alone as with App 2 together i.e. a slowdown of 1.
+
+        \textbf{App 2}
+
+        If App 2 runs alone the first request is a row miss followed by to row
+        hits i.e. a runtime of $2T + 2 \times T = 4T$. If App 2 runs together
+        with App 1, then the requests of App 1 are executed before the requests
+        of App 2 i.e. a runtime of $2T + 15 \times T + 2T + 2 \times T = 21T$.
+        Thus, the slowdown is $\frac{21}{4}$.
+
+    \item App 2 slows down more.
+
+        App 1 is memory intensive and has a high row-buffer locality. Coupled
+        with the FR-FCFS policy, App 1 denies App 2 access to the shared DRAM,
+        which incurs the slow down of App 2.
+
+    \item A solution which reduces the slowdown of App 1 without increasing the
+        slowdown of App 2, requires some sort of parallelism.  The data of both
+        applications are mapped to the same bank, so memory channel partitioning
+        is not an option. Similarly, interleaving the data of App 1 and App 2 to
+        reduce the row hits of App 1 or source throttling would increase the
+        slowdown of App 2. A last option would be some kind of inter-bank
+        parallelism but this requires fundamental changes to the DRAM
+        organization.
 \end{enumerate}
 
 \section{DRAM Scheduling and Latency [200 points]}
 
 \begin{enumerate}[label=\alph*)]
-    \item a
-    \item b
-    \item c
+    \item The DRAM command bus operates at 1 GHz i.e. 1 cycle is equal to 1 ns,
+        so we omit an explicit conversion from cycles to nanoseconds in each
+        subtask.
+        \begin{enumerate}[label=\roman*)]
+            \item \verb|ACTIVATE| to \verb|READ|: 5 ns
+
+                In cycle 13, a \verb|ACTIVATE| is scheduled followed by
+                a \verb|READ| in cycle 18.  Similarly, the \verb|ACTIVATE| in
+                cycle 20 is followed by a \verb|READ| in cycle 25 (the
+                \verb|READ| in cycle 22 goes to a different bank).
+
+            \item \verb|ACTIVATE| to \verb|PRECHARGE|: \textit{unknown}
+
+                There is no \verb|PRECHARGE| followed by an \verb|ACTIVATE| in
+                the above command trace.
+
+            \item \verb|PRECHARGE| to \verb|ACTIVATE|: 12 ns
+
+                The \verb|PRECHARGE| command in cycle 1 is followed by an
+                \verb|ACTIVATE| in cycle 13 (same for cycle 8 and 20).
+
+            \item \verb|READ| to \verb|PRECHARGE|: 8 ns
+
+                After the \verb|READ| command in cycle 0, the \verb|PRECHARGE|
+                command is delayed by 8 cycles (the \verb|PRECHARGE| in cycle
+                1 must go to a different bank to make the other timing
+                constraints consistent)
+
+            \item \verb|READ| to \verb|READ|: 4 ns
+
+                The \verb|READ| command in cycle 18 and the \verb|READ| command
+                in cycle 22 go both to bank 0 and they are 4 cycles apart.
+        \end{enumerate}
+    \item The \verb|READ| command in cycle 0 goes to bank 1 so the bank must
+        have been open with row address 43 (deduced from \verb|0xD780|). Bank
+        0 is pre-charged in cycle 1 so the bank was open but we cannot determine
+          the row address.
+
+    \item The following command trace has a total runtime of 23 cycles as
+        required:
+\begin{lstlisting}
+Cycle 0  --- READ       // bank 1 row 43
+Cycle 1  --- PRECHARGE  // bank 0 row unknown (near segment)
+Cycle 8  --- PRECHARGE  // bank 1 row 43 (near segment)
+Cycle 10 --- ACTIVATE   // bank 0 row 20 (near segment)
+Cycle 14 --- READ       // bank 0 row 20 (near segment)
+Cycle 17 --- ACTIVATE   // bank 1 row 50 (far segment)
+Cycle 18 --- READ       // bank 0 row 20 (near segment)
+Cycle 23 --- READ       // bank 1 row 50 (far segment)
+\end{lstlisting}
+        All other traces don't have a runtime of 23 cycles. Thus, in bank 0 row
+        20 and in bank 1 the unknown row and row 43 has to be in the near
+        segment. If row 50 is in the near segment, the runtime would be
+        shorter. Therefore, N is between 44 and 50.
 \end{enumerate}
 
 \section{Memory Scheduling [200 points]}
@@ -71,44 +157,135 @@ see \href{https://safari.ethz.ch/review/architecture20/}{here}
 \subsection{Application-Unaware Scheduling Policies}
 
 \begin{enumerate}[label=\alph*)]
-    \item a
-    \item b
-    \item c
-    \item d
+    \item
+        \textbf{App. A:} $9 \times 45ns + 15ns = 420ns$
+
+        \textbf{App. B:} $8 \times 45ns + 2 \times 15ns = 390ns$
+
+        \textbf{App. C:} $10 \times 45ns + 15ns = 465ns$
+
+    \item
+        \textbf{App. A:} $6 \times 45ns + 4 \times 15ns = 330ns$
+
+        \textbf{App. B:} $5 \times 45ns + 5 \times 15ns = 300ns$
+
+        \textbf{App. C:} $7 \times 45ns + 4 \times 15ns = 375ns$
+
+    \item row buffer locality
+    \item prioritize row hits and use FCFS as tie breaker
 \end{enumerate}
 
 \subsection{Application-Aware Scheduling Policies}
 
 \begin{enumerate}[label=\alph*)]
-    \item a
-    \item b
-    \item c
-    \item d
+    \item
+        \textbf{App. A:} $330ns + 45ns + 2 \times 15ns = 405ns$ (add R27 and \verb|ACT|/\verb|PRE| for R12)
+
+        \textbf{App. B:} $300ns + 45ns + 2 \times 15ns = 375ns$
+
+        \textbf{App. C:} $45ns$
+    \item C, B, A
+    \item
+        \textbf{App. A:} $8 \times 45ns + 3 \times 15ns = 405ns$
+
+        \textbf{App. B:} $4 \times 45ns + 3 \times 15ns = 125ns$
+
+        \textbf{App. C:} $45ns$
+
+    \item Y $<$ X $<$ FR-FCFS $<$ FCFS
 \end{enumerate}
 
 \section{Memory Request Scheduling [200 points]}
 
 \begin{enumerate}[label=\alph*)]
-    \item a
-    \item b
-    \item c
+    \item The scheduler forms a batch with all requests in the request buffer
+        for each bank. Both applications have the same number of requests
+        outstanding, so the scheduler prioritizes the application with the
+        oldest request. For bank 0, application A is prioritized and for bank
+        1 application B is prioritized.
+
+        Application A has a stall time of $45ns + 3 \times 15ns + 45ns 3 \times
+        15ns = 180ns$ and application B has a stall time of $4 \times 15ns
+        + 45ns + 15ns + 45ns + 15ns = 180ns$.
+
+        X prioritizes application A at bank 0 and application B at bank 1,
+        which destroys bank level parallelism of both applications and gives
+        a performance penalty. Additionally, the resulting scheduling order is
+        exactly the same as with FR-FCFS so there is no improvement.
+
+    \item Scheduler Y could prioritize the same application across all banks.
+        That would allow for bank level parallelism and guarantees a performance
+        improvement. Within a batch, the application with the shortest stall
+        time could be prioritized. In this example, application A would be
+        prioritized over application B because application A has a better row
+        buffer locality i.e. shorter stall time.
+
+        With the new policy, all requests of application A are scheduled before
+        the requests of application B. Thus, the stall time of application
+        A reduces to $45ns + 3 \times 15ns = 90ns$.
+
+        The requests of application B in bank 0 take the longest to complete.
+        Thus, the stall time of application B is $60ns + 45ns + 15ns + 45ns
+        + 15ns = 180ns$.
+
+    \item For application A nothing changes because no requests were delayed
+        due to interference of other applications. So the stall time is still
+        $90 ns$.
+
+        Application B has now its own channel without any interference of
+        application A. The improved stall time is $45ns + 15ns + 45ns + 15ns
+        = 120ns$
+
+        Channel partitioning is better than scheduler Y because it removes the
+        interference between the two applications which enables a higher
+        throughput.
 \end{enumerate}
 
 \section{Emerging Memory Technologies [100 points]}
 
 \begin{enumerate}[label=\alph*)]
-    \item a
-    \item b
+    \item The latencies for sending a request to ETH-RAM is given, so we need to
+        find the latency that ETH-RAM requires to process the request. In the
+        student's measurement, each cell received $10^6$ writes and to touch
+        all cells $\frac{2^{30}}{2^2} \times 10^6$ writes are necessary (ETH-RAM
+        is word addressable). Thus, we get
+        \[365 \times 24 \times 3600 \times 10^9ns = \frac{2^{30}}{2^2} \times 10^6 \times (l_{RAM} + 5ns + 28ns)\]
+        \[l_{RAM} = \frac{365 \times 24 \times 3600 \times 10^3}{2^{28}} - 33
+        = 84.5ns\]
+
+        Overall, the total memory access latency is $84.5ns + 5ns + 28ns
+        = 117.5ns$
+
+    \item We are using ETH-RAM in SLC mode so each cell should receive $10
+        \times 10^6 = 10^7$ writes and the memory capacity is halved to $2^{29}$
+        bytes. The test requires $\frac{2^{29}}{2^2} \times 10^7$ writes and the
+        latency drops to $0.3 \times 84.5ns = 25.35ns$. With these new
+        parameters, we get a lifetime of
+        \[ \frac{2^{29}}{2^2} \times 10^7 \times (25.35ns + 5ns + 28ns) \approx
+        2.49 \, years \]
 \end{enumerate}
 
 \section{BossMem [100 points]}
 
 \begin{enumerate}[label=\roman*)]
-    \item i
-    \item ii
-    \item iii
-    \item iv
-    \item v
+    \item Some sort of prefetching or out-of-order execution allows the core to
+    fetch the required data before BossMem has to cool down.
+
+    \item This is a bad idea because a row miss/conflict has a much higher
+        latency in DRAM than in BossMem. A better approach would be to place
+        data with high row buffer locality in DRAM and data with low row buffer
+        locality in BossMem to fully benefit from the reduced memory timing.
+
+    \item A cache replacement policy that improves the performance of the hybrid
+        memory system could replace data based on where it is mapped. For
+        example, if it's more costly to fetch data from BossMem then the policy
+        is less likely to replace data that is mapped to BossMem than data that
+        is mapped to DRAM.
+
+    \item PCM is non-volatile and endurance attacks are possible
+
+    \item DRAM should be of least interest. Despite attacks like RowHammer, DRAM
+        is well studied and scrutinized by the security research community.
 \end{enumerate}
 
 \end{document}
