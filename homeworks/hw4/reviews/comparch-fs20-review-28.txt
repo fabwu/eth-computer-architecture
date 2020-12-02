@@ -18,23 +18,56 @@ Ready
 
 ==+== A. Paper summary
 
+Modern multi-core systems have several memory controllers to control access
+to DRAM. Each controller executes a scheduling algorithm that can have a great
+impact on performance. Previous scheduling algorithms (e.g. FR-RFCS) were
+designed for a single memory-controller and don't perform well in a multi-core
+system. Requests from different cores interfere with each other which slows the
+whole system down.
 
+This paper presents ATLAS, a new scheduling algorithm designed to improve
+throughput in multi-core systems without requiring extensive communication with
+other memory controllers. The key idea of ATLAS is to record the service that
+a thread attained from the memory system and prioritize threads that attained
+the least service so they can catch up. A meta-controller periodically collects
+the attained service of each thread from each memory controller, calculates
+a new prioritization order and propagate the order to all memory controllers.
+
+ATLAS improves instruction throughput by 10.8% and system throughput by 8.4% on
+average compared to the best previous scheduler PAR-BS.
 
 ==+== B. Strengths
 
+* Improves overall throughput significantly because compute-intensive threads
+  are prioritized
 
+* Easy to understand and implement (compared to PAR-BS)
+
+* Coordination between meta-controller and memory controllers does not happen
+  often
+
+* ATLAS scales with the number of cores in a system
 
 ==+== C. Weaknesses
 
+* ATLAS has a high unfairness so lower ranked threads get a huge delay
 
+* Workloads have to follow a Pareto distribution, which might be not always the
+  case in practice
 
 ==+== D. Thoughts and ideas
 
+* Combine ATLAS with batching from PAR-BS
 
+* Adapt scheduling policy dynamically based on workload
+
+* Detect unfairness somehow and react to it by using a fair scheduling
+  algorithm
 
 ==+== E. Takeaways
 
-
+ATLAS shows that prioritizing compute-intensive threads can greatly improve
+overall performance.
 
 ==+== F. Other comments
 
