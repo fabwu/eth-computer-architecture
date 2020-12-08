@@ -117,7 +117,7 @@ echo "LLC Replacement: ${LLC_REPLACEMENT}"
 echo "Cores: ${NUM_CORE}"
 BINARY_NAME="${BRANCH}-${L1D_PREFETCHER}-${L2C_PREFETCHER}-${LLC_PREFETCHER}-${LLC_REPLACEMENT}-${NUM_CORE}core"
 echo "Binary: bin/${BINARY_NAME}"
-echo ""
+echo "${NORMAL}"
 mv bin/champsim bin/${BINARY_NAME}
 
 
