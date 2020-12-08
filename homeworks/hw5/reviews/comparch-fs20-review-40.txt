@@ -1,0 +1,46 @@
+==+== Computer Architecture Paper Review Form
+==-== DO NOT CHANGE LINES THAT START WITH "==+==" UNLESS DIRECTED!
+==-== For further guidance, or to upload this file when you are done, go to:
+==-== https://safari.ethz.ch/review/architecture20/offline
+
+==+== =====================================================================
+==+== Begin Review #40.
+==+== Reviewer: Fabian Wüthrich <fabianwu@student.ethz.ch>
+
+==+== Paper #40
+==-== Title: Runahead Execution: An Alternative to Very Large Instruction
+==-==        Windows for Out-of-order Processor
+
+==+== Review Readiness
+==-== Enter "Ready" if the review is ready for others to see:
+
+Ready
+
+==+== A. Paper summary
+
+
+
+==+== B. Strengths
+
+
+
+==+== C. Weaknesses
+
+
+
+==+== D. Thoughts and ideas
+
+
+
+==+== E. Takeaways
+
+
+
+==+== F. Other comments
+
+
+
+==+== Scratchpad (for unsaved private notes)
+
+==+== End Review
+
