@@ -18,27 +18,67 @@ Ready
 
 ==+== A. Paper summary
 
+The performance of modern CPUs is increasing while memory latency remains
+constant which makes it increasingly harder for processors to tolerate these
+latencies. A larger instruction window is one way to circumvent the memory
+latency but a very large instruction window has a complex design and a high
+energy consumption.
 
+This paper proposes runahead execution as an alternative to a large instruction
+window. Whereas the idea of runahead execution was proposed earlier, this paper
+introduces runahead execution to a Intel Pentium 4 machine model and shows that
+runahead execution can replace a large instruction window.
+
+Another interesting result is that runahead execution in combination with
+a hardware prefetcher increases performance more and that runahead execution can
+train e.g. branch prediction to improve accuracy.
+
+Overall, this was a very interesting read about a technology which is ubiquitous
+in modern processors.
 
 ==+== B. Strengths
 
+* Runahead execution increases memory latency tolerance without increasing the
+  instruction window
 
+* Everything that is required by runahead execution is already implemented in
+  the CPU so it's easy to adopt this technology
+
+* Runahead execution outperforms the stream based HWP significantly
+
+* Runahead execution supports other out-of-order technologies e.g. HWP, branch
+  prediction
+
+* Still accurate results if runahead execution is on the wrong path
 
 ==+== C. Weaknesses
 
+* Comparison between a stream-based HWP and runahead execution seems unfair
+  because a stream-based HWP is not very sophisticated.
 
+* A wrong execution path could degrade performance (although no such execution
+  paths were observed during the simulation)
 
 ==+== D. Thoughts and ideas
 
+* Compare runahead execution to more sophisticated prefetchers
 
+* Research when to exit runahead mode
+
+* Research more a more aggressive runahead prefetcher
+
+* Research how runahead execution works in a multi-core (or heterogeneous)
+  environment
 
 ==+== E. Takeaways
 
-
+Runahead execution is an effective prefetching mechanism which enables the CPU
+to tolerate memory latency and supports other out-of-order techniques like HWP,
+branch predictors etc.
 
 ==+== F. Other comments
 
-
+* In 2020 we still don't have an 8GHz CPU as predicted by Table 2 ^^
 
 ==+== Scratchpad (for unsaved private notes)
 
