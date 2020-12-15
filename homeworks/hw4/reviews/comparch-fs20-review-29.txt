@@ -18,23 +18,52 @@ Ready
 
 ==+== A. Paper summary
 
+DRAM is a shared resource in a multi-core system and memory requests of
+different applications interfere with each other which degrades overall
+performance. Previous memory request scheduler rank applications based on their
+memory access pattern to prioritize requests of applications that are vulnerable
+to interference. These schedulers have two problems. First, they implement
+complex ranking mechanisms which increases hardware cost and complexity.
+Second, their scheduling algorithm is inherently unfair so applications with
+a low rank experience a huge slowdown.
 
+This paper presents BLISS, a memory request scheduler which achieves high
+performance without being overly complex. BLISS divides the applications into
+two groups. Applications that are vulnerable to interference and applications
+that cause interference. Vulnerable applications are then prioritized. The
+separation is simply done by counting the number of consecutive requests that
+were served from each application and blacklisting too aggressive applications.
+
+BLISS achieves 5% better performance and 25% better fairness compared to
+state-of-the-art memory schedulers and reduces the area by 43%.
 
 ==+== B. Strengths
 
+* Simple and beautiful mechanism to greatly improve system performance and
+  fairness
 
+* BLISS is easy to implement with low hardware areas costs
+
+* BLISS scales with more cores in a system
+
+* Implementation in Verilog improves accuracy of timing/area results
 
 ==+== C. Weaknesses
 
+* Blacklisting Threshold and Clearing Interval have to be picked correctly so
+  BLISS can make accurate scheduling decisions
 
+* No support for system software (e.g. thread priorities)
 
 ==+== D. Thoughts and ideas
 
-
+* Apply the key idea of BLISS to other areas of computer science (e.g. network
+  QoS)
 
 ==+== E. Takeaways
 
-
+The innovative idea of blacklisting effectively reduces interference while
+keeping the scheduler simple.
 
 ==+== F. Other comments
 
