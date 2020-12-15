@@ -104,7 +104,7 @@ make
 echo ""
 if [ ! -f bin/champsim ]; then
     echo "${BOLD}ChampSim build FAILED!"
-    echo ""
+    echo "${NORMAL}"
     exit 1
 fi
 
