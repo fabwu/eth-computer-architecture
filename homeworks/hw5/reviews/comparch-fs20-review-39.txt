@@ -18,23 +18,60 @@ Ready
 
 ==+== A. Paper summary
 
+An application must be split into multiple threads to take full advantages of
+a multi-core system. Critical sections ensure that only one thread can access
+shared data at any given time. However, critical sections can serialize the
+execution of threads which reduces performance.
 
+This paper introduces Accelerated Critical Sections (ACS), a mechanism that
+uses Asymmetric Chip Multiprocessors (ACMP) to speed-up critical section which
+improves overall performance. The parallel portion of a program is executed on
+several small cores whereas the serial portion and the critical sections (not
+the same concept!) are moved to a more powerful core. The larger core does not
+only execute the critical section faster but reduces cache ping-ponging as the
+lock and shared data is only kept in the cache of the large core.
+
+ACS reduces average execution time by 34% compared to a Symmetric Chip
+Multiprocessor (SCMP) and by 23% compared to a ACMP using the same chip-area.
 
 ==+== B. Strengths
 
+* Critical sections have a reduced execution time which improves overall
+  performance
 
+* The large core has all the shared locks which improves lock locality
+
+* Less cache ping-ponging as shared data stays in the large core's cache
+
+* Easy to implement on an existing ACMP
+
+* Acceleration is transparent to programmers
 
 ==+== C. Weaknesses
 
+* The large core occupies area that could be used for small cores i.e. reduced
+  parallel throughput
 
+* CSCALL and CSDONE have an overhead as information is transfer over the
+  interconnect from the small to the large core and vice versa
+
+* Private data from the small core has to be transferred to the large core
+
+* Only useful on systems with many cores (> 16 cores)
+
+* Benefits are workload dependent
 
 ==+== D. Thoughts and ideas
 
+* Research how to handle nested critical sections in ACS
 
+* Use multiple large cores to accelerate critical and/or serial sections
 
 ==+== E. Takeaways
 
-
+After reading this paper I know that the serial portion of a program and
+critical sections are not the same. Furthermore, accelerating critical sections
+reduces overall execution time significantly.
 
 ==+== F. Other comments
 
