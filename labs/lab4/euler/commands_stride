@@ -1,0 +1,16 @@
+./run_champsim.sh bin/perceptron-no-ip_stride-no-ship-1core 100 500 traces/436.cactusADM-1804B.champsimtrace.xz
+./run_champsim.sh bin/perceptron-no-ip_stride-no-ship-1core 100 500 traces/437.leslie3d-134B.champsimtrace.xz
+./run_champsim.sh bin/perceptron-no-ip_stride-no-ship-1core 100 500 traces/450.soplex-247B.champsimtrace.xz
+./run_champsim.sh bin/perceptron-no-ip_stride-no-ship-1core 100 500 traces/459.GemsFDTD-1320B.champsimtrace.xz
+./run_champsim.sh bin/perceptron-no-ip_stride-no-ship-1core 100 500 traces/462.libquantum-714B.champsimtrace.xz
+./run_champsim.sh bin/perceptron-no-ip_stride-no-ship-1core 100 500 traces/482.sphinx3-1100B.champsimtrace.xz
+./run_champsim.sh bin/perceptron-no-ip_stride-no-ship-1core 100 500 traces/602.gcc_s-2226B.champsimtrace.xz
+./run_champsim.sh bin/perceptron-no-ip_stride-no-ship-1core 100 500 traces/603.bwaves_s-891B.champsimtrace.xz
+./run_champsim.sh bin/perceptron-no-ip_stride-no-ship-1core 100 500 traces/605.mcf_s-1644B.champsimtrace.xz
+./run_champsim.sh bin/perceptron-no-ip_stride-no-ship-1core 100 500 traces/619.lbm_s-2677B.champsimtrace.xz
+./run_champsim.sh bin/perceptron-no-ip_stride-no-ship-1core 100 500 traces/620.omnetpp_s-141B.champsimtrace.xz
+./run_champsim.sh bin/perceptron-no-ip_stride-no-ship-1core 100 500 traces/621.wrf_s-6673B.champsimtrace.xz
+./run_champsim.sh bin/perceptron-no-ip_stride-no-ship-1core 100 500 traces/623.xalancbmk_s-10B.champsimtrace.xz
+./run_champsim.sh bin/perceptron-no-ip_stride-no-ship-1core 100 500 traces/627.cam4_s-573B.champsimtrace.xz
+./run_champsim.sh bin/perceptron-no-ip_stride-no-ship-1core 100 500 traces/649.fotonik3d_s-10881B.champsimtrace.xz
+./run_champsim.sh bin/perceptron-no-ip_stride-no-ship-1core 100 500 traces/654.roms_s-1390B.champsimtrace.xz
