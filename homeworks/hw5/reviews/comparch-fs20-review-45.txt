@@ -1,0 +1,78 @@
+==+== Computer Architecture Paper Review Form
+==-== DO NOT CHANGE LINES THAT START WITH "==+==" UNLESS DIRECTED!
+==-== For further guidance, or to upload this file when you are done, go to:
+==-== https://safari.ethz.ch/review/architecture20/offline
+
+==+== =====================================================================
+==+== Begin Review #45.
+==+== Reviewer: Fabian Wüthrich <fabianwu@student.ethz.ch>
+
+==+== Paper #45
+==-== Title: Feedback Directed Prefetching: Improving the Perfor- mance and
+==-==        Bandwidth-Efficiency of Hardware Prefetchers
+
+==+== Review Readiness
+==-== Enter "Ready" if the review is ready for others to see:
+
+Ready
+
+==+== A. Paper summary
+
+A very aggressive prefetcher can significantly improve the performance of many
+workloads but reduces performance for other programs. Furthermore, an aggressive
+prefetcher puts additional load on the memory bus.
+
+This paper presents a mechanism that uses dynamic feedback to tune the
+prefetcher's behaviour. The mechanism uses accuracy, timeliness and
+prefetcher-caused cache pollution as metrics. Based on these metrics the
+aggressivness and cache-placement policy is dynamically adjusted.
+
+The feedback mechanism can be used with a wide range of prefetchers (next-block,
+stride, GHB etc.) and improves performance while using similar or less memory
+bandwidth.
+
+==+== B. Strengths
+
+* Improves performance while using similar or less memory bandwidth
+
+* Low complexity and hardware costs
+
+* Achieves the same performance as a system with a large and complex prefetch
+  cache
+
+==+== C. Weaknesses
+
+* Thresholds are empirically determined which could give away a lot of potential
+  for some workloads
+
+* Some workloads have for the whole execution very aggressive (5) as dynamic
+  configuration but they perform not as good as the very aggressive prefetcher
+  baseline
+
+* Dynamic adaption was proposed before but only with accuracy
+
+==+== D. Thoughts and ideas
+
+* Incorporate other metrics such as available memory bandwidth, prefetch
+  coverage, MPKI etc.
+
+* Research a hybrid prefetcher e.g. switch dynamically from GHB to
+  content-directed prefetching
+
+* Determine the thresholds for each system dynamically
+
+==+== E. Takeaways
+
+Adding a feedback loop to a prefetcher can greatly improve performance and
+memory bandwidth consumption.
+
+==+== F. Other comments
+
+* Explain what the metrics mean (i.e. prefetch lateness -> lower is better)
+
+* Figure 3: remove duplicated IPC plot and insert cache pollution plot
+
+==+== Scratchpad (for unsaved private notes)
+
+==+== End Review
+
