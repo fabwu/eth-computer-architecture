@@ -1,0 +1,116 @@
+#include "cache.h"
+#include "ooo_cpu.h"
+#include "ghb.h"
+
+#define SAMPLE_INTERVAL 1000
+#define ACCURACY_THRESHOLD_H 0.75
+#define ACCURACY_THRESHOLD_L 0.4
+#define LATENESS_THRESHOLD 0.01
+#define COUNTER_MIN_VAL 1
+#define COUNTER_MAX_VAL 5
+
+enum accuracy_state_t {
+  ACCURACY_LOW,
+  ACCURACY_MEDIUM,
+  ACCURACY_HIGH,
+
+  NUM_ACCURACY_STATE
+};
+
+enum lateness_state_t {
+  LATE,
+  NOT_LATE,
+
+  NUM_LATENESS_STATE
+};
+
+uint64_t counter_update[NUM_ACCURACY_STATE][NUM_LATENESS_STATE];
+GHB *ghb;
+
+int64_t counter = 3;
+
+void CACHE::l2c_prefetcher_initialize()
+{
+    cout << "CPU " << cpu << " L2C GHB Feedback prefetcher" << endl;
+    ghb = new GHB();
+
+    counter_update[ACCURACY_HIGH][LATE]         =  1;
+    counter_update[ACCURACY_HIGH][NOT_LATE]     =  0;
+    counter_update[ACCURACY_MEDIUM][LATE]       =  1;
+    counter_update[ACCURACY_MEDIUM][NOT_LATE]   =  0;
+    counter_update[ACCURACY_LOW][LATE]          = -1;
+    counter_update[ACCURACY_LOW][NOT_LATE]      =  0;
+}
+
+uint64_t pf_late_last;
+
+uint32_t CACHE::l2c_prefetcher_operate(uint64_t addr, uint64_t ip, uint8_t cache_hit, uint8_t type, uint32_t metadata_in)
+{
+    if (pf_late_last != pf_late) {
+        cout << "pf_late changed from " << pf_late_last << " to " << pf_late << endl;
+        pf_late_last = pf_late;
+    }
+
+    if ((ooo_cpu[cpu].num_retired % SAMPLE_INTERVAL) == 0 && pf_issued > 0 && pf_useful > 0) {
+        // caclulate metrics
+        double pf_accuracy = pf_useful / (double) pf_issued;
+        double pf_lateness = pf_late / (double) pf_useful;
+
+        // determine accuracy and lateness state
+        accuracy_state_t accuracy_state;
+        if (pf_accuracy > ACCURACY_THRESHOLD_H) {
+            accuracy_state = ACCURACY_HIGH;
+        } else if (pf_accuracy < ACCURACY_THRESHOLD_L) {
+            accuracy_state = ACCURACY_LOW;
+        } else {
+            accuracy_state = ACCURACY_MEDIUM;
+        }
+
+        lateness_state_t lateness_state;
+        if (pf_lateness > LATENESS_THRESHOLD) {
+            lateness_state = LATE;
+        } else {
+            lateness_state = NOT_LATE;
+        }
+
+        // update counter
+        counter = (counter + counter_update[accuracy_state][lateness_state]) % (COUNTER_MAX_VAL + 1);
+        if (counter < COUNTER_MIN_VAL) {
+            counter = COUNTER_MAX_VAL;
+        }
+        assert(counter >= COUNTER_MIN_VAL && counter <= COUNTER_MAX_VAL);
+
+        // update prefetcher
+        GHB::aggressivness_t aggressivness = static_cast<GHB::aggressivness_t>(counter - 1);
+        ghb->set_aggressiveness(aggressivness);
+    }
+
+    // process only cache loads
+    if (type != LOAD) {
+        return metadata_in;
+    }
+
+    std::vector<uint64_t> pf_addr_list;
+
+    ghb->operate(addr, ip, &pf_addr_list);
+
+    //cout << addr << ": ";
+    for (uint64_t pf_addr : pf_addr_list) {
+        //cout << hex << pf_addr << " ";
+        prefetch_line(ip, addr, pf_addr, FILL_L2, 0);
+    }
+    //cout << endl;
+
+    return metadata_in;
+}
+
+uint32_t CACHE::l2c_prefetcher_cache_fill(uint64_t addr, uint32_t set, uint32_t way, uint8_t prefetch, uint64_t evicted_addr, uint32_t metadata_in)
+{
+    return metadata_in;
+}
+
+void CACHE::l2c_prefetcher_final_stats()
+{
+    cout << "CPU " << cpu << " L2C GHB prefetcher final stats" << endl;
+}
+
