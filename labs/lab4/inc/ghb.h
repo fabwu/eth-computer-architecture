@@ -20,6 +20,8 @@ struct GHB_Entry {
     IT_Entry *it;
 };
 
+//TODO use 8 bits to index IT
+
 class GHB {
   public:
     enum aggressivness_t {
