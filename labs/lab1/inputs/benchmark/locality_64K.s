@@ -17,21 +17,11 @@ loop:
     slt     $t0, $s1, $t2   # i < 16384 
     beq     $t0, $0,  done  # if not then done
     sll     $t0, $s1, 2     # $t0 = i * 4 (byte offset)
-    add     $t0, $t0, $s0   # address of array[i]
-    lw      
-    addi    $t1, $0, 42     # $t1 = 42
-    sw      $t1, 0($t0)     # array[i] = $t1
+    add     $t0, $t0, $s0   # address of a[i]
+    lw      $t1, 0($t0),    # $t1 = a[i]
+    add	    $s2, $s2, $t1   # sum = sim + a[i]
     addi    $s1, $s1, 1     # i = i + 1
     j       loop            # repeat
-
-read:
-    slt     $t0, $s2, $t2   # i < 16384 
-    beq     $t0, $0,  done  # if not then done
-    sll     $t0, $s2, 2     # $t0 = i * 4 (byte offset)
-    add     $t0, $t0, $s0   # address of array[i]
-    lw      $t1, 0($t0)     # array[i] = $t1
-    addi    $s2, $s2, 1     # i = i + 1
-    j       read           # repeat
 
 done:
     addiu   $v0, $0, 10
