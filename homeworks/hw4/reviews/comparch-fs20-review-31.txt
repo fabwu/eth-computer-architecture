@@ -18,27 +18,66 @@ Ready
 
 ==+== A. Paper summary
 
+The virtual memory framework was designed for a single core machine with a small
+but fast memory and a large but slow hard-drive. Adapting this framework to
+heterogeneous systems and emerging memory technologies often requires
+sophisticated workarounds and incurs a performance loss.
 
+This paper scrutinizes the conventional virtual memory framework and moves parts
+of the memory management to hardware. The so called Virtual Block Interface
+(VBI) manages a set of variable-sized virtual blocks for each application. An
+application can allocate a virtual block and annotate it with semantic
+information. Furthermore, the VBI decouples access control (done by OS) from
+address translation (done in hardware) and virtual addresses are used to index
+the caches. These changes allow the allocation of blocks which are not backed by
+main memory reducing the number of page table walks which increases performance.
+
+The VBI increases performance for many use cases while requiring significant changes
+across the whole stack.
 
 ==+== B. Strengths
 
+* Novel approach for virtual memory which increases performance significantly
+  and reduces complexity in software
 
+* Using virtual addresses instead of physical addresses to index caches has many
+  benefits (e.g. lazy-allocate, reduces page table walks)
+
+* Applications can allocate blocks as required (no overhead due to huge virtual
+  address space)
+
+* Separation of access control and address translations allows many performance
+  improvements
+
+* Adapting a system to new hardware trends becomes easier
 
 ==+== C. Weaknesses
 
+* Hard to implement as VBI requires many changes across the whole stack
 
+* Eviction of cache lines after block deallocation or promotion can be expensive
+
+* Evaluation on a heterogeneous system is missing and specs for multicore
+  evaluation are missing
+
+* Paper is hard to read as many new concepts are introduced
+
+* Source code link is dead
 
 ==+== D. Thoughts and ideas
 
+* Apply VBI to a heterogeneous system
 
+* Simulate VBI together with a real OS
 
 ==+== E. Takeaways
 
-
+Moving virtual address translations to the memory controller can improve
+performance and simplifies systems software.
 
 ==+== F. Other comments
 
-
+* Typo meomry in 4.5.2
 
 ==+== Scratchpad (for unsaved private notes)
 
