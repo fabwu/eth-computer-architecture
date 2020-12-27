@@ -18,23 +18,32 @@ Ready
 
 ==+== A. Paper summary
 
-
+This short paper defines how a program is correctly executed even if the
+microarchitecture uses a different order than specified by the programmer.
+Later, this definition is extended to multicore systems which require additional
+conditions to guarantee a correct execution i.e. sequential consistency.
 
 ==+== B. Strengths
 
+* The paper gives an important definition of correctness which made multi-core
+  systems usable
 
+* Illustrative example to understand the gist of the problem
 
 ==+== C. Weaknesses
 
-
+* Requirement R2 is very restrictive and can severely reduce performance
 
 ==+== D. Thoughts and ideas
 
-
+* Develop algorithms that work without sequential consistency to improve
+  performance
 
 ==+== E. Takeaways
 
-
+Sequential consistency in a multicore system has more restrictive requirements
+so some techniques to speed up single-core machines cannot be employed in
+a multicore environment.
 
 ==+== F. Other comments
 

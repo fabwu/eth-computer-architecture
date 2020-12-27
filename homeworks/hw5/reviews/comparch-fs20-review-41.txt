@@ -18,23 +18,35 @@ Ready
 
 ==+== A. Paper summary
 
-
+This short essay introduces Amdahl's Law which was used for decades as a upper
+bound for parallel computing performance.
 
 ==+== B. Strengths
 
+* Predicted many problems in parallel computing which we have today
 
+* Identifies data movement as a major sequential bottleneck which cannot be
+  reduced significantly by parallel programming
 
 ==+== C. Weaknesses
 
+* Amdahl's Law doesn't consider PIM which could remove the data movement
+  bottleneck and speed up parallel computing significantly
 
+* In practice, Amdahl's Law doesn't seemed to be correct because many problems
+  in e.g. Deep Learning or climate simulation benefited from many-core systems.
 
 ==+== D. Thoughts and ideas
 
+* Reformulate Amdahl's law considering PIM
 
+* Incorporate some characteristics of a problem into Amdahl's law to get tighter
+  bounds (e.g. Roofline Model)
 
 ==+== E. Takeaways
 
-
+Running a program on N cores doesn't give you a N-times speedup i.e. single
+processor approach is still important.
 
 ==+== F. Other comments
 
