@@ -56,6 +56,8 @@ def main():
 
         if error == 0:
             print("  " + green + "REGISTER CONTENTS OK" + normal)
+        else:
+            raise ValueError("Registers don't match!")
         print()
 
 
