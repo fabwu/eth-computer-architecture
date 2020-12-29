@@ -1,11 +1,12 @@
 SRC = $(wildcard src/*.c)
+HEADER = $(wildcard src/*.h)
 INPUT ?= $(wildcard inputs/*/*.x)
 
 .PHONY: all verify clean
 
 all: sim
 
-sim: $(SRC)
+sim: $(SRC) $(HEADER)
 	gcc -Wall -Wextra -g -O2 $^ -o $@
 
 basesim: $(SRC)
