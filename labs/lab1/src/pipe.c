@@ -6,6 +6,7 @@
  * Chris Fallin, 2012
  */
 
+#include "debug.h"
 #include "pipe.h"
 #include "cache.h"
 #include "mips.h"
@@ -15,17 +16,19 @@
 #include <stdlib.h>
 #include <string.h>
 
-//#define DEBUG
-
 #define INST_CACHE_DEFAULT_TOTAL_SIZE 8 * 1024
 #define INST_CACHE_DEFAULT_BLOCK_SIZE 32
 #define INST_CACHE_DEFAULT_NUM_WAY 4
+#define INST_CACHE_DEFAULT_REPLACMENT_POLICY CACHE_LRU_MRU
 
 #define DATA_CACHE_DEFAULT_TOTAL_SIZE 64 * 1024
 #define DATA_CACHE_DEFAULT_BLOCK_SIZE 32
 #define DATA_CACHE_DEFAULT_NUM_WAY 8
+#define DATA_CACHE_DEFAULT_REPLACMENT_POLICY CACHE_LRU_MRU
 
 //TODO Inst Miss/Hits are wrong because 0x00000 is also counted
+
+char *str_to_policy[] = {"lru_mru", "fifo"};
 
 /* debug */
 void print_op(Pipe_Op *op) {
@@ -41,10 +44,10 @@ void print_op(Pipe_Op *op) {
 }
 
 void print_cache(Cache_State *c, char *name) {
-    printf(
-        "%s: %d bytes total %d bytes block %d ways %d sets (addr[%d:%d])\n\n",
+    debug(
+        "%s: %d bytes total %d bytes block %d ways %d sets (addr[%d:%d]) policy: %s\n\n",
         name, c->total_size, c->block_size, c->num_ways, c->num_sets,
-        c->set_idx_to, c->set_idx_from);
+        c->set_idx_to, c->set_idx_from, str_to_policy[c->policy]);
 }
 
 /* global pipeline state */
@@ -73,13 +76,21 @@ static void pipe_init_inst_cache() {
     inst_cache_num_way = atoi(env);
   }
 
+  Cache_Policy inst_cache_policy = INST_CACHE_DEFAULT_REPLACMENT_POLICY;
+  if ((env = getenv("INST_CACHE_POLICY"))) {
+      for(int i = 0; i < LAST_CACHE_POLICY; i++) {
+          if (strcmp(env, str_to_policy[i]) == 0) {
+              inst_cache_policy = (Cache_Policy) i;
+              break;
+          }
+      }
+  }
+
   /* init instruction cache */
   cache_init(&inst_cache, inst_cache_total_size, inst_cache_block_size,
-             inst_cache_num_way);
+             inst_cache_num_way, inst_cache_policy);
 
-#ifdef DEBUG
   print_cache(&inst_cache, "instruction cache");
-#endif
 }
 
 static void pipe_init_data_cache() {
@@ -99,13 +110,20 @@ static void pipe_init_data_cache() {
     data_cache_num_way = atoi(env);
   }
 
+  Cache_Policy data_cache_policy = DATA_CACHE_DEFAULT_REPLACMENT_POLICY;
+  if ((env = getenv("DATA_CACHE_POLICY"))) {
+      for(int i = 0; i < LAST_CACHE_POLICY; i++) {
+          if (strcmp(env, str_to_policy[i]) == 0) {
+              data_cache_policy = (Cache_Policy) i;
+              break;
+          }
+      }
+  }
   /* init data cache */
   cache_init(&data_cache, data_cache_total_size, data_cache_block_size,
-             data_cache_num_way);
+             data_cache_num_way, data_cache_policy);
 
-#ifdef DEBUG
   print_cache(&data_cache, "data cache");
-#endif
 }
 
 void pipe_init() {
@@ -116,7 +134,7 @@ void pipe_init() {
 }
 
 void pipe_cycle() {
-#ifdef DEBUG
+#if DEBUG
   printf("\n\n----\n\nPIPELINE:\n");
   printf("DCODE: ");
   print_op(pipe.decode_op);
@@ -137,7 +155,7 @@ void pipe_cycle() {
 
   /* handle branch recoveries */
   if (pipe.branch_recover) {
-#ifdef DEBUG
+#if DEBUG
     printf("branch recovery: new dest %08x flush %d stages\n", pipe.branch_dest,
            pipe.branch_flush);
 #endif
@@ -206,7 +224,7 @@ void pipe_stage_wb() {
   /* if this instruction writes a register, do so now */
   if (op->reg_dst != -1 && op->reg_dst != 0) {
     pipe.REGS[op->reg_dst] = op->reg_dst_value;
-#ifdef DEBUG
+#if DEBUG
     printf("R%d = %08x\n", op->reg_dst, op->reg_dst_value);
 #endif
   }
@@ -315,7 +333,7 @@ void pipe_stage_mem() {
     break;
 
   case OP_SH:
-#ifdef DEBUG
+#if DEBUG
     printf("SH: addr %08x val %04x old word %08x\n", op->mem_addr,
            op->mem_value & 0xFFFF, val);
 #endif
@@ -323,7 +341,7 @@ void pipe_stage_mem() {
       val = (val & 0x0000FFFF) | (op->mem_value) << 16;
     else
       val = (val & 0xFFFF0000) | (op->mem_value & 0xFFFF);
-#ifdef DEBUG
+#if DEBUG
     printf("new word %08x\n", val);
 #endif
 

@@ -1,24 +1,8 @@
+#include "debug.h"
 #include "cache.h"
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
-
-//#define DEBUG
-
-__attribute__((unused)) static void printBits(size_t const size,
-                                              void const *const ptr) {
-  unsigned char *b = (unsigned char *)ptr;
-  unsigned char byte;
-  int i, j;
-
-  for (i = size - 1; i >= 0; i--) {
-    for (j = 7; j >= 0; j--) {
-      byte = (b[i] >> j) & 1;
-      printf("%u", byte);
-    }
-  }
-  printf("\n");
-}
 
 static int bit_length(uint32_t n) {
   uint32_t l = 0;
@@ -29,7 +13,7 @@ static int bit_length(uint32_t n) {
   return l;
 }
 
-void cache_init(Cache_State *c, int total_size, int block_size, int num_ways) {
+void cache_init(Cache_State *c, int total_size, int block_size, int num_ways, Cache_Policy policy) {
   c->total_size = total_size;
   c->block_size = block_size;
   c->num_ways = num_ways;
@@ -52,7 +36,9 @@ void cache_init(Cache_State *c, int total_size, int block_size, int num_ways) {
   c->blocks =
       (Cache_Block *)calloc(c->num_sets * c->num_ways, sizeof(Cache_Block));
 
+  c->policy = policy;
   c->timestamp = 0;
+  c->insert_counter = 0;
 }
 
 void cache_free(Cache_State *c) { free(c->blocks); }
@@ -81,6 +67,125 @@ static void write_block(Cache_Block *block, uint32_t tag, int timestamp) {
   block->last_access = timestamp;
 }
 
+static void cache_lru_lru_replacement(Cache_State *c, Cache_Block *set, uint32_t addr) {
+  /* no invalid block -> evict LRU block */
+  Cache_Block *block = set + 0;
+  for (int way = 1; way < c->num_ways; ++way) {
+    Cache_Block *temp_block = set + way;
+    if (block->last_access > temp_block->last_access) {
+      block = temp_block;
+    }
+  }
+
+  uint32_t tag = get_tag(c, addr);
+  debug("0x%X: MISS (lru/lru) replaced tag 0x%X in set %d way %d with tag 0x%X\n",
+        addr, block->tag, get_set_idx(c, addr), (int)(block - set), tag);
+
+  /* insert at LRU location */
+  write_block(block, tag, block->last_access);
+}
+
+static void cache_lru_mru_replacement(Cache_State *c, Cache_Block *set, uint32_t addr) {
+  /* evict LRU block */
+  Cache_Block *block = set + 0;
+  for (int way = 1; way < c->num_ways; ++way) {
+    Cache_Block *temp_block = set + way;
+    if (block->last_access > temp_block->last_access) {
+      block = temp_block;
+    }
+  }
+
+  uint32_t tag = get_tag(c, addr);
+  debug("0x%X: MISS (lru/mru) replaced tag 0x%X in set %d way %d with tag 0x%X\n",
+        addr, block->tag, get_set_idx(c, addr), (int)(block - set), tag);
+
+  /* insert at MRU location */
+  write_block(block, tag, c->timestamp);
+}
+
+static void cache_mru_mru_replacement(Cache_State *c, Cache_Block *set, uint32_t addr) {
+  /* evict MRU block */
+  Cache_Block *block = set + 0;
+  for (int way = 1; way < c->num_ways; ++way) {
+    Cache_Block *temp_block = set + way;
+    if (block->last_access < temp_block->last_access) {
+      block = temp_block;
+    }
+  }
+
+  uint32_t tag = get_tag(c, addr);
+  debug("0x%X: MISS (mru/mru) replaced tag 0x%X in set %d way %d with tag 0x%X\n",
+        addr, block->tag, get_set_idx(c, addr), (int)(block - set), tag);
+
+  /* insert at MRU location */
+  write_block(block, tag, c->timestamp);
+}
+
+static void cache_mru_lru_replacement(Cache_State *c, Cache_Block *set, uint32_t addr) {
+  /* evict MRU block */
+  Cache_Block *block = set + 0;
+  for (int way = 1; way < c->num_ways; ++way) {
+    Cache_Block *temp_block = set + way;
+    if (block->last_access < temp_block->last_access) {
+      block = temp_block;
+    }
+  }
+
+  int lru_timestamp = set->last_access;
+  for (int way = 1; way < c->num_ways; ++way) {
+    Cache_Block *temp_block = set + way;
+    if (lru_timestamp > temp_block->last_access) {
+      lru_timestamp = temp_block->last_access;
+    }
+  }
+
+  uint32_t tag = get_tag(c, addr);
+  debug("0x%X: MISS (mru/lru) replaced tag 0x%X in set %d way %d with tag 0x%X\n",
+        addr, block->tag, get_set_idx(c, addr), (int)(block - set), tag);
+
+  write_block(block, tag, lru_timestamp);
+}
+
+static void cache_fifo_replacement(Cache_State *c, Cache_Block *set, uint32_t addr) {
+  Cache_Block *block = set + 0;
+  for (int way = 1; way < c->num_ways; ++way) {
+    Cache_Block *temp_block = set + way;
+    // pick oldest block
+    if (temp_block->insert_timestamp < block->insert_timestamp) {
+      block = temp_block;
+    }
+  }
+
+  uint32_t tag = get_tag(c, addr);
+  debug("0x%X: MISS (fifo) replaced tag 0x%X in set %d way %d with tag 0x%X\n",
+        addr, block->tag, get_set_idx(c, addr), (int)(block - set), tag);
+
+  c->insert_counter++;
+  block->insert_timestamp = c->insert_counter;
+
+  write_block(block, tag, c->timestamp);
+}
+
+static void cache_lifo_replacement(Cache_State *c, Cache_Block *set, uint32_t addr) {
+  Cache_Block *block = set + 0;
+  for (int way = 1; way < c->num_ways; ++way) {
+    Cache_Block *temp_block = set + way;
+    // pick oldest block
+    if (temp_block->insert_timestamp > block->insert_timestamp) {
+      block = temp_block;
+    }
+  }
+
+  uint32_t tag = get_tag(c, addr);
+  debug("0x%X: MISS (lifo) replaced tag 0x%X in set %d way %d with tag 0x%X\n",
+        addr, block->tag, get_set_idx(c, addr), (int)(block - set), tag);
+
+  c->insert_counter++;
+  block->insert_timestamp = c->insert_counter;
+
+  write_block(block, tag, c->timestamp);
+}
+
 enum Cache_Result cache_access(Cache_State *c, uint32_t addr) {
   uint32_t tag = get_tag(c, addr);
 
@@ -91,16 +196,16 @@ enum Cache_Result cache_access(Cache_State *c, uint32_t addr) {
 
     if (block->valid && (block->tag == tag)) {
       block->valid = false;
-#ifdef DEBUG
-      printf("0x%X: HIT (cache disabled) tag 0x%X\n", addr, tag);
-#endif
+
+      debug("0x%X: HIT (cache disabled) tag 0x%X\n", addr, tag);
+
       return CACHE_HIT;
     } else {
       block->tag = tag;
       block->valid = true;
-#ifdef DEBUG
-      printf("0x%X: MISS (cache disabled) tag 0x%X\n", addr, tag);
-#endif
+
+      debug("0x%X: MISS (cache disabled) tag 0x%X\n", addr, tag);
+
       return CACHE_MISS;
     }
   }
@@ -117,9 +222,8 @@ enum Cache_Result cache_access(Cache_State *c, uint32_t addr) {
   for (int way = 0; way < c->num_ways; ++way) {
     block = set + way;
     if (block->valid && (block->tag == tag)) {
-#ifdef DEBUG
-      printf("0x%X: HIT in set %d way %d tag 0x%X\n", addr, set_idx, way, tag);
-#endif
+      debug("0x%X: HIT in set %d way %d tag 0x%X\n", addr, set_idx, way, tag);
+
       write_block(block, tag, c->timestamp);
       return CACHE_HIT;
     }
@@ -129,29 +233,39 @@ enum Cache_Result cache_access(Cache_State *c, uint32_t addr) {
   for (int way = 0; way < c->num_ways; ++way) {
     block = set + way;
     if (!block->valid) {
-#ifdef DEBUG
-      printf("0x%X: MISS (invalid) in set %d way %d tag 0x%X\n", addr, set_idx,
+      debug("0x%X: MISS (invalid) in set %d way %d tag 0x%X\n", addr, set_idx,
              way, tag);
-#endif
+
+      c->insert_counter++;
+      block->insert_timestamp = c->insert_counter;
       write_block(block, tag, c->timestamp);
+
       return CACHE_MISS;
     }
   }
 
-  /* no invalid block -> evict LRU block */
-  block = set + 0;
-  for (int way = 1; way < c->num_ways; ++way) {
-    Cache_Block *temp_block = set + way;
-    if (block->last_access > temp_block->last_access) {
-      block = temp_block;
-    }
-  }
+  replacement_func_t policies[LAST_CACHE_POLICY];
+  policies[CACHE_LRU_LRU] = &cache_lru_lru_replacement;
+  policies[CACHE_LRU_MRU] = &cache_lru_mru_replacement;
+  policies[CACHE_MRU_MRU] = &cache_mru_mru_replacement;
+  policies[CACHE_MRU_LRU] = &cache_mru_lru_replacement;
+  policies[CACHE_FIFO] = &cache_fifo_replacement;
+  policies[CACHE_LIFO] = &cache_lifo_replacement;
+  policies[c->policy](c, set, addr);
 
-#ifdef DEBUG
-  printf("0x%X: MISS (lru) in set %d way %d tag 0x%X\n", addr, set_idx,
-         (int)(block - set), tag);
-#endif
-
-  write_block(block, tag, c->timestamp);
   return CACHE_MISS;
+  /* TODO
+   *
+   *  general:
+   *  - FIFO
+   *  - LIFO
+   *
+   *  replace/insert:
+   *  - LRU/LRU
+   *  - LRU/MRU
+   *  - MRU/MRU
+   *  - MRU/LRU
+   *
+   *   check other paper for other methods
+   */
 }
