@@ -18,23 +18,39 @@ Ready
 
 ==+== A. Paper summary
 
+The paper identifies three major challenges to scale DRAM below 10nm feature
+size:
 
+* Refresh
+* write recovery time (tWR)
+* variable retention time (VRT)
+
+The authors propose to increase tWR to make DRAM more reliable but then
+performance decreases. SALP could be used to mitigate this performance loss.
+Reliable writes depend also on temperature so a temperature aware memory
+controller could increase tWR only if it's necessary. To solve the VRT and
+refresh problems the authors suggest ECC in DRAM.
+
+All these solutions are only possible if the memory controller and DRAM
+communicate over a rich interface or are at best co-architected together. In
+summary, this paper is a call for intelligent memory controllers.
 
 ==+== B. Strengths
 
-
+* This work is not some academic proposal without any connection to reality but
+  people from industry who call for a better integration of the memory
+  controller and DRAM
 
 ==+== C. Weaknesses
 
-
+* This paper doesn't make any novel contributions (to be expected from
+  a summary)
 
 ==+== D. Thoughts and ideas
 
-
-
 ==+== E. Takeaways
 
-
+Feature sizes below 10nm are only possible with smart memory controllers.
 
 ==+== F. Other comments
 
