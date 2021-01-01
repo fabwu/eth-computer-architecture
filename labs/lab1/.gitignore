@@ -1,5 +1,7 @@
 tags
 .venv/
+*.csv
+__pycache__/
 
 # Prerequisites
 *.d
