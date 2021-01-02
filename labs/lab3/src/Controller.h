@@ -373,6 +373,11 @@ public:
             }
         }
 
+        // ATLAS - increase attained service for pending requests
+        for (Request pending_req : pending) {
+            attained_service[pending_req.coreid]++;
+        }
+
         /*** 2. Refresh scheduler ***/
         refresh->tick_ref();
 
@@ -409,6 +414,8 @@ public:
             auto cmd = T::Command::PRE;
             vector<int> victim = rowpolicy->get_victim(cmd);
             if (!victim.empty()){
+                // ATLAS - increase attained service for precharge
+                attained_service[req->coreid]++;
                 issue_cmd(cmd, victim);
             }
             return;  // nothing more to be done this cycle
