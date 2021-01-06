@@ -2,6 +2,7 @@
 #define GHB_H
 
 #define IT_SIZE 256
+#define IT_INDEX_MASK (IT_SIZE - 1)
 #define GHB_SIZE 256
 #define NUM_LAST_ENTRIES 3
 
@@ -20,8 +21,6 @@ struct GHB_Entry {
     IT_Entry *it;
 };
 
-//TODO use 8 bits to index IT
-
 class GHB {
   public:
     enum aggressivness_t {
@@ -38,7 +37,6 @@ class GHB {
     void set_aggressiveness(aggressivness_t aggressivness);
 
     GHB() {
-        it_head_idx = 0;
         ghb_head_idx = 0;
         // default is 4 so Task 1 still works
         prefetch_distance = 4;
@@ -64,7 +62,6 @@ class GHB {
     uint64_t prefetch_degree;
 
     IT_Entry it[IT_SIZE];
-    int it_head_idx;
 
     GHB_Entry ghb[GHB_SIZE];
     int ghb_head_idx;
@@ -74,24 +71,14 @@ class GHB {
 };
 
 void GHB::operate(uint64_t addr, uint64_t ip, std::vector<uint64_t> *pf_addr_list) {
-    IT_Entry *it_entry = NULL;
+    uint64_t it_idx = IT_INDEX_MASK & ip;
+    uint64_t cl_addr = addr >> LOG2_BLOCK_SIZE;
 
-    // use linear search for now
-    for(int i = 0; i < IT_SIZE; i++) {
-        IT_Entry *curr = it + i;
-        if(curr->ip == ip) {
-            it_entry = curr;
-            break;
-        }
-    }
+    IT_Entry *it_entry = it + it_idx;
 
-    if (it_entry == NULL) {
-        // it not in index table -> allocate new IT entry
-        it_entry = it + it_head_idx;
+    if (it_entry->ip != ip) {
         it_entry->ip = ip;
         it_entry->ghb_ptr = NULL;
-
-        it_head_idx = (it_head_idx + 1) % IT_SIZE;
     }
 
     GHB_Entry *ghb_entry = ghb + ghb_head_idx;
@@ -106,7 +93,6 @@ void GHB::operate(uint64_t addr, uint64_t ip, std::vector<uint64_t> *pf_addr_lis
         ghb_entry->it->ghb_ptr = NULL;
     }
 
-    uint64_t cl_addr = addr >> LOG2_BLOCK_SIZE;
 
     // insert new entry into GHB
     ghb_entry->addr = cl_addr;

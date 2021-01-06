@@ -20,25 +20,14 @@ struct IT_Entry {
 };
 
 #define IT_SIZE 4
+#define IT_INDEX_MASK (IT_SIZE - 1)
 IT_Entry it[IT_SIZE];
-uint64_t it_head_idx = 0;
 
 void IT_check(uint64_t pc, uint64_t addr) {
-    IT_Entry *it_entry = NULL;
+    uint64_t it_idx = IT_INDEX_MASK & pc;
+    IT_Entry *it_entry = it + it_idx;
 
-    // use linear search for now
-    for(int i = 0; i < IT_SIZE; i++) {
-        IT_Entry *curr = it + i;
-        if(curr->pc == pc) {
-            it_entry = curr;
-            break;
-        }
-    }
-
-    // pc not in index table
-    if (it_entry == NULL) {
-        it_entry = it + it_head_idx;
-        it_head_idx = (it_head_idx + 1) % IT_SIZE;
+    if (it_entry->pc != pc) {
         it_entry->pc = pc;
         it_entry->ghb_ptr = NULL;
     }
@@ -93,12 +82,21 @@ void IT_check(uint64_t pc, uint64_t addr) {
 
 
 int main() {
-    IT_check(1, 1);
-    IT_check(1, 2);
-    IT_check(1, 4);
-    IT_check(1, 6);
-    IT_check(1, 8);
-    IT_check(2, 6);
+   // IT_check(1, 1);
+   // IT_check(1, 2);
+   // IT_check(1, 4);
+   // IT_check(1, 6);
+   // IT_check(1, 8);
+   // IT_check(2, 6);
+
+   // IT_check(1, 1);
+   // IT_check(2, 2);
+   // IT_check(1, 3);
+   // IT_check(2, 4);
+   // IT_check(1, 4);
+   // IT_check(2, 3);
+   // IT_check(1, 2);
+   // IT_check(2, 1);
 
     for (int i = 0; i < IT_SIZE; i++) {
         std::cout << it[i].pc << ": ";
