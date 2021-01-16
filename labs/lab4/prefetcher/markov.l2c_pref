@@ -1,9 +1,22 @@
 #include "cache.h"
 
-#define NUM_MARKOV_NODES 8
+/*
+ * Markov Prefetcher
+ *
+ * Paper: https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=752653
+ */
+
+/*
+ * The paper fixes the Markov table size at 1MB.
+ *
+ * Assume one entry is 5 * 8 byte (idx addr plus 4 prediction addr)
+ *
+ * Number of entries: 2^20 / 5 * 2^3 > 2^14 entries
+ */
+#define NUM_MARKOV_ENTRIES (1 << 14)
 #define NUM_MARKOV_TRANSISTIONS 4
 
-#define MARKOV_TABLE_IDX_MASK (NUM_MARKOV_NODES - 1)
+#define MARKOV_TABLE_IDX_MASK (NUM_MARKOV_ENTRIES - 1)
 
 struct Prediction {
     uint64_t addr;
@@ -16,10 +29,11 @@ struct Tag {
     uint64_t next_pred;
 };
 
-Tag markov_table[NUM_MARKOV_NODES];
+Tag markov_table[NUM_MARKOV_ENTRIES];
 Tag *last_tag = NULL;
 
 static void update_model(uint64_t addr) {
+    // addr is already addr of cache line so we can index directly
     uint64_t table_idx = MARKOV_TABLE_IDX_MASK & addr;
 
     if (last_tag) {
@@ -61,15 +75,15 @@ void CACHE::l2c_prefetcher_initialize()
 uint32_t CACHE::l2c_prefetcher_operate(uint64_t addr, uint64_t ip, uint8_t cache_hit, uint8_t type, uint32_t metadata_in)
 {
     uint64_t cl_addr = addr >> LOG2_BLOCK_SIZE;
-    update_model(addr);
+    update_model(cl_addr);
 
-    uint64_t table_idx = MARKOV_TABLE_IDX_MASK & addr;
+    uint64_t table_idx = MARKOV_TABLE_IDX_MASK & cl_addr;
     for (Prediction p : markov_table[table_idx].predictions) {
         if (p.priority > 0 ) {
-            uint64_t pf_addr = ((p.addr>>LOG2_BLOCK_SIZE)) << LOG2_BLOCK_SIZE;
+            uint64_t pf_addr = p.addr << LOG2_BLOCK_SIZE;
 
-            cout << " pf_cl: " << (pf_addr >> LOG2_BLOCK_SIZE) << " ip: " << ip
-                << " cache_hit: " << +cache_hit << " type: " << +type << endl;
+//            cout << " pf_cl: " << (pf_addr >> LOG2_BLOCK_SIZE) << " ip: " << ip
+//                << " cache_hit: " << +cache_hit << " type: " << +type << endl;
             prefetch_line(ip, addr, pf_addr, FILL_L2, 0);
         }
     }
@@ -84,10 +98,4 @@ uint32_t CACHE::l2c_prefetcher_cache_fill(uint64_t addr, uint32_t set, uint32_t 
 
 void CACHE::l2c_prefetcher_final_stats()
 {
-    cout << "Requested: " << pf_requested << endl;
-    cout << "Issued: " << pf_issued << endl;
-    cout << "Useful: " << pf_useful << endl;
-    cout << "Late: " << pf_late << endl;
-    cout << "Fill: " << pf_fill << endl;
-
 }
