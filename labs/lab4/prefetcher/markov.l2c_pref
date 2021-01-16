@@ -1,0 +1,93 @@
+#include "cache.h"
+
+#define NUM_MARKOV_NODES 8
+#define NUM_MARKOV_TRANSISTIONS 4
+
+#define MARKOV_TABLE_IDX_MASK (NUM_MARKOV_NODES - 1)
+
+struct Prediction {
+    uint64_t addr;
+    uint64_t priority;
+};
+
+struct Tag {
+    uint64_t addr;
+    Prediction predictions[NUM_MARKOV_TRANSISTIONS];
+    uint64_t next_pred;
+};
+
+Tag markov_table[NUM_MARKOV_NODES];
+Tag *last_tag = NULL;
+
+static void update_model(uint64_t addr) {
+    uint64_t table_idx = MARKOV_TABLE_IDX_MASK & addr;
+
+    if (last_tag) {
+        bool existed = false;
+        for (int i = 0; i < NUM_MARKOV_TRANSISTIONS; i++) {
+            Prediction *p = last_tag->predictions + i;
+            if (p->addr == addr) {
+                // if exists increase occurance counter
+                p->priority++;
+                existed = true;
+                break;
+            }
+        }
+
+        if (!existed) {
+            // if not exists insert into prediction table
+            Prediction *next = last_tag->predictions + last_tag->next_pred;
+            // insert new prediction
+            next->addr = addr;
+            next->priority = 1;
+            last_tag->next_pred = (last_tag->next_pred + 1) % 4;
+        }
+    }
+
+    Tag *current_tag = markov_table + table_idx;
+    if (current_tag->addr != addr) {
+        // evict old tag
+        current_tag->addr = addr;
+        memset(current_tag->predictions, 0, sizeof(current_tag->predictions));
+    }
+    last_tag = current_tag;
+}
+
+void CACHE::l2c_prefetcher_initialize()
+{
+    cout << "CPU " << cpu << " L2C Markov prefetcher" << endl;
+}
+
+uint32_t CACHE::l2c_prefetcher_operate(uint64_t addr, uint64_t ip, uint8_t cache_hit, uint8_t type, uint32_t metadata_in)
+{
+    uint64_t cl_addr = addr >> LOG2_BLOCK_SIZE;
+    update_model(addr);
+
+    uint64_t table_idx = MARKOV_TABLE_IDX_MASK & addr;
+    for (Prediction p : markov_table[table_idx].predictions) {
+        if (p.priority > 0 ) {
+            uint64_t pf_addr = ((p.addr>>LOG2_BLOCK_SIZE)) << LOG2_BLOCK_SIZE;
+
+            cout << " pf_cl: " << (pf_addr >> LOG2_BLOCK_SIZE) << " ip: " << ip
+                << " cache_hit: " << +cache_hit << " type: " << +type << endl;
+            prefetch_line(ip, addr, pf_addr, FILL_L2, 0);
+        }
+    }
+
+    return metadata_in;
+}
+
+uint32_t CACHE::l2c_prefetcher_cache_fill(uint64_t addr, uint32_t set, uint32_t way, uint8_t prefetch, uint64_t evicted_addr, uint32_t metadata_in)
+{
+  return metadata_in;
+}
+
+void CACHE::l2c_prefetcher_final_stats()
+{
+    cout << "Requested: " << pf_requested << endl;
+    cout << "Issued: " << pf_issued << endl;
+    cout << "Useful: " << pf_useful << endl;
+    cout << "Late: " << pf_late << endl;
+    cout << "Fill: " << pf_fill << endl;
+
+}
