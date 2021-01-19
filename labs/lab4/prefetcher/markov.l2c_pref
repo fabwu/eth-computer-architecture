@@ -54,6 +54,7 @@ static void update_model(uint64_t addr) {
             // insert new prediction
             next->addr = addr;
             next->priority = 1;
+            //TODO Use LRU replacement
             last_tag->next_pred = (last_tag->next_pred + 1) % 4;
         }
     }
@@ -77,6 +78,7 @@ uint32_t CACHE::l2c_prefetcher_operate(uint64_t addr, uint64_t ip, uint8_t cache
     uint64_t cl_addr = addr >> LOG2_BLOCK_SIZE;
     update_model(cl_addr);
 
+    //TODO filter predictions
     uint64_t table_idx = MARKOV_TABLE_IDX_MASK & cl_addr;
     for (Prediction p : markov_table[table_idx].predictions) {
         if (p.priority > 0 ) {
