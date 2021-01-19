@@ -16,8 +16,10 @@ uint32_t CACHE::l2c_prefetcher_operate(uint64_t addr, uint64_t ip, uint8_t cache
         return metadata_in;
     }
 
+    // prefetch logic is implemented in the GHB.
+    //
+    // for Task 1 the prefetch degree and distance is set to 4
     std::vector<uint64_t> pf_addr_list;
-
     ghb->operate(addr, ip, &pf_addr_list);
 
     //cout << addr << ": ";

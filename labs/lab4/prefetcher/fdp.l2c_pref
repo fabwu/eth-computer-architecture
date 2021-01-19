@@ -24,16 +24,20 @@ enum lateness_state_t {
   NUM_LATENESS_STATE
 };
 
+// table to encode counter updates
 uint64_t counter_update[NUM_ACCURACY_STATE][NUM_LATENESS_STATE];
-GHB *ghb;
-
+// global counter to determine prefetcher aggressiveness
 int64_t counter = 3;
+// reference to GHB stride prefetcher
+GHB *ghb;
 
 void CACHE::l2c_prefetcher_initialize()
 {
     cout << "CPU " << cpu << " L2C GHB Feedback prefetcher" << endl;
+    // init prefetcher
     ghb = new GHB();
 
+    // init counter updates (0 = no change, 1 = increment, -1 = decrement)
     counter_update[ACCURACY_HIGH][LATE]         =  1;
     counter_update[ACCURACY_HIGH][NOT_LATE]     =  0;
     counter_update[ACCURACY_MEDIUM][LATE]       =  1;
@@ -46,13 +50,8 @@ uint64_t pf_late_last;
 
 uint32_t CACHE::l2c_prefetcher_operate(uint64_t addr, uint64_t ip, uint8_t cache_hit, uint8_t type, uint32_t metadata_in)
 {
-    if (pf_late_last != pf_late) {
-        cout << "pf_late changed from " << pf_late_last << " to " << pf_late << endl;
-        pf_late_last = pf_late;
-    }
-
     if ((ooo_cpu[cpu].num_retired % SAMPLE_INTERVAL) == 0 && pf_issued > 0 && pf_useful > 0) {
-        // caclulate metrics
+        // caclulate metrics (most values are already collected by champsim)
         double pf_accuracy = pf_useful / (double) pf_issued;
         double pf_lateness = pf_late / (double) pf_useful;
 
@@ -73,7 +72,7 @@ uint32_t CACHE::l2c_prefetcher_operate(uint64_t addr, uint64_t ip, uint8_t cache
             lateness_state = NOT_LATE;
         }
 
-        // update counter
+        // update counter based on accuracy and lateness
         counter = (counter + counter_update[accuracy_state][lateness_state]) % (COUNTER_MAX_VAL + 1);
         if (counter < COUNTER_MIN_VAL) {
             counter = COUNTER_MAX_VAL;
@@ -90,8 +89,8 @@ uint32_t CACHE::l2c_prefetcher_operate(uint64_t addr, uint64_t ip, uint8_t cache
         return metadata_in;
     }
 
+    // generate a list with addresses to prefetch
     std::vector<uint64_t> pf_addr_list;
-
     ghb->operate(addr, ip, &pf_addr_list);
 
     //cout << addr << ": ";
