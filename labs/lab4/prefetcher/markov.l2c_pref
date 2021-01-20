@@ -61,6 +61,9 @@ static void update_model(uint64_t addr) {
 
     Tag *current_tag = markov_table + table_idx;
     if (current_tag->addr != addr) {
+        if (current_tag->addr != 0) {
+            cout << "EVICTED " << hex << current_tag->addr << " replaced with " << addr << endl;
+        }
         // evict old tag
         current_tag->addr = addr;
         memset(current_tag->predictions, 0, sizeof(current_tag->predictions));
@@ -75,7 +78,16 @@ void CACHE::l2c_prefetcher_initialize()
 
 uint32_t CACHE::l2c_prefetcher_operate(uint64_t addr, uint64_t ip, uint8_t cache_hit, uint8_t type, uint32_t metadata_in)
 {
+    // use only cache misses
+    if (cache_hit != 0) {
+        return metadata_in;
+    }
+
+    //TODO Use LRU replacement for whole Markov table
+
     uint64_t cl_addr = addr >> LOG2_BLOCK_SIZE;
+
+    //cout << hex << cl_addr << endl;
     update_model(cl_addr);
 
     //TODO filter predictions
