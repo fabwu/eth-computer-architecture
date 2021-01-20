@@ -8,6 +8,20 @@
 \date{Dezember 2020}
 \maketitle
 
-Task 3 has not been implemented yet.
+The prefetchers in Task 1 and 2 do not perform well on irregular memory requests
+because they can detect only a constant stride in an access pattern.
+The Markov prefetcher by ?? showed good results on irregular access patterns
+so for Task 3 we combine a Markov prefetcher with the stride
+prefetcher from Task 1 (or 2 not sure yet).
+
+Design choices different from paper:
+\begin{itemize}
+    \item Paper uses Markov prefetcher as prefetcher for LLC, we use it for L2
+        cache
+    \item Paper considers only cache misses because prefetcher is off-chip, we
+        consider all memory requests
+    \item Paper uses a 1MB Markov table with 32-bit addresses, we have 64-bit
+        addresses so the table size was adjusted accordingly
+\end{itemize}
 
 \end{document}

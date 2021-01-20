@@ -2,6 +2,7 @@ bin/
 obj/
 traces/
 tags
+.venv/
 
 ## Core latex/pdflatex auxiliary files:
 *.aux
