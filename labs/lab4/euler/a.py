@@ -7,12 +7,15 @@ import matplotlib.pyplot as plt
 
 files = [
         "euler/result_no.txt",
+        "euler/dpc3/result_pangloss.txt",
+        "euler/dpc3/result_ipcp.txt",
+        "euler/dpc3/result_sangam.txt",
+        "euler/dpc3/result_berti.txt",
+        "euler/dpc3/result_team_12.txt",
         "euler/result_next.txt",
         "euler/result_stride.txt",
         "euler/result_ghb.txt",
         "euler/result_fdb.txt",
-        "euler/result_markov.txt",
-        "euler/result_pangloss.txt",
         ]
 
 def process_file(filename,data):
@@ -64,6 +67,15 @@ def main():
     data = []
     for filename in files:
         process_file(filename, data);
+
+    for prefetcher in files:
+        product = 1.0
+        num_el = 0
+        for line in data:
+            if prefetcher == line[0]:
+                product *= line[2]
+                num_el += 1
+        print(prefetcher + ": " + str(pow(product, 1/num_el)))
 
     df = pd.DataFrame(data, columns=["prefetcher",
                                      "trace",

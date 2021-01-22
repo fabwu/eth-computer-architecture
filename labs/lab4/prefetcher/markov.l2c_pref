@@ -1,106 +1,210 @@
 #include "cache.h"
 
-/*
- * Markov Prefetcher
- *
- * Paper: https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=752653
- */
+#define BLOCK_OFFSET_MASK (BLOCK_SIZE - 1)
+#define PREFETCH_DEGREE 4
+
+typedef uint64_t delta_t; // TODO check uint8_t for more speed
 
 /*
- * The paper fixes the Markov table size at 1MB.
+ * Delta Cache
  *
- * Assume one entry is 5 * 8 byte (idx addr plus 4 prediction addr)
- *
- * Number of entries: 2^20 / 5 * 2^3 > 2^14 entries
+ * Hardware-friendly representation of hte Markov chain.
  */
-#define NUM_MARKOV_ENTRIES (1 << 14)
-#define NUM_MARKOV_TRANSISTIONS 4
+#define DELTA_NUM_SETS 128 // -64 to +63 possible offsets in a 4KB page for 64 byte block size
+#define DELTA_NUM_WAYS 16 //TODO WHY?
 
-#define MARKOV_TABLE_IDX_MASK (NUM_MARKOV_ENTRIES - 1)
+// use 64 bit for simplicity
+delta_t delta_cache_next[DELTA_NUM_SETS][DELTA_NUM_WAYS];
+uint64_t delta_cache_lru[DELTA_NUM_SETS][DELTA_NUM_WAYS];
 
-struct Prediction {
-    uint64_t addr;
-    uint64_t priority;
-};
+/*
+ * Page Cache
+ *
+ * Keeps track of last addr/deltas within a page to prevent invalid transistions in the delta table.
+ */
 
-struct Tag {
-    uint64_t addr;
-    Prediction predictions[NUM_MARKOV_TRANSISTIONS];
-    uint64_t next_pred;
-};
+#define PAGE_NUM_SETS 256 //TODO Test
+#define PAGE_NUM_WAYS 12 //TODO Test
+#define PAGE_TAG_BITS 10
 
-Tag markov_table[NUM_MARKOV_ENTRIES];
-Tag *last_tag = NULL;
+// use 64 bit for simplicity
+uint64_t page_cache_tag[PAGE_NUM_SETS][PAGE_NUM_WAYS];
+delta_t page_cache_delta[PAGE_NUM_SETS][PAGE_NUM_WAYS];
+uint64_t page_cache_offset[PAGE_NUM_SETS][PAGE_NUM_WAYS];
+uint64_t page_cache_lru[PAGE_NUM_SETS][PAGE_NUM_WAYS]; //TODO use LRU
 
-static void update_model(uint64_t addr) {
-    // addr is already addr of cache line so we can index directly
-    uint64_t table_idx = MARKOV_TABLE_IDX_MASK & addr;
+/*
+ * Normalize delta to the range +/-64
+ */
+static delta_t norm_delta(delta_t delta) {
+    return delta + DELTA_NUM_SETS / 2;
+}
 
-    if (last_tag) {
-        bool existed = false;
-        for (int i = 0; i < NUM_MARKOV_TRANSISTIONS; i++) {
-            Prediction *p = last_tag->predictions + i;
-            if (p->addr == addr) {
-                // if exists increase occurance counter
-                p->priority++;
-                existed = true;
-                break;
-            }
-        }
+/*
+ * Normalize delta to the range +/-64
+ */
+static delta_t denorm_delta(delta_t delta) {
+    return delta - DELTA_NUM_SETS / 2;
+}
 
-        if (!existed) {
-            // if not exists insert into prediction table
-            Prediction *next = last_tag->predictions + last_tag->next_pred;
-            // insert new prediction
-            next->addr = addr;
-            next->priority = 1;
-            //TODO Use LRU replacement
-            last_tag->next_pred = (last_tag->next_pred + 1) % 4;
+/*
+ * This function adds a new delta to the delta cache using a LFU policy.
+ */
+static void update_delta_cache(delta_t prev_delta, delta_t curr_delta) {
+    // check for hit
+    for (int i = 0; i < DELTA_NUM_WAYS; i++) {
+        if (delta_cache_next[prev_delta][i] == curr_delta) {
+            // on a hit increment counter
+            // TODO Handle overflows
+            delta_cache_lru[prev_delta][i]++;
+            return;
         }
     }
 
-    Tag *current_tag = markov_table + table_idx;
-    if (current_tag->addr != addr) {
-        if (current_tag->addr != 0) {
-            cout << "EVICTED " << hex << current_tag->addr << " replaced with " << addr << endl;
+    // no cache hit: find entry with lowest counter i.e. LFU policy
+    int way = 0;
+    uint64_t min_counter = delta_cache_lru[prev_delta][way];
+
+    for (int i = 1; i < DELTA_NUM_WAYS; i++) {
+        if (delta_cache_lru[prev_delta][i] < min_counter) {
+            way = i;
+            min_counter = delta_cache_lru[prev_delta][i];
         }
-        // evict old tag
-        current_tag->addr = addr;
-        memset(current_tag->predictions, 0, sizeof(current_tag->predictions));
     }
-    last_tag = current_tag;
+
+    // replace victim
+    delta_cache_next[prev_delta][way] = curr_delta;
+    delta_cache_lru[prev_delta][way] = 1;
 }
 
 void CACHE::l2c_prefetcher_initialize()
 {
     cout << "CPU " << cpu << " L2C Markov prefetcher" << endl;
+
+    for (int i = 0; i < DELTA_NUM_SETS; i++) {
+        for (int j = 0; j < DELTA_NUM_WAYS; j++) {
+            // init delta to 1
+            delta_cache_next[i][j] = norm_delta(1);
+            delta_cache_lru[i][j] = 0;
+        }
+    }
 }
 
 uint32_t CACHE::l2c_prefetcher_operate(uint64_t addr, uint64_t ip, uint8_t cache_hit, uint8_t type, uint32_t metadata_in)
 {
-    // use only cache misses
-    if (cache_hit != 0) {
-        return metadata_in;
-    }
-
-    //TODO Use LRU replacement for whole Markov table
-
     uint64_t cl_addr = addr >> LOG2_BLOCK_SIZE;
+    uint64_t page_addr = addr >> LOG2_PAGE_SIZE;
+    uint64_t curr_page_offset = cl_addr & BLOCK_OFFSET_MASK;
 
-    //cout << hex << cl_addr << endl;
-    update_model(cl_addr);
-
-    //TODO filter predictions
-    uint64_t table_idx = MARKOV_TABLE_IDX_MASK & cl_addr;
-    for (Prediction p : markov_table[table_idx].predictions) {
-        if (p.priority > 0 ) {
-            uint64_t pf_addr = p.addr << LOG2_BLOCK_SIZE;
-
-//            cout << " pf_cl: " << (pf_addr >> LOG2_BLOCK_SIZE) << " ip: " << ip
-//                << " cache_hit: " << +cache_hit << " type: " << +type << endl;
-            prefetch_line(ip, addr, pf_addr, FILL_L2, 0);
+    // lookup page cache entry
+    uint64_t pc_set = page_addr % PAGE_NUM_SETS; // TODO check better hashing
+    int pc_way = -1;
+    uint64_t pc_tag = page_addr & ((1 << PAGE_TAG_BITS) - 1);
+    for (int i = 0; i < PAGE_NUM_WAYS; i++) {
+        if (page_cache_tag[pc_set][i] == pc_tag) {
+            pc_way = i;
+            break;
         }
     }
+
+    delta_t curr_delta = norm_delta(1); // current delta=1 if no page cache hit
+
+    // update delta cache on page cache hit and cache miss
+    // TODO Try remove cache miss
+    bool update_allowed = (pc_way != -1) && (cache_hit == 0);
+
+    if (update_allowed) {
+        delta_t prev_delta = page_cache_delta[pc_set][pc_way];
+        uint64_t prev_page_offset = page_cache_offset[pc_set][pc_way];
+
+        // calculate current delta from previous page offset
+        curr_delta = norm_delta(curr_page_offset - prev_page_offset);
+
+        // update delta cache with new delta
+        update_delta_cache(prev_delta, curr_delta);
+
+        // update the page cache entry
+        page_cache_delta[pc_set][pc_way] = curr_delta;
+    }
+
+    // on cache miss find victim in page cache
+    if (pc_way == -1) {
+        // evict NRU entry
+        for (int i = 0; i < PAGE_NUM_WAYS; i++) {
+            if (page_cache_lru[pc_set][i] == 0) {
+                pc_way = i;
+                break;
+            }
+
+            // if all equals to 1 pick first entry and flip bit
+            if (pc_way == -1) {
+                pc_way = 0;
+                for (int i = 0; i < PAGE_NUM_WAYS; i++) {
+                    page_cache_lru[pc_set][i] = 0;
+                }
+            }
+        }
+    }
+
+    // update page cache
+    page_cache_tag[pc_set][pc_way] = pc_tag;
+    page_cache_offset[pc_set][pc_way] = curr_page_offset;
+    page_cache_lru[pc_set][pc_way] = 1;
+
+	int degree = (MSHR.SIZE-MSHR.occupancy)*2/3;
+	if ((type==PREFETCH) && (cache_hit==0)) degree/=2;
+
+    //TODO try adjust prefetch degree
+    uint64_t num_pre_issued = 0;
+    // Start traversing the Markov graph from the current delta
+    uint64_t next_delta = curr_delta;
+    uint64_t next_addr = cl_addr;
+    std::vector<uint64_t> addresses;
+    for (int j = 0; j < degree && num_pre_issued <= degree; j++) {
+        // sum up all counter values for propability caluclation
+        float sum = 0;
+        for (int i = 0; i < DELTA_NUM_WAYS; i++) {
+            sum += delta_cache_lru[next_delta][i];
+        }
+
+        float best_prop = 0;
+        for (int i = 0; i < DELTA_NUM_WAYS; i++) {
+            float prop = delta_cache_lru[next_delta][i] / sum;
+
+            if (prop >= (1/3.0)) {
+                // calculate prefetch address from next address and delta
+                uint64_t pf_addr =
+                    (next_addr + denorm_delta(delta_cache_next[next_delta][i]))
+                    << LOG2_BLOCK_SIZE;
+                uint64_t pf_page_addr = pf_addr >> LOG2_PAGE_SIZE;
+
+                // don't prefetch accross page boundries
+                if (page_addr == pf_page_addr) {
+                    prefetch_line(ip, addr, pf_addr, FILL_L2, 0);
+                    addresses.push_back(pf_addr);
+                    num_pre_issued++;
+                }
+
+                // update predecessor
+                if (prop > best_prop) {
+                    best_prop = prop;
+                    next_delta = delta_cache_next[next_delta][i];
+                    next_addr = pf_addr >> LOG2_BLOCK_SIZE;
+                }
+            }
+        }
+
+        // abort if no children with high prop
+        if (best_prop == 0) {
+            break;
+        }
+    }
+
+//    cout << hex << addr << ": ";
+//    for (auto a : addresses) {
+//        cout << hex<< a << " ";
+//    }
+//    cout << endl;
 
     return metadata_in;
 }
@@ -112,4 +216,12 @@ uint32_t CACHE::l2c_prefetcher_cache_fill(uint64_t addr, uint32_t set, uint32_t 
 
 void CACHE::l2c_prefetcher_final_stats()
 {
-}
+	// Print the information stored in Delta Cache
+	printf("\n");
+	for (int i=0; i<DELTA_NUM_SETS; i++){
+		printf ("L2C %d>\t",i-DELTA_NUM_SETS/2);
+		for (int j=0; j<DELTA_NUM_WAYS; j++){
+			printf("(%d,%d)\t", delta_cache_next[i][j]-DELTA_NUM_SETS/2,delta_cache_lru[i][j]);
+		}
+		printf("\n");
+	}}
