@@ -3,35 +3,33 @@
 #define BLOCK_OFFSET_MASK (BLOCK_SIZE - 1)
 #define PREFETCH_DEGREE 4
 
-typedef uint64_t delta_t; // TODO check uint8_t for more speed
+typedef uint64_t delta_t;
 
 /*
  * Delta Cache
  *
- * Hardware-friendly representation of hte Markov chain.
+ * Hardware-friendly representation of the Markov chain.
  */
 #define DELTA_NUM_SETS 128 // -64 to +63 possible offsets in a 4KB page for 64 byte block size
-#define DELTA_NUM_WAYS 16 //TODO WHY?
+#define DELTA_NUM_WAYS 16
 
-// use 64 bit for simplicity
 delta_t delta_cache_next[DELTA_NUM_SETS][DELTA_NUM_WAYS];
-uint64_t delta_cache_lru[DELTA_NUM_SETS][DELTA_NUM_WAYS];
+uint64_t delta_cache_counter[DELTA_NUM_SETS][DELTA_NUM_WAYS];
 
 /*
  * Page Cache
  *
- * Keeps track of last addr/deltas within a page to prevent invalid transistions in the delta table.
+ * Keeps track of last addr/deltas within a page to prevent invalid transitions in the delta table.
  */
-
-#define PAGE_NUM_SETS 256 //TODO Test
-#define PAGE_NUM_WAYS 12 //TODO Test
+#define PAGE_NUM_SETS 256
+#define PAGE_NUM_WAYS 12
 #define PAGE_TAG_BITS 10
 
 // use 64 bit for simplicity
 uint64_t page_cache_tag[PAGE_NUM_SETS][PAGE_NUM_WAYS];
 delta_t page_cache_delta[PAGE_NUM_SETS][PAGE_NUM_WAYS];
 uint64_t page_cache_offset[PAGE_NUM_SETS][PAGE_NUM_WAYS];
-uint64_t page_cache_lru[PAGE_NUM_SETS][PAGE_NUM_WAYS]; //TODO use LRU
+uint64_t page_cache_lru[PAGE_NUM_SETS][PAGE_NUM_WAYS];
 
 /*
  * Normalize delta to the range +/-64
@@ -41,7 +39,7 @@ static delta_t norm_delta(delta_t delta) {
 }
 
 /*
- * Normalize delta to the range +/-64
+ * Reverse normalization
  */
 static delta_t denorm_delta(delta_t delta) {
     return delta - DELTA_NUM_SETS / 2;
@@ -55,26 +53,25 @@ static void update_delta_cache(delta_t prev_delta, delta_t curr_delta) {
     for (int i = 0; i < DELTA_NUM_WAYS; i++) {
         if (delta_cache_next[prev_delta][i] == curr_delta) {
             // on a hit increment counter
-            // TODO Handle overflows
-            delta_cache_lru[prev_delta][i]++;
+            delta_cache_counter[prev_delta][i]++;
             return;
         }
     }
 
     // no cache hit: find entry with lowest counter i.e. LFU policy
     int way = 0;
-    uint64_t min_counter = delta_cache_lru[prev_delta][way];
+    uint64_t min_counter = delta_cache_counter[prev_delta][way];
 
     for (int i = 1; i < DELTA_NUM_WAYS; i++) {
-        if (delta_cache_lru[prev_delta][i] < min_counter) {
+        if (delta_cache_counter[prev_delta][i] < min_counter) {
             way = i;
-            min_counter = delta_cache_lru[prev_delta][i];
+            min_counter = delta_cache_counter[prev_delta][i];
         }
     }
 
     // replace victim
     delta_cache_next[prev_delta][way] = curr_delta;
-    delta_cache_lru[prev_delta][way] = 1;
+    delta_cache_counter[prev_delta][way] = 1;
 }
 
 void CACHE::l2c_prefetcher_initialize()
@@ -85,7 +82,7 @@ void CACHE::l2c_prefetcher_initialize()
         for (int j = 0; j < DELTA_NUM_WAYS; j++) {
             // init delta to 1
             delta_cache_next[i][j] = norm_delta(1);
-            delta_cache_lru[i][j] = 0;
+            delta_cache_counter[i][j] = 0;
         }
     }
 }
@@ -97,7 +94,7 @@ uint32_t CACHE::l2c_prefetcher_operate(uint64_t addr, uint64_t ip, uint8_t cache
     uint64_t curr_page_offset = cl_addr & BLOCK_OFFSET_MASK;
 
     // lookup page cache entry
-    uint64_t pc_set = page_addr % PAGE_NUM_SETS; // TODO check better hashing
+    uint64_t pc_set = page_addr % PAGE_NUM_SETS;
     int pc_way = -1;
     uint64_t pc_tag = page_addr & ((1 << PAGE_TAG_BITS) - 1);
     for (int i = 0; i < PAGE_NUM_WAYS; i++) {
@@ -110,7 +107,6 @@ uint32_t CACHE::l2c_prefetcher_operate(uint64_t addr, uint64_t ip, uint8_t cache
     delta_t curr_delta = norm_delta(1); // current delta=1 if no page cache hit
 
     // update delta cache on page cache hit and cache miss
-    // TODO Try remove cache miss
     bool update_allowed = (pc_way != -1) && (cache_hit == 0);
 
     if (update_allowed) {
@@ -127,7 +123,7 @@ uint32_t CACHE::l2c_prefetcher_operate(uint64_t addr, uint64_t ip, uint8_t cache
         page_cache_delta[pc_set][pc_way] = curr_delta;
     }
 
-    // on cache miss find victim in page cache
+    // on page cache miss find victim in page cache
     if (pc_way == -1) {
         // evict NRU entry
         for (int i = 0; i < PAGE_NUM_WAYS; i++) {
@@ -136,7 +132,7 @@ uint32_t CACHE::l2c_prefetcher_operate(uint64_t addr, uint64_t ip, uint8_t cache
                 break;
             }
 
-            // if all equals to 1 pick first entry and flip bit
+            // if all equals 1, pick first entry and flip all bits
             if (pc_way == -1) {
                 pc_way = 0;
                 for (int i = 0; i < PAGE_NUM_WAYS; i++) {
@@ -151,25 +147,24 @@ uint32_t CACHE::l2c_prefetcher_operate(uint64_t addr, uint64_t ip, uint8_t cache
     page_cache_offset[pc_set][pc_way] = curr_page_offset;
     page_cache_lru[pc_set][pc_way] = 1;
 
+    // simple heuristic for prefetch degree
 	int degree = (MSHR.SIZE-MSHR.occupancy)*2/3;
 	if ((type==PREFETCH) && (cache_hit==0)) degree/=2;
 
-    //TODO try adjust prefetch degree
-    uint64_t num_pre_issued = 0;
-    // Start traversing the Markov graph from the current delta
+    int num_pre_issued = 0;
+    // Start traversing the Markov chain from the current delta
     uint64_t next_delta = curr_delta;
     uint64_t next_addr = cl_addr;
-    std::vector<uint64_t> addresses;
     for (int j = 0; j < degree && num_pre_issued <= degree; j++) {
-        // sum up all counter values for propability caluclation
+        // sum up all counter values for probability calculation
         float sum = 0;
         for (int i = 0; i < DELTA_NUM_WAYS; i++) {
-            sum += delta_cache_lru[next_delta][i];
+            sum += delta_cache_counter[next_delta][i];
         }
 
         float best_prop = 0;
         for (int i = 0; i < DELTA_NUM_WAYS; i++) {
-            float prop = delta_cache_lru[next_delta][i] / sum;
+            float prop = delta_cache_counter[next_delta][i] / sum;
 
             if (prop >= (1/3.0)) {
                 // calculate prefetch address from next address and delta
@@ -178,14 +173,13 @@ uint32_t CACHE::l2c_prefetcher_operate(uint64_t addr, uint64_t ip, uint8_t cache
                     << LOG2_BLOCK_SIZE;
                 uint64_t pf_page_addr = pf_addr >> LOG2_PAGE_SIZE;
 
-                // don't prefetch accross page boundries
+                // don't prefetch across page boundaries
                 if (page_addr == pf_page_addr) {
                     prefetch_line(ip, addr, pf_addr, FILL_L2, 0);
-                    addresses.push_back(pf_addr);
                     num_pre_issued++;
                 }
 
-                // update predecessor
+                // update successor
                 if (prop > best_prop) {
                     best_prop = prop;
                     next_delta = delta_cache_next[next_delta][i];
@@ -200,12 +194,6 @@ uint32_t CACHE::l2c_prefetcher_operate(uint64_t addr, uint64_t ip, uint8_t cache
         }
     }
 
-//    cout << hex << addr << ": ";
-//    for (auto a : addresses) {
-//        cout << hex<< a << " ";
-//    }
-//    cout << endl;
-
     return metadata_in;
 }
 
@@ -216,12 +204,4 @@ uint32_t CACHE::l2c_prefetcher_cache_fill(uint64_t addr, uint32_t set, uint32_t 
 
 void CACHE::l2c_prefetcher_final_stats()
 {
-	// Print the information stored in Delta Cache
-	printf("\n");
-	for (int i=0; i<DELTA_NUM_SETS; i++){
-		printf ("L2C %d>\t",i-DELTA_NUM_SETS/2);
-		for (int j=0; j<DELTA_NUM_WAYS; j++){
-			printf("(%d,%d)\t", delta_cache_next[i][j]-DELTA_NUM_SETS/2,delta_cache_lru[i][j]);
-		}
-		printf("\n");
-	}}
+}
