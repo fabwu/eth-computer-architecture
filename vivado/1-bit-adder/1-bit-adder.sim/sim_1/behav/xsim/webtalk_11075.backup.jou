@@ -1,0 +1,12 @@
+#-----------------------------------------------------------
+# Webtalk v2020.1 (64-bit)
+# SW Build 2902540 on Wed May 27 19:54:35 MDT 2020
+# IP Build 2902112 on Wed May 27 22:43:36 MDT 2020
+# Start of session at: Sun Jan 24 17:33:38 2021
+# Process ID: 11075
+# Current directory: /home/me/git/computer-architecture/vivado/1-bit-adder/1-bit-adder.sim/sim_1/behav/xsim
+# Command line: wbtcv -mode batch -source /home/me/git/computer-architecture/vivado/1-bit-adder/1-bit-adder.sim/sim_1/behav/xsim/xsim.dir/testbench_behav/webtalk/xsim_webtalk.tcl -notrace
+# Log file: /home/me/git/computer-architecture/vivado/1-bit-adder/1-bit-adder.sim/sim_1/behav/xsim/webtalk.log
+# Journal file: /home/me/git/computer-architecture/vivado/1-bit-adder/1-bit-adder.sim/sim_1/behav/xsim/webtalk.jou
+#-----------------------------------------------------------
+source /home/me/git/computer-architecture/vivado/1-bit-adder/1-bit-adder.sim/sim_1/behav/xsim/xsim.dir/testbench_behav/webtalk/xsim_webtalk.tcl -notrace
