@@ -1,0 +1,71 @@
+==+== Computer Architecture Paper Review Form
+==-== DO NOT CHANGE LINES THAT START WITH "==+==" UNLESS DIRECTED!
+==-== For further guidance, or to upload this file when you are done, go to:
+==-== https://safari.ethz.ch/review/architecture20/offline
+
+==+== =====================================================================
+==+== Begin Review #53.
+==+== Reviewer: Fabian Wüthrich <fabianwu@student.ethz.ch>
+
+==+== Paper #53
+==-== Title: Prefetching using Markov Predictors
+
+==+== Review Readiness
+==-== Enter "Ready" if the review is ready for others to see:
+
+Ready
+
+==+== A. Paper summary
+
+Static and stride prefetchers are effective for structured workloads but are
+inefficient for unstructured workloads. One technique to tackle these
+unstructured workloads are correlation-based prefetchers.
+
+This paper describes the Markov prefetcher. The prefetcher builds a approximated
+Markov model and prioritizes memory requests based on the transition
+probability. The basic Markov prefetcher is not always accurate i.e. memory
+bandwidth intensive. The paper presents several techniques to reduce the
+bandwidth demands of the prefetcher.
+
+The Markov prefetcher provides a good trade-off between coverage, accuracy, and
+timeliness, especially in combination with other prefetchers.
+
+==+== B. Strengths
+
+* Strong prefetcher for unstructured workloads
+
+* Markov prefetcher can support e.g. a stride prefetcher by covering the
+  irregular workloads
+
+* Excellent description of the experimental setup
+
+==+== C. Weaknesses
+
+* Correlation table has to be large to get accurate predictions
+
+* Markov prefetcher can only prefetch patterns that already occurred
+
+* High memory-bandwidth consumption
+
+* Cannot prefetch compulsory misses
+
+==+== D. Thoughts and ideas
+
+* Pre-train Markov model on common workloads
+
+* Apply statistical methods to get a better representation of the Markov model
+  (instead of a simple table)
+
+==+== E. Takeaways
+
+The Markov prefetcher is an efficient approach to prefetch irregular workloads.
+
+==+== F. Other comments
+
+* Fig. 6 is hard to read and understand (use a different color for each prefetch
+  configuration would make it more readable)
+
+==+== Scratchpad (for unsaved private notes)
+
+==+== End Review
+
