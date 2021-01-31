@@ -7,18 +7,20 @@ import matplotlib.pyplot as plt
 import simulator as sim
 
 csv_file = "plot_ways.csv"
-num_ways_list = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512]
+num_ways_list = [1, 2, 4, 8, 16, 32, 64, 128]
 
 config = {
     "DEFAULT": {},
     "INSTRUCTION CACHE": {
         "TotalSize": 8 * 1024,
         "BlockSize": 32,
-        "NumWay": 3
+        "NumWay": 4,
+        "ReplacementPolicy": "lru_mru",
     },
     "DATA CACHE": {
-        "TotalSize": 43 * 1024,
-        "BlockSize": 4,
+        "TotalSize": 4 * 1024,
+        "BlockSize": 32,
+        "ReplacementPolicy": "lru_mru",
     }
 }
 
@@ -27,8 +29,11 @@ def plot(df, save):
     sns.set_style("whitegrid")
     sns.set_context("paper")
     g = sns.catplot(x="num_ways", y="ipc", hue="benchmark", data=df, kind="bar")
-    g.set_axis_labels("# of ways", "IPC")
-    g.legend.set_title(None)
+    g.set_axis_labels("# of ways", "IPC (normalized)")
+    g.legend.remove()
+    g.fig.set_figheight(3)
+    plt.tight_layout()
+    plt.legend(loc="lower right")
     if save:
         plt.savefig(os.path.realpath(__file__ + "/../../img/ways.pdf"), format="pdf")
     else:

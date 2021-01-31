@@ -1,8 +1,13 @@
 # int i;
 # int array[16384];
+# int x;
 #
 # for (i = 0; i < 16384; i = i + 1) {
 #   array[i] = 42
+# }
+#
+# for (i = 0; i < 16384; i = i + 1) {
+#   x = array[i];
 # }
 .text
     lui     $s0, 0x1000     # $s0 = 0x10000000 array base address

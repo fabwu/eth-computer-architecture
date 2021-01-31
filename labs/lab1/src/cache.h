@@ -9,6 +9,7 @@ typedef struct Cache_State Cache_State;
 typedef void (*replacement_func_t)(Cache_State *c, Cache_Block *set, uint32_t tag);
 
 typedef enum Cache_Result { CACHE_MISS, CACHE_HIT } Cache_Result;
+
 typedef enum Cache_Policy {
   CACHE_LRU_LRU,
   CACHE_LRU_MRU,
@@ -35,14 +36,14 @@ struct Cache_State {
   int total_size;
   /* block size in bytes */
   int block_size;
+  /* log2 of block size */
+  int block_size_log2;
   /* number of ways */
   int num_ways;
   /* number of sets */
   int num_sets;
-  /* bit number of set idx start */
-  int set_idx_from;
-  /* bit number of set idx end */
-  int set_idx_to;
+  /* log2 of number of sets */
+  int num_sets_log2;
   /* replacment policy */
   Cache_Policy policy;
   /* timestamp gets increased on every cache access */
@@ -51,10 +52,13 @@ struct Cache_State {
   int insert_counter;
   /* ptr to cache blocks */
   Cache_Block *blocks;
+  /* enable debug output for this cache */
+  bool debug;
 };
 
 /* initialize a cache with the ususal values */
-void cache_init(Cache_State *c, int total_size, int block_size, int num_ways, Cache_Policy policy);
+void cache_init(Cache_State *c, int total_size, int block_size, int num_ways,
+                Cache_Policy policy, bool debug);
 
 /* free memory used by cache */
 void cache_free(Cache_State *c);

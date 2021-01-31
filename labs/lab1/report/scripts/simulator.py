@@ -27,9 +27,12 @@ def run(config):
                 "INST_CACHE_TOTAL_SIZE": str(config["INSTRUCTION CACHE"]["TotalSize"]),
                 "INST_CACHE_BLOCK_SIZE": str(config["INSTRUCTION CACHE"]["BlockSize"]),
                 "INST_CACHE_NUM_WAY": str(config["INSTRUCTION CACHE"]["NumWay"]),
+                "INST_CACHE_POLICY": str(config["INSTRUCTION CACHE"]["ReplacementPolicy"]),
+
                 "DATA_CACHE_TOTAL_SIZE": str(config["DATA CACHE"]["TotalSize"]),
                 "DATA_CACHE_BLOCK_SIZE": str(config["DATA CACHE"]["BlockSize"]),
-                "DATA_CACHE_NUM_WAY": str(config["DATA CACHE"]["NumWay"])
+                "DATA_CACHE_NUM_WAY": str(config["DATA CACHE"]["NumWay"]),
+                "DATA_CACHE_POLICY": str(config["DATA CACHE"]["ReplacementPolicy"])
             }
         )
 
@@ -40,7 +43,7 @@ def run(config):
 
     cmds += b"\ngo\nrdump\nquit\n"
     (s, s_err) = simproc.communicate(input=cmds)
-
+    #print(s_err)
     return filter_stats(s.decode('utf-8'))
 
 def filter_stats(out):

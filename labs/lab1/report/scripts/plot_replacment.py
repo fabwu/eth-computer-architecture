@@ -6,8 +6,15 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import simulator as sim
 
-csv_file = "plot_block_size.csv"
-block_size_list = [4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048]
+csv_file = "plot_replacment.csv"
+policy_list = [
+        "lru_lru",
+        "lru_mru",
+        "mru_mru",
+        "mru_lru",
+        "fifo",
+        "lifo"
+]
 
 config = {
     "DEFAULT": {},
@@ -19,8 +26,8 @@ config = {
     },
     "DATA CACHE": {
         "TotalSize": 64 * 1024,
-        "NumWay": 1,
-        "ReplacementPolicy": "lru_mru",
+        "BlockSize": 4,
+        "NumWay": 1
     }
 }
 
@@ -28,14 +35,15 @@ def plot(df, save):
     sns.set_theme()
     sns.set_style("whitegrid")
     sns.set_context("paper")
-    g = sns.catplot(x="size", y="ipc", hue="benchmark", data=df, kind="bar")
-    g.set_axis_labels("Block Size (Bytes)", "IPC (normalized)")
+    g = sns.catplot(x="policy", y="ipc", hue="benchmark", data=df, kind="bar")
+    g.set_axis_labels("Policy", "IPC")
     g.legend.remove()
     g.fig.set_figheight(3)
     plt.tight_layout()
-    plt.legend(loc="upper left")
+    plt.legend(loc="lower right")
+
     if save:
-        plt.savefig(os.path.realpath(__file__ + "/../../img/block_size.pdf"), format="pdf")
+        plt.savefig(os.path.realpath(__file__ + "/../../img/replacement.pdf"), format="pdf")
     else:
         plt.show()
 
@@ -44,9 +52,9 @@ def simulate():
     for benchmark in sim.benchmarks:
         config["DEFAULT"]["Input"] = sim.get_input_file(benchmark)
 
-        for block_size in block_size_list:
-            print(sim.bold + "Benchmark: " + sim.normal + f"{benchmark} with block size {block_size}")
-            config["DATA CACHE"]["BlockSize"] = block_size
+        for policy in policy_list:
+            print(sim.bold + "Benchmark: " + sim.normal + f"{benchmark} with replacment policy {policy}")
+            config["DATA CACHE"]["ReplacementPolicy"] = policy
             sim_out = sim.run(config)
             if not sim_out:
                 print(sim.red + "ERROR -- no output from simulator" + sim.normal)
@@ -63,19 +71,14 @@ def simulate():
             print("Data Hit/Miss: " + stats['DataHit'] + "/" + stats['DataMiss'])
             print("Inst Hit/Miss: " + stats['InstHit'] + "/" + stats['InstMiss'])
 
-            if block_size == block_size_list[0]:
-                # baseline
-                baseline_ipc = ipc
-                data.append([benchmark, block_size, 1.0])
-            else:
-                data.append([benchmark, block_size, ipc / baseline_ipc])
+            data.append([benchmark, policy, ipc])
 
-    df = pd.DataFrame(data, columns=["benchmark", "size", "ipc"])
+    df = pd.DataFrame(data, columns=["benchmark", "policy", "ipc"])
     df.to_csv(csv_file, index=False)
     return df
 
 def main():
-    parser = argparse.ArgumentParser(description='Simulate and plot various block sizes.')
+    parser = argparse.ArgumentParser(description='Simulate and plot various replacement policies.')
     parser.add_argument('--sim', const=True, default=False, help="Run simulation", nargs="?")
     parser.add_argument('--save', const=True, default=False, help="Save plots as pdf", nargs="?")
 

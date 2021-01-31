@@ -4,18 +4,23 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-static int bit_length(uint32_t n) {
-  uint32_t l = 0;
+/* source: https://graphics.stanford.edu/~seander/bithacks.html#IntegerLog */
+static int log2_int(unsigned int v) {
+    unsigned int r = 0; // r will be lg(v)
 
-  while (n >>= 1)
-    ++l;
+    while (v >>= 1) // unroll for more speed...
+    {
+        r++;
+    }
 
-  return l;
+    return r;
 }
 
-void cache_init(Cache_State *c, int total_size, int block_size, int num_ways, Cache_Policy policy) {
+void cache_init(Cache_State *c, int total_size, int block_size, int num_ways,
+                Cache_Policy policy, bool debug) {
   c->total_size = total_size;
   c->block_size = block_size;
+  c->block_size_log2 = log2_int(c->block_size);
   c->num_ways = num_ways;
 
   if (c->total_size == 0) {
@@ -25,13 +30,8 @@ void cache_init(Cache_State *c, int total_size, int block_size, int num_ways, Ca
   }
 
   c->num_sets = (c->total_size / c->num_ways) / c->block_size;
-  c->set_idx_from = bit_length(c->block_size);
+  c->num_sets_log2 = log2_int(c->num_sets);
 
-  if(c->num_sets == 1) {
-    c->set_idx_to = c->set_idx_from;
-  } else {
-    c->set_idx_to = c->set_idx_from + bit_length(c->num_sets) - 1;
-  }
   /* init sets*ways cache blocks */
   c->blocks =
       (Cache_Block *)calloc(c->num_sets * c->num_ways, sizeof(Cache_Block));
@@ -39,26 +39,18 @@ void cache_init(Cache_State *c, int total_size, int block_size, int num_ways, Ca
   c->policy = policy;
   c->timestamp = 0;
   c->insert_counter = 0;
+  c->debug = debug;
 }
 
 void cache_free(Cache_State *c) { free(c->blocks); }
 
 static uint32_t get_set_idx(Cache_State *c, uint32_t addr) {
-    if (c->num_sets == 1) {
-        return 0;
-    }
-
-    uint32_t mask = ~0;
-    mask >>= 32 - (c->set_idx_to + 1);
-
-    uint32_t set_idx = (addr & mask);
-    set_idx >>= c->set_idx_from;
-
-    return set_idx;
+    uint32_t set_idx = addr >> c->block_size_log2;
+    return set_idx & (c->num_sets - 1);
 }
 
 static uint32_t get_tag(Cache_State *c, uint32_t addr) {
-  return addr >> (c->set_idx_to + 1);
+  return addr >> (c->block_size_log2 + c->num_sets_log2);
 }
 
 static void write_block(Cache_Block *block, uint32_t tag, int timestamp) {
@@ -78,7 +70,7 @@ static void cache_lru_lru_replacement(Cache_State *c, Cache_Block *set, uint32_t
   }
 
   uint32_t tag = get_tag(c, addr);
-  debug("0x%X: MISS (lru/lru) replaced tag 0x%X in set %d way %d with tag 0x%X\n",
+  debug(c->debug, "0x%X: MISS (lru/lru) replaced tag 0x%X in set %d way %d with tag 0x%X\n",
         addr, block->tag, get_set_idx(c, addr), (int)(block - set), tag);
 
   /* insert at LRU location */
@@ -96,7 +88,7 @@ static void cache_lru_mru_replacement(Cache_State *c, Cache_Block *set, uint32_t
   }
 
   uint32_t tag = get_tag(c, addr);
-  debug("0x%X: MISS (lru/mru) replaced tag 0x%X in set %d way %d with tag 0x%X\n",
+  debug(c->debug, "0x%X: MISS (lru/mru) replaced tag 0x%X in set %d way %d with tag 0x%X\n",
         addr, block->tag, get_set_idx(c, addr), (int)(block - set), tag);
 
   /* insert at MRU location */
@@ -114,7 +106,7 @@ static void cache_mru_mru_replacement(Cache_State *c, Cache_Block *set, uint32_t
   }
 
   uint32_t tag = get_tag(c, addr);
-  debug("0x%X: MISS (mru/mru) replaced tag 0x%X in set %d way %d with tag 0x%X\n",
+  debug(c->debug, "0x%X: MISS (mru/mru) replaced tag 0x%X in set %d way %d with tag 0x%X\n",
         addr, block->tag, get_set_idx(c, addr), (int)(block - set), tag);
 
   /* insert at MRU location */
@@ -140,7 +132,7 @@ static void cache_mru_lru_replacement(Cache_State *c, Cache_Block *set, uint32_t
   }
 
   uint32_t tag = get_tag(c, addr);
-  debug("0x%X: MISS (mru/lru) replaced tag 0x%X in set %d way %d with tag 0x%X\n",
+  debug(c->debug, "0x%X: MISS (mru/lru) replaced tag 0x%X in set %d way %d with tag 0x%X\n",
         addr, block->tag, get_set_idx(c, addr), (int)(block - set), tag);
 
   write_block(block, tag, lru_timestamp);
@@ -157,7 +149,7 @@ static void cache_fifo_replacement(Cache_State *c, Cache_Block *set, uint32_t ad
   }
 
   uint32_t tag = get_tag(c, addr);
-  debug("0x%X: MISS (fifo) replaced tag 0x%X in set %d way %d with tag 0x%X\n",
+  debug(c->debug, "0x%X: MISS (fifo) replaced tag 0x%X in set %d way %d with tag 0x%X\n",
         addr, block->tag, get_set_idx(c, addr), (int)(block - set), tag);
 
   c->insert_counter++;
@@ -177,7 +169,7 @@ static void cache_lifo_replacement(Cache_State *c, Cache_Block *set, uint32_t ad
   }
 
   uint32_t tag = get_tag(c, addr);
-  debug("0x%X: MISS (lifo) replaced tag 0x%X in set %d way %d with tag 0x%X\n",
+  debug(c->debug, "0x%X: MISS (lifo) replaced tag 0x%X in set %d way %d with tag 0x%X\n",
         addr, block->tag, get_set_idx(c, addr), (int)(block - set), tag);
 
   c->insert_counter++;
@@ -187,24 +179,24 @@ static void cache_lifo_replacement(Cache_State *c, Cache_Block *set, uint32_t ad
 }
 
 enum Cache_Result cache_access(Cache_State *c, uint32_t addr) {
-  uint32_t tag = get_tag(c, addr);
-
   if (c->total_size == 0) {
-    /* if cache is disabled return HIT on second access but evict address
-     * immediately */
+    /*
+     * if cache is disabled return HIT on second access but evict address
+     * immediately
+     */
     Cache_Block *block = c->blocks;
 
-    if (block->valid && (block->tag == tag)) {
+    if (block->valid && (block->tag == addr)) {
       block->valid = false;
 
-      debug("0x%X: HIT (cache disabled) tag 0x%X\n", addr, tag);
+      debug(c->debug, "0x%X: HIT (cache disabled)\n", addr);
 
       return CACHE_HIT;
     } else {
-      block->tag = tag;
+      block->tag = addr;
       block->valid = true;
 
-      debug("0x%X: MISS (cache disabled) tag 0x%X\n", addr, tag);
+      debug(c->debug, "0x%X: MISS (cache disabled)\n", addr);
 
       return CACHE_MISS;
     }
@@ -213,8 +205,10 @@ enum Cache_Result cache_access(Cache_State *c, uint32_t addr) {
   /* increase timestamp for recency */
   c->timestamp++;
 
-  /* calculate set idx */
+  /* calculate set idx and tag */
   uint32_t set_idx = get_set_idx(c, addr);
+  uint32_t tag = get_tag(c, addr);
+
   Cache_Block *set = c->blocks + set_idx * c->num_ways;
   Cache_Block *block;
 
@@ -222,7 +216,7 @@ enum Cache_Result cache_access(Cache_State *c, uint32_t addr) {
   for (int way = 0; way < c->num_ways; ++way) {
     block = set + way;
     if (block->valid && (block->tag == tag)) {
-      debug("0x%X: HIT in set %d way %d tag 0x%X\n", addr, set_idx, way, tag);
+      debug(c->debug, "0x%X: HIT in set %d way %d tag 0x%X\n", addr, set_idx, way, tag);
 
       write_block(block, tag, c->timestamp);
       return CACHE_HIT;
@@ -233,7 +227,7 @@ enum Cache_Result cache_access(Cache_State *c, uint32_t addr) {
   for (int way = 0; way < c->num_ways; ++way) {
     block = set + way;
     if (!block->valid) {
-      debug("0x%X: MISS (invalid) in set %d way %d tag 0x%X\n", addr, set_idx,
+      debug(c->debug, "0x%X: MISS (invalid) in set %d way %d tag 0x%X\n", addr, set_idx,
              way, tag);
 
       c->insert_counter++;
@@ -254,18 +248,4 @@ enum Cache_Result cache_access(Cache_State *c, uint32_t addr) {
   policies[c->policy](c, set, addr);
 
   return CACHE_MISS;
-  /* TODO
-   *
-   *  general:
-   *  - FIFO
-   *  - LIFO
-   *
-   *  replace/insert:
-   *  - LRU/LRU
-   *  - LRU/MRU
-   *  - MRU/MRU
-   *  - MRU/LRU
-   *
-   *   check other paper for other methods
-   */
 }

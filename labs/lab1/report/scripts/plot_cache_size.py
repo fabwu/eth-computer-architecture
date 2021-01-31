@@ -7,18 +7,20 @@ import matplotlib.pyplot as plt
 import simulator as sim
 
 csv_file = "plot_cache_size.csv"
-total_size_list = [0, 1, 2, 4, 8, 16, 32, 64, 128, 256]
+total_size_list = [0, 64]
 
 config = {
     "DEFAULT": {},
     "INSTRUCTION CACHE": {
         "TotalSize": 8 * 1024,
         "BlockSize": 32,
-        "NumWay": 3
+        "NumWay": 4,
+        "ReplacementPolicy": "lru_mru",
     },
     "DATA CACHE": {
-        "BlockSize": 4,
-        "NumWay": 1
+        "BlockSize": 32,
+        "NumWay": 8,
+        "ReplacementPolicy": "lru_mru",
     }
 }
 
@@ -27,8 +29,11 @@ def plot(df, save):
     sns.set_style("whitegrid")
     sns.set_context("paper")
     g = sns.catplot(x="size", y="ipc", hue="benchmark", data=df, kind="bar")
-    g.set_axis_labels("Cache Size", "IPC")
-    g.legend.set_title(None)
+    g.set_axis_labels("Cache Size (KB)", "IPC (normalized)")
+    g.legend.remove()
+    g.fig.set_figheight(3)
+    plt.tight_layout()
+    plt.legend(loc="upper left")
     if save:
         plt.savefig(os.path.realpath(__file__ + "/../../img/cache_size.pdf"), format="pdf")
     else:
@@ -58,12 +63,7 @@ def simulate():
             print("Data Hit/Miss: " + stats['DataHit'] + "/" + stats['DataMiss'])
             print("Inst Hit/Miss: " + stats['InstHit'] + "/" + stats['InstMiss'])
 
-            if total_size == 0:
-                # baseline
-                baseline_ipc = ipc
-                data.append([benchmark, total_size, 1.0])
-            else:
-                data.append([benchmark, total_size, ipc / baseline_ipc])
+            data.append([benchmark, total_size, ipc ])
 
     df = pd.DataFrame(data, columns=["benchmark", "size", "ipc"])
     df.to_csv(csv_file, index=False)
